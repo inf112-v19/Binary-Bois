@@ -5,13 +5,13 @@ public class Robot extends IItem {
     private int size;
     private String name;
     private String symbol;
-    private Dir direction;
+    private Vector2D direction;
 
     public Robot() {
         //TODO: What do we want to store here, and what do we want in player class?
     }
 
-    public Dir getDirection() {
+    public Vector2D getDirection() {
         return direction;
     }
 

@@ -1,7 +1,6 @@
 package inf112.skeleton.app;
 
 import java.util.ArrayList;
-
 /**
  * The board itself. Knows what is on the board and where
  */
