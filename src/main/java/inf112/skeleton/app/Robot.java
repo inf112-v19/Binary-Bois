@@ -4,7 +4,9 @@ public class Robot extends IItem {
 
     private int size;
     private String name;
-    private String symbol;
+
+    //Todo: private Texture texture;
+
     private Vector2D direction;
 
     public Robot() {
@@ -25,8 +27,4 @@ public class Robot extends IItem {
         return name;
     }
 
-    @Override
-    public String getSymbol() {
-        return symbol;
-    }
 }

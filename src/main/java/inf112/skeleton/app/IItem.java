@@ -22,10 +22,11 @@ public abstract class IItem {
      */
     abstract String getName();
 
-    /**
+
+    /** Todo
      * Representing the item. Used for graphics
-     * @return Sttring used for graphics
+     * @return 'type' used for graphics
      */
-    abstract String getSymbol();
+    //abstract String getSymbol();
 
 }
