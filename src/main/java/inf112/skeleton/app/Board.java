@@ -10,7 +10,7 @@ public class Board implements IBoard {
     private int height;
     private HashMap<IItem, Integer> itemList; //keeps track of the pos of every item
 
-    public Board(int height, int width){
+    public Board(int height, int width) {
         this.width = width;
         this.height = height;
         this.grid = new ArrayList[width*height];
