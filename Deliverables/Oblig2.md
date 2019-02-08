@@ -43,7 +43,9 @@ Vert borti SQL og OpenGL/GLSL. Har programmert webapplikasjoner, spillmotorer, D
 	 hvordan vi vil at strukturen skal se ut  
 	-Kode grid/spillbrettet  
 	-Kode brikke/robot som kan bevege seg  
-	-Kode bevegelseskortene  
+	-Kode bevegelseskortene og planlegge hvordan de skal implementeres (se Programcards.csv under resources)  
+	
+	
 
 
 
@@ -61,7 +63,8 @@ Oppfølging: Følger hverandre opp under møtene og kontrollerer push-requests u
 Felles dokumenter: Vi bruker google docs til dokumenter og har alt av diagram, nyttige lenker osv. der, og bruker GitHub som kodebase.
 
 ###Oppsummering  
-Kort oppsumert nådde vi målene våre ganske bra.   
+Kort oppsumert nådde vi målene våre ganske bra. Det er en del arbeid som ikke kommer fram av commits (Jonas, Martin og Eirik)
+da de har gjort mye rundt planlegging og struktur.   
 Vi oppdaget at arbeidsfordelingen ikke var så lett som antatt, siden vi har konstruert systemet fra bunnen av  
 og heller ikke hatt noe kjennskap til LibGdx før nå. Det resulterte i at de som fikk ansvaret for LibGdx  
 endte opp med en større bit av ansvaret for at programmet skulle tilfredstille kravene våre til første iterasjon.
