@@ -33,10 +33,6 @@ class RobotTest implements IRenderable {
         this.dir.rotate((double) deg);
     }
 
-    public void backward(int d) {
-        this.pos.move(dir, d);
-    }
-
     @Override
     public Vector2D getPos() {
         return pos;
@@ -121,6 +117,12 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
                 break;
             case Input.Keys.LEFT:
                 my_robot.rot(90);
+                break;
+            case Input.Keys.M:
+                FileHandle file = new FileHandle("resources/RoboLazer.mp3");
+                Music player = Gdx.audio.newMusic(file);
+                player.setLooping(true);
+                player.play();
                 break;
             case Input.Keys.DOWN:
                 System.out.println("UP");
