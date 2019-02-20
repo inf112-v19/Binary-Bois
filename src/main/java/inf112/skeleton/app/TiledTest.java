@@ -4,6 +4,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -105,11 +107,8 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        System.out.println("DOWN");
-        System.out.flush();
         switch (keycode) {
             case Input.Keys.UP:
-                System.out.println("UP");
                 my_robot.forward(1);
                 break;
             case Input.Keys.RIGHT:
@@ -118,13 +117,18 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
             case Input.Keys.LEFT:
                 my_robot.rot(90);
                 break;
+            case Input.Keys.M:
+                FileHandle file = new FileHandle("resources/RoboLazer.mp3");
+                Music player = Gdx.audio.newMusic(file);
+                player.setLooping(true);
+                player.play();
+                break;
         }
         return false;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        System.out.println("UP");
         return false;
     }
 
