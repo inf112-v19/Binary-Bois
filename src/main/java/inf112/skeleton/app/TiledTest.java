@@ -31,6 +31,10 @@ class RobotTest implements IRenderable {
         this.pos.move(dir, d);
     }
 
+    public void backward(int d) {
+        this.pos.move(dir, d);
+    }
+
     public void rot(int deg) {
         this.dir.rotate((double) deg);
     }
@@ -110,8 +114,11 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
+        System.out.println("DOWN");
+        System.out.flush();
         switch (keycode) {
             case Input.Keys.UP:
+                System.out.println("UP");
                 my_robot.forward(1);
                 System.out.println(my_robot.getPos());
                 TiledMapTileLayer layer = (TiledMapTileLayer)tiledMap.getLayers().get(0); // assuming the layer at index on contains tiles
@@ -130,12 +137,17 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
                 player.setLooping(true);
                 player.play();
                 break;
+            case Input.Keys.DOWN:
+                System.out.println("UP");
+                my_robot.backward(-1);
+                break;
         }
         return false;
     }
 
     @Override
     public boolean keyUp(int keycode) {
+        System.out.println("UP");
         return false;
     }
 
