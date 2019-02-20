@@ -9,10 +9,10 @@ import java.util.ArrayList;
     /**
      * Gives you all items at specified location, including
      * floor tiles, holes and walls.
-     * x and y are y-inverted cartesian coordinates, (0,0) being
-     * upper left corner so (1,2) = ( . . . )
+     * x and y are cartesian coordinates, (0,0) being
+     * lower left corner so (1,2) = ( . x . )
      *                              ( . . . )
-     *                              ( . x . )
+     *                              ( . . . )
      * @param x row number, starting at 0
      * @param y column number, starting at 0
      * @return ArrayList of all items in grid position

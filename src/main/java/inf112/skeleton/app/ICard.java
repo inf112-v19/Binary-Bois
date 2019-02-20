@@ -1,7 +1,6 @@
 package inf112.skeleton.app;
 
 /**These are the program cards that the player uses to program their robot
- * TODO: Make a .csv (or something) containing all the cards
  */
 public abstract class ICard {
 

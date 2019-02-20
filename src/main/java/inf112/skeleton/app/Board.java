@@ -14,6 +14,8 @@ public class Board implements IBoard {
         this.width = width;
         this.height = height;
         this.grid = new ArrayList[width*height];
+        for (int i = 0; i<grid.length; i++)
+            grid[i] = new ArrayList<>();
         this.itemList = new HashMap<>();
     }
 

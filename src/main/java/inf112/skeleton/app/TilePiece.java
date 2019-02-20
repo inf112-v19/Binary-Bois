@@ -12,6 +12,6 @@ public class TilePiece extends  IItem {
 
     @Override
     String getName() {
-        return null;
+        return "TilePiece";
     }
 }
