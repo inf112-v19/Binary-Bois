@@ -33,6 +33,10 @@ class RobotTest implements IRenderable {
         this.dir.rotate((double) deg);
     }
 
+    public void backward(int d) {
+        this.pos.move(dir, d);
+    }
+
     @Override
     public Vector2D getPos() {
         return pos;
@@ -117,6 +121,10 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
                 break;
             case Input.Keys.LEFT:
                 my_robot.rot(90);
+                break;
+            case Input.Keys.DOWN:
+                System.out.println("UP");
+                my_robot.backward(-1);
                 break;
         }
         return false;
