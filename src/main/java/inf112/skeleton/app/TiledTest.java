@@ -112,6 +112,9 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
             batch.draw(r.getTexture(), px_pos.getX(), px_pos.getY());
         }
         batch.end();
+
+
+
     }
 
     @Override
@@ -122,6 +125,10 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
             case Input.Keys.UP:
                 System.out.println("UP");
                 my_robot.forward(1);
+                System.out.println(my_robot.getPos());
+                TiledMapTileLayer layer = (TiledMapTileLayer)tiledMap.getLayers().get(0); // assuming the layer at index on contains tiles
+                TiledMapTileLayer.Cell cell = layer.getCell(my_robot.getPos().getX(), my_robot.getPos().getY());
+                System.out.println(cell.getTile().getProperties().get("MapObject", String.class));
                 break;
             case Input.Keys.RIGHT:
                 my_robot.rot(-90);
