@@ -3,26 +3,34 @@ package inf112.skeleton.app;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class Game {
 
     private final int HEIGHT = 12;
     private final int WIDTH = 12;
     private IBoard board;
     private LwjglApplicationConfiguration cfg;
+    private HashMap<Player, Robot> playersAndRobots;
 
     public Game() {
-        cfg = new LwjglApplicationConfiguration();
-        cfg.title = "Robo Rally";
-        cfg.width = 32*WIDTH;
-        cfg.height = 32*HEIGHT;
-        new LwjglApplication(new TiledTest(), cfg);
-
+        playersAndRobots = new HashMap<>();
         board = new Board(HEIGHT, WIDTH);
         setup();
     }
 
     private void setup() {
+        Player player1 = new Player("Player1");
+        Robot robot1 = new Robot("Robot1", new Vector2D(4,4));
+        playersAndRobots.put(player1, robot1);
         horribleBoardSetup();
+
+        cfg = new LwjglApplicationConfiguration();
+        cfg.title = "Robo Rally";
+        cfg.width = 32*WIDTH;
+        cfg.height = 32*HEIGHT;
+        new LwjglApplication(new TiledTest(robot1), cfg);
     }
 
     private void horribleBoardSetup() {

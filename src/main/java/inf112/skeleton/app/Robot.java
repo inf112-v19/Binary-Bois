@@ -4,17 +4,19 @@ public class Robot extends IItem {
 
     private int size;
     private String name;
-
+    private Vector2D pos;
     //Todo: private Texture texture;
 
-    private Vector2D direction;
 
-    public Robot() {
+
+    public Robot(String name, Vector2D pos) {
         //TODO: What do we want to store here, and what do we want in player class?
+        this.name = name;
+        this.pos = pos;
     }
 
-    public Vector2D getDirection() {
-        return direction;
+    public Vector2D getPos() {
+        return pos;
     }
 
     @Override

@@ -65,13 +65,18 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
     Vector<IRenderable> board_render_queue;
     private SpriteBatch batch;
     private RobotTest my_robot;
+    private Robot rob;
+
+    public TiledTest(Robot rob){
+        this.rob = rob;
+    }
 
     @Override
     public void create () {
         int w = Gdx.graphics.getWidth();
         int h = Gdx.graphics.getHeight();
         camera = new OrthographicCamera();
-        camera.setToOrtho(false,w,h);
+        camera.setToOrtho(false, w, h);
         camera.update();
         tiledMap = new TmxMapLoader().load("./resources/map.tmx");
         System.out.println(tiledMap.getProperties());
@@ -79,9 +84,9 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
         batch = new SpriteBatch();
         board_render_queue = new Vector<>();
         map_dim = new Vector2D(
-                tiledMap.getProperties().get("width",Integer.class),
-                tiledMap.getProperties().get("height",Integer.class));
-        my_robot = new RobotTest(4, 4);
+                tiledMap.getProperties().get("width", Integer.class),
+                tiledMap.getProperties().get("height", Integer.class));
+        my_robot = new RobotTest(rob.getPos().getX(), rob.getPos().getY());
         board_render_queue.add(my_robot);
         System.out.println(map_dim);
         Gdx.input.setInputProcessor(this);
