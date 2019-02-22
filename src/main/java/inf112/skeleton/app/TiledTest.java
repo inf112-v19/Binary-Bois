@@ -44,6 +44,10 @@ class RobotTest implements IRenderable {
         return pos;
     }
 
+    public Vector2D getDir(){
+        return dir;
+    }
+
     @Override
     public Texture getTexture() {
         return texture;
@@ -65,11 +69,8 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
     Vector<IRenderable> board_render_queue;
     private SpriteBatch batch;
     private RobotTest my_robot;
-    private Robot rob;
+    private Game game;
 
-    public TiledTest(Robot rob){
-        this.rob = rob;
-    }
 
     @Override
     public void create () {
@@ -86,10 +87,11 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
         map_dim = new Vector2D(
                 tiledMap.getProperties().get("width", Integer.class),
                 tiledMap.getProperties().get("height", Integer.class));
-        my_robot = new RobotTest(rob.getPos().getX(), rob.getPos().getY());
+        my_robot = new RobotTest(6,6);
         board_render_queue.add(my_robot);
         System.out.println(map_dim);
         Gdx.input.setInputProcessor(this);
+        this.game = new Game(map_dim.getX(), map_dim.getY(), my_robot);
     }
 
     public Vector2D toPixelCoordinate(Vector2D vec) {
@@ -124,7 +126,12 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
         switch (keycode) {
             case Input.Keys.UP:
                 System.out.println("UP");
-                my_robot.forward(1);
+                if (game.canMoveTo(my_robot.getPos(), my_robot.getDir())) {
+                    game.registerFlag(my_robot.getPos(), my_robot.getDir());
+                    my_robot.forward(1);
+                } else {
+                    System.out.println("There is a wall ahead!");
+                }
                 System.out.println(my_robot.getPos());
                 TiledMapTileLayer layer = (TiledMapTileLayer)tiledMap.getLayers().get(0); // assuming the layer at index on contains tiles
                 TiledMapTileLayer.Cell cell = layer.getCell(my_robot.getPos().getX(), my_robot.getPos().getY());
@@ -141,6 +148,9 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
                 Music player = Gdx.audio.newMusic(file);
                 player.setLooping(true);
                 player.play();
+                break;
+            case Input.Keys.F:
+                game.printFlags();
                 break;
             case Input.Keys.DOWN:
                 System.out.println("UP");

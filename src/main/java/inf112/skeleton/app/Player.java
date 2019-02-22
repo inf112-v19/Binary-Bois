@@ -12,11 +12,24 @@ public class Player {
     private int robotLives = 3;
     private int memoryHealth = 10;
     private ArrayList<ICard> hand = new ArrayList<>();
+    private ArrayList<Integer> flags;
 
     public Player(String name) {
         if (name.length() < 1)
                 throw new IllegalArgumentException("Names of players should be at least one");
         this.name = name;
+        this.flags = new ArrayList<>();
+    }
+
+    public void register(Integer flag) {
+        if (!flags.contains(flag)) {
+            flags.add(flag);
+            System.out.println("Flag " + flag + " registered");
+        }
+    }
+
+    public ArrayList<Integer> getFlags() {
+        return flags;
     }
 
     public String getName() {

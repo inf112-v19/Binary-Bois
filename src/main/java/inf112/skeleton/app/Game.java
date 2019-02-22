@@ -1,50 +1,78 @@
 package inf112.skeleton.app;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Game {
 
-    private final int HEIGHT = 12;
-    private final int WIDTH = 12;
+    private final int height;
+    private final int width;
     private IBoard board;
-    private LwjglApplicationConfiguration cfg;
-    private HashMap<Player, Robot> playersAndRobots;
+    private HashMap<Player, RobotTest> playersAndRobots;
+    private RobotTest robot;
+    private Player player1;
+    
 
-    public Game() {
+    public Game(int height, int width, RobotTest robot) {
+        this.height = height;
+        this.width = width;
+        this.robot = robot;
         playersAndRobots = new HashMap<>();
-        board = new Board(HEIGHT, WIDTH);
+        board = new Board(height, width);
+        System.out.println("height+width" + height + width);
         setup();
     }
 
     private void setup() {
-        Player player1 = new Player("Player1");
-        Robot robot1 = new Robot("Robot1", new Vector2D(4,4));
-        playersAndRobots.put(player1, robot1);
+        player1 = new Player("Player1");
+        playersAndRobots.put(player1, robot);
         horribleBoardSetup();
+    }
 
-        cfg = new LwjglApplicationConfiguration();
-        cfg.title = "Robo Rally";
-        cfg.width = 32*WIDTH;
-        cfg.height = 32*HEIGHT;
-        new LwjglApplication(new TiledTest(robot1), cfg);
+    public void registerFlag(Vector2D pos, Vector2D dir) {
+        Vector2D newpos = new Vector2D(pos.getX(), pos.getY());
+        newpos.move(dir, 1);
+        ArrayList<IItem> itemlist = board.get(newpos.getX(), newpos.getY());
+        if (itemlist.isEmpty())
+            return;
+        IItem itemInFront = itemlist.get(0);
+        if (itemInFront instanceof Flag) {
+            player1.register(((Flag) itemInFront).getNumber());
+        }
+    }
+
+    public void printFlags() {
+        System.out.println("Flags: ");
+        for (Integer flag : player1.getFlags())
+            System.out.print(flag + " ");
+        System.out.println();
+    }
+
+    public boolean canMoveTo(Vector2D pos, Vector2D dir){
+        Vector2D newpos = new Vector2D(pos.getX(), pos.getY());
+        newpos.move(dir, 1);
+        ArrayList<IItem> itemlist = board.get(newpos.getX(), newpos.getY());
+        if (itemlist.isEmpty()) {
+            System.out.println("It was empty soooo.. OK");
+            return true;
+        }
+        IItem itemInFront = itemlist.get(0);
+        return !(itemInFront instanceof Wall);
     }
 
     private void horribleBoardSetup() {
-        for (int i = 0; i < WIDTH; i++) {
+        /* Hardcoded board */
+        for (int i = 0; i < width; i++) {
             board.set(new Wall(), i, 0);
         }
-        for (int i = 0; i < WIDTH; i++) {
-            board.set(new Wall(), i, HEIGHT-1);
+        for (int i = 0; i < width; i++) {
+            board.set(new Wall(), i, height-1);
         }
-        for (int i = 0; i < HEIGHT; i++) {
+        for (int i = 0; i < height; i++) {
             board.set(new Wall(), 0, i);
         }
-        for (int i = 0; i < HEIGHT; i++) {
-            board.set(new Wall(), WIDTH-1, i);
+        for (int i = 0; i < height; i++) {
+            board.set(new Wall(), width-1, i);
         }
         board.set(new Wall(), 3, 2);
         board.set(new Wall(), 3, 3);
@@ -64,10 +92,10 @@ public class Game {
         board.set(new Wall(), 8, 9);
         board.set(new Wall(), 9, 9);
         board.set(new Wall(), 2, 10);
-        board.set(new Flag(), 2, 2);
-        board.set(new Flag(), 8, 2);
-        board.set(new Flag(), 6, 7);
-        board.set(new Flag(), 3, 10);
+        board.set(new Flag(1), 2, 2);
+        board.set(new Flag(2), 8, 2);
+        board.set(new Flag(3), 6, 7);
+        board.set(new Flag(4), 3, 10);
     }
 
 }
