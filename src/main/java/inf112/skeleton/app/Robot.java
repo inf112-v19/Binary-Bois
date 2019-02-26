@@ -10,6 +10,7 @@ public class Robot extends IItem implements IRenderable {
     private int size;
     private String name;
     private static int nameInt = 1;
+    private Flag lastFlag;
 
     Robot(int x, int y) {
         this.dir = new Vector2D(1, 0);
@@ -32,6 +33,14 @@ public class Robot extends IItem implements IRenderable {
 
     public Vector2D getDir(){
         return dir;
+    }
+
+    public void setLastFlag(Flag lastFlag) {
+        this.lastFlag = lastFlag;
+    }
+
+    public Flag getLastFlag() {
+        return lastFlag;
     }
 
     @Override

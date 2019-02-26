@@ -20,7 +20,6 @@ public class Game {
         this.robots = robots;
         robotsToPlayers = new HashMap<>();
         board = new Board(height, width);
-        System.out.println("height+width" + height + width);
         setup();
     }
 
@@ -40,6 +39,7 @@ public class Game {
             return;
         IItem itemInFront = itemlist.get(0);
         if (itemInFront instanceof Flag) {
+            robot.setLastFlag((Flag) itemInFront);
             Player robotOwner = robotsToPlayers.get(robot);
             robotOwner.register(((Flag) itemInFront).getNumber());
         }
@@ -64,25 +64,17 @@ public class Game {
         newpos.move(dir, 1);
         ArrayList<IItem> itemlist = board.get(newpos.getX(), newpos.getY());
         if (itemlist.isEmpty()) {
-            System.out.println("It was empty soooo.. OK");
             moveOnBoard(my_robot, newpos, dir);
-            //board.get(pos.getX(), pos.getY()).remove(my_robot);
-            //board.set(my_robot, newpos.getX(), newpos.getY());
-            //registerFlag(pos, dir, my_robot);
             return true;
         }
         int listLength = itemlist.size();
         IItem itemInFront = itemlist.get(listLength-1);
-        System.out.println("iteminfront is: " + itemInFront.getName());
+        System.out.println("iteminfront was: " + itemInFront.getName());
         if (itemInFront instanceof Robot) {
-            System.out.println("There's a robot ahead. " + itemInFront.getName());
             Vector2D otherBotPos = ((Robot) itemInFront).getPos();
             if (canMoveTo(otherBotPos, dir, (Robot) itemInFront)) {
                 System.out.println("Pushed other robot");
                 otherBotPos.move(dir, 1);
-                //board.get(pos.getX(), pos.getY()).remove(my_robot);
-                //board.set(my_robot, newpos.getX(), newpos.getY());
-                //registerFlag(pos, dir, my_robot);
                 moveOnBoard(my_robot, newpos, dir);
                 return true;
             } else {
@@ -91,14 +83,10 @@ public class Game {
             }
         }
         if (!(itemInFront instanceof Wall)) {
-            //board.get(pos.getX(), pos.getY()).remove(my_robot);
-            //board.set(my_robot, newpos.getX(), newpos.getY());
-            //registerFlag(pos, dir, my_robot);
             moveOnBoard(my_robot, newpos, dir);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     private void horribleBoardSetup() {

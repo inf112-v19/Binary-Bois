@@ -68,6 +68,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     TiledMapRenderer tiledMapRenderer;
     // All positions are in board dimensions, not in pixel dimensions.
     Vector<IRenderable> board_render_queue;
+    private Music player;
     private SpriteBatch batch;
     private Robot my_robot;
     private Robot my_second_robot;
@@ -89,6 +90,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         map_dim = new Vector2D(
                 tiledMap.getProperties().get("width", Integer.class),
                 tiledMap.getProperties().get("height", Integer.class));
+        FileHandle file = new FileHandle("resources/RoboLazer.mp3");
+        player = Gdx.audio.newMusic(file);
+        player.setLooping(true);
 
         my_robot = new Robot(6,6);
         my_second_robot = new Robot(6, 7);
@@ -148,10 +152,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 my_robot.rot(90);
                 break;
             case Input.Keys.M:
-                FileHandle file = new FileHandle("resources/RoboLazer.mp3");
-                Music player = Gdx.audio.newMusic(file);
-                player.setLooping(true);
-                player.play();
+                if (!player.isPlaying())
+                    player.play();
+                else
+                    player.stop();
                 break;
             case Input.Keys.F:
                 game.printFlags();

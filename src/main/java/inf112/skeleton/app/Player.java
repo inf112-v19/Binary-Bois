@@ -24,7 +24,7 @@ public class Player {
     public void register(Integer flag) {
         if (!flags.contains(flag)) {
             flags.add(flag);
-            System.out.println("Flag " + flag + " registered");
+            System.out.println("Flag " + flag + " registered by " + name);
         }
     }
 
