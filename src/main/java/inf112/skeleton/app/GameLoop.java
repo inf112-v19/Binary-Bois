@@ -14,6 +14,7 @@ import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 import javax.xml.soap.Text;
+import java.util.ArrayList;
 import java.util.Vector;
 
 class RobotTest implements IRenderable {
@@ -24,7 +25,7 @@ class RobotTest implements IRenderable {
     RobotTest(int x, int y) {
         this.dir = new Vector2D(1, 0);
         this.pos = new Vector2D(x, y);
-        this.texture = new Texture("./resources/robot.png");
+        this.texture = new Texture("./resources/robot1.png");
     }
 
     public void forward(int d) {
@@ -59,7 +60,7 @@ class RobotTest implements IRenderable {
     }
 }
 
-public class TiledTest extends ApplicationAdapter implements InputProcessor {
+public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
     TiledMap tiledMap;
     Vector2D map_dim;
@@ -68,7 +69,8 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
     // All positions are in board dimensions, not in pixel dimensions.
     Vector<IRenderable> board_render_queue;
     private SpriteBatch batch;
-    private RobotTest my_robot;
+    private Robot my_robot;
+    private Robot my_second_robot;
     private Game game;
 
 
@@ -87,11 +89,17 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
         map_dim = new Vector2D(
                 tiledMap.getProperties().get("width", Integer.class),
                 tiledMap.getProperties().get("height", Integer.class));
-        my_robot = new RobotTest(6,6);
+
+        my_robot = new Robot(6,6);
+        my_second_robot = new Robot(6, 7);
         board_render_queue.add(my_robot);
+        board_render_queue.add(my_second_robot);
         System.out.println(map_dim);
         Gdx.input.setInputProcessor(this);
-        this.game = new Game(map_dim.getX(), map_dim.getY(), my_robot);
+        ArrayList<Robot> robots = new ArrayList<>();
+        robots.add(my_robot);
+        robots.add(my_second_robot);
+        this.game = new Game(map_dim.getX(), map_dim.getY(), robots);
     }
 
     public Vector2D toPixelCoordinate(Vector2D vec) {
@@ -114,9 +122,6 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
             batch.draw(r.getTexture(), px_pos.getX(), px_pos.getY());
         }
         batch.end();
-
-
-
     }
 
     @Override
@@ -126,8 +131,7 @@ public class TiledTest extends ApplicationAdapter implements InputProcessor {
         switch (keycode) {
             case Input.Keys.UP:
                 System.out.println("UP");
-                if (game.canMoveTo(my_robot.getPos(), my_robot.getDir())) {
-                    game.registerFlag(my_robot.getPos(), my_robot.getDir());
+                if (game.canMoveTo(my_robot.getPos(), my_robot.getDir(), my_robot)) {
                     my_robot.forward(1);
                 } else {
                     System.out.println("There is a wall ahead!");

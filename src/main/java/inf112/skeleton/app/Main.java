@@ -17,6 +17,6 @@ public class Main {
         cfg.title = "Robo Rally";
         cfg.width = 32*WIDTH;
         cfg.height = 32*HEIGHT;
-        new LwjglApplication(new TiledTest(), cfg);
+        new LwjglApplication(new GameLoop(), cfg);
     }
 }

@@ -8,16 +8,17 @@ public class Game {
     private final int height;
     private final int width;
     private IBoard board;
-    private HashMap<Player, RobotTest> playersAndRobots;
-    private RobotTest robot;
+    private HashMap<Robot, Player> robotsToPlayers;
+    private ArrayList<Robot> robots;
     private Player player1;
+    private Player player2;
     
 
-    public Game(int height, int width, RobotTest robot) {
+    public Game(int height, int width, ArrayList<Robot> robots) {
         this.height = height;
         this.width = width;
-        this.robot = robot;
-        playersAndRobots = new HashMap<>();
+        this.robots = robots;
+        robotsToPlayers = new HashMap<>();
         board = new Board(height, width);
         System.out.println("height+width" + height + width);
         setup();
@@ -25,11 +26,13 @@ public class Game {
 
     private void setup() {
         player1 = new Player("Player1");
-        playersAndRobots.put(player1, robot);
+        robotsToPlayers.put(robots.get(0), player1);
+        player2 = new Player("Player2");
+        robotsToPlayers.put(robots.get(1), player2);
         horribleBoardSetup();
     }
 
-    public void registerFlag(Vector2D pos, Vector2D dir) {
+    public void registerFlag(Vector2D pos, Vector2D dir, Robot robot) {
         Vector2D newpos = new Vector2D(pos.getX(), pos.getY());
         newpos.move(dir, 1);
         ArrayList<IItem> itemlist = board.get(newpos.getX(), newpos.getY());
@@ -37,7 +40,8 @@ public class Game {
             return;
         IItem itemInFront = itemlist.get(0);
         if (itemInFront instanceof Flag) {
-            player1.register(((Flag) itemInFront).getNumber());
+            Player robotOwner = robotsToPlayers.get(robot);
+            robotOwner.register(((Flag) itemInFront).getNumber());
         }
     }
 
@@ -48,16 +52,53 @@ public class Game {
         System.out.println();
     }
 
-    public boolean canMoveTo(Vector2D pos, Vector2D dir){
+    public void moveOnBoard(Robot robot, Vector2D newpos, Vector2D dir) {
+        Vector2D pos = robot.getPos();
+        board.get(pos.getX(), pos.getY()).remove(robot);
+        board.set(robot, newpos.getX(), newpos.getY());
+        registerFlag(pos, dir, robot);
+    }
+
+    public boolean canMoveTo(Vector2D pos, Vector2D dir, Robot my_robot){
         Vector2D newpos = new Vector2D(pos.getX(), pos.getY());
         newpos.move(dir, 1);
         ArrayList<IItem> itemlist = board.get(newpos.getX(), newpos.getY());
         if (itemlist.isEmpty()) {
             System.out.println("It was empty soooo.. OK");
+            moveOnBoard(my_robot, newpos, dir);
+            //board.get(pos.getX(), pos.getY()).remove(my_robot);
+            //board.set(my_robot, newpos.getX(), newpos.getY());
+            //registerFlag(pos, dir, my_robot);
             return true;
         }
-        IItem itemInFront = itemlist.get(0);
-        return !(itemInFront instanceof Wall);
+        int listLength = itemlist.size();
+        IItem itemInFront = itemlist.get(listLength-1);
+        System.out.println("iteminfront is: " + itemInFront.getName());
+        if (itemInFront instanceof Robot) {
+            System.out.println("There's a robot ahead. " + itemInFront.getName());
+            Vector2D otherBotPos = ((Robot) itemInFront).getPos();
+            if (canMoveTo(otherBotPos, dir, (Robot) itemInFront)) {
+                System.out.println("Pushed other robot");
+                otherBotPos.move(dir, 1);
+                //board.get(pos.getX(), pos.getY()).remove(my_robot);
+                //board.set(my_robot, newpos.getX(), newpos.getY());
+                //registerFlag(pos, dir, my_robot);
+                moveOnBoard(my_robot, newpos, dir);
+                return true;
+            } else {
+                System.out.println("Unable to push other robot!");
+                return false;
+            }
+        }
+        if (!(itemInFront instanceof Wall)) {
+            //board.get(pos.getX(), pos.getY()).remove(my_robot);
+            //board.set(my_robot, newpos.getX(), newpos.getY());
+            //registerFlag(pos, dir, my_robot);
+            moveOnBoard(my_robot, newpos, dir);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void horribleBoardSetup() {
@@ -96,6 +137,10 @@ public class Game {
         board.set(new Flag(2), 8, 2);
         board.set(new Flag(3), 6, 7);
         board.set(new Flag(4), 3, 10);
+
+        for (Robot robot : robots) {
+            board.set(robot, robot.getPos().getX(), robot.getPos().getY());
+        }
     }
 
 }

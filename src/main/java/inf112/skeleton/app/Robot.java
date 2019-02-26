@@ -1,22 +1,52 @@
 package inf112.skeleton.app;
 
-public class Robot extends IItem {
+import com.badlogic.gdx.graphics.Texture;
 
+public class Robot extends IItem implements IRenderable {
+
+    private Vector2D pos;
+    private Vector2D dir;
+    private Texture texture;
     private int size;
     private String name;
-    private Vector2D pos;
-    //Todo: private Texture texture;
+    private static int nameInt = 1;
 
-
-
-    public Robot(String name, Vector2D pos) {
-        //TODO: What do we want to store here, and what do we want in player class?
-        this.name = name;
-        this.pos = pos;
+    Robot(int x, int y) {
+        this.dir = new Vector2D(1, 0);
+        this.pos = new Vector2D(x, y);
+        this.texture = new Texture("./resources/robot" + nameInt + ".png");
+        this.name = "Robot " + String.valueOf(nameInt++);
     }
 
+    public void forward(int d) {
+        this.pos.move(dir, d);
+    }
+
+    public void backward(int d) {
+        this.pos.move(dir, d);
+    }
+
+    public void rot(int deg) {
+        this.dir.rotate((double) deg);
+    }
+
+    public Vector2D getDir(){
+        return dir;
+    }
+
+    @Override
     public Vector2D getPos() {
         return pos;
+    }
+
+    @Override
+    public Texture getTexture() {
+        return texture;
+    }
+
+    @Override
+    public int compareTo(IRenderable o) {
+        return 0;
     }
 
     @Override
