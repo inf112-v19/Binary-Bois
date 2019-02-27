@@ -96,13 +96,15 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     public boolean keyDown(int keycode) {
         System.out.println("DOWN");
         System.out.flush();
+        int dir = 1;
         switch (keycode) {
+            case Input.Keys.DOWN:
+                dir = -1;
             case Input.Keys.UP:
-                System.out.println("UP");
-                if (game.canMoveTo(my_robot.getPos(), my_robot.getDir(), my_robot)) {
-                    my_robot.forward(1);
-                } else {
-                    System.out.println("There is a wall ahead!");
+                Vector2D dir_v = my_robot.getDir().copy();
+                dir_v.mul(dir);
+                if (game.canMoveTo(my_robot.getPos(), dir_v, my_robot)) {
+                    my_robot.move(dir);
                 }
                 System.out.println(my_robot.getPos());
                 TiledMapTileLayer layer = (TiledMapTileLayer)tiledMap.getLayers().get(0); // assuming the layer at index on contains tiles
@@ -123,10 +125,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 break;
             case Input.Keys.F:
                 game.printFlags();
-                break;
-            case Input.Keys.DOWN:
-                System.out.println("UP");
-                my_robot.backward(-1);
                 break;
         }
         return false;

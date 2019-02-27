@@ -66,6 +66,7 @@ public class Game {
 
     public boolean canMoveTo(Vector2D pos, Vector2D dir, Robot my_robot){
         Vector2D newpos = new Vector2D(pos.getX(), pos.getY());
+        System.out.println("Checking for " + pos + " along " + dir + " for " + my_robot);
         newpos.move(dir, 1);
         ArrayList<IItem> itemlist = board.get(newpos);
         if (itemlist.isEmpty()) {

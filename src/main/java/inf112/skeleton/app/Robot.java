@@ -29,11 +29,11 @@ public class Robot extends IItem implements IRenderable {
         this.name = "Robot " + String.valueOf(nameInt++);
     }
 
-    public void forward(int d) {
-        this.pos.move(dir, d);
-    }
-
-    public void backward(int d) {
+    /**
+     * Move the robot d units along it's direction vector.
+     * @param d Positive or negative number.
+     */
+    public void move(int d) {
         this.pos.move(dir, d);
     }
 
