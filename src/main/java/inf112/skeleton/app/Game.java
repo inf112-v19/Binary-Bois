@@ -32,9 +32,9 @@ public class Game {
     }
 
     public void registerFlag(Vector2D pos, Vector2D dir, Robot robot) {
-        Vector2D newpos = new Vector2D(pos.getX(), pos.getY());
+        Vector2D newpos = pos.copy();
         newpos.move(dir, 1);
-        ArrayList<IItem> itemlist = board.get(newpos.getX(), newpos.getY());
+        ArrayList<IItem> itemlist = board.get(newpos);
         if (itemlist.isEmpty())
             return;
         IItem itemInFront = itemlist.get(0);
@@ -54,15 +54,15 @@ public class Game {
 
     public void moveOnBoard(Robot robot, Vector2D newpos, Vector2D dir) {
         Vector2D pos = robot.getPos();
-        board.get(pos.getX(), pos.getY()).remove(robot);
-        board.set(robot, newpos.getX(), newpos.getY());
+        board.get(pos).remove(robot);
+        board.set(robot, newpos);
         registerFlag(pos, dir, robot);
     }
 
     public boolean canMoveTo(Vector2D pos, Vector2D dir, Robot my_robot){
         Vector2D newpos = new Vector2D(pos.getX(), pos.getY());
         newpos.move(dir, 1);
-        ArrayList<IItem> itemlist = board.get(newpos.getX(), newpos.getY());
+        ArrayList<IItem> itemlist = board.get(newpos);
         if (itemlist.isEmpty()) {
             moveOnBoard(my_robot, newpos, dir);
             return true;
@@ -127,7 +127,7 @@ public class Game {
         board.set(new Flag(4), 3, 10);
 
         for (Robot robot : robots) {
-            board.set(robot, robot.getPos().getX(), robot.getPos().getY());
+            board.set(robot, robot.getPos());
         }
     }
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 /**
  * The board itself. Knows what is on the board and where
  */
- public interface IBoard {
+public interface IBoard {
 
     /**
      * Gives you all items at specified location, including
@@ -19,6 +19,12 @@ import java.util.ArrayList;
      */
     ArrayList<IItem> get(int x, int y);
 
+    /** See get(int, int) */
+    default ArrayList<IItem> get(Vector2D pos) {
+        return get(pos.getX(), pos.getY());
+    }
+
+
     /**
      * Adds item to the list of items at specified location
      * on the board
@@ -27,6 +33,11 @@ import java.util.ArrayList;
      * @param y
      */
     void set(IItem item, int x, int y);
+
+    /** See set(IItem, int, int) */
+    default void set(IItem item, Vector2D pos) {
+        set(item, pos.getX(), pos.getY());
+    }
 
     /**
      * @return height of board
