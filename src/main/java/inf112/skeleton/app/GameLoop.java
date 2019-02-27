@@ -61,7 +61,12 @@ class RobotTest implements IRenderable {
 }
 
 public class GameLoop extends ApplicationAdapter implements InputProcessor {
-
+    private static int[][] robot_start_positions = {
+            {6, 5},
+            {6, 6},
+            {6, 7},
+            {6, 8}
+    };
     TiledMap tiledMap;
     Vector2D map_dim;
     OrthographicCamera camera;
@@ -71,9 +76,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private Music player;
     private SpriteBatch batch;
     private Robot my_robot;
-    private Robot my_second_robot;
     private Game game;
-
 
     @Override
     public void create () {
@@ -94,16 +97,20 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         player = Gdx.audio.newMusic(file);
         player.setLooping(true);
 
-        my_robot = new Robot(6,6);
-        my_second_robot = new Robot(6, 7);
-        board_render_queue.add(my_robot);
-        board_render_queue.add(my_second_robot);
-        System.out.println(map_dim);
-        Gdx.input.setInputProcessor(this);
         ArrayList<Robot> robots = new ArrayList<>();
-        robots.add(my_robot);
-        robots.add(my_second_robot);
+        for (int[] pos : robot_start_positions) {
+            Robot robut = new Robot(pos[0], pos[1]);
+            robots.add(robut);
+            board_render_queue.add(robut);
+        }
+        my_robot = robots.get(robots.size() - 1);
+        my_robot.rot(-90);
+
+        System.out.println("Map Dimensions: " + map_dim);
+
         this.game = new Game(map_dim.getX(), map_dim.getY(), robots);
+
+        Gdx.input.setInputProcessor(this);
     }
 
     public Vector2D toPixelCoordinate(Vector2D vec) {
