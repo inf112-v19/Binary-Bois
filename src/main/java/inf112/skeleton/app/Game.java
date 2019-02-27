@@ -10,24 +10,25 @@ public class Game {
     private IBoard board;
     private HashMap<Robot, Player> robotsToPlayers;
     private ArrayList<Robot> robots;
-    private Player player1;
-    private Player player2;
-    
+    private ArrayList<Player> players;
 
     public Game(int height, int width, ArrayList<Robot> robots) {
         this.height = height;
         this.width = width;
         this.robots = robots;
+        this.players = new ArrayList<>();
         robotsToPlayers = new HashMap<>();
         board = new Board(height, width);
         setup();
     }
 
     private void setup() {
-        player1 = new Player("Player1");
-        robotsToPlayers.put(robots.get(0), player1);
-        player2 = new Player("Player2");
-        robotsToPlayers.put(robots.get(1), player2);
+        int player_num = 0;
+        for (Robot r : robots) {
+            Player p = new Player("Player-" + player_num++);
+            robotsToPlayers.put(r, p);
+            players.add(p);
+        }
         horribleBoardSetup();
     }
 
@@ -45,11 +46,15 @@ public class Game {
         }
     }
 
-    public void printFlags() {
+    public void printFlags(int player_id) {
         System.out.println("Flags: ");
-        for (Integer flag : player1.getFlags())
+        for (Integer flag : players.get(player_id).getFlags())
             System.out.print(flag + " ");
         System.out.println();
+    }
+
+    public void printFlags() {
+        printFlags(0);
     }
 
     public void moveOnBoard(Robot robot, Vector2D newpos, Vector2D dir) {
