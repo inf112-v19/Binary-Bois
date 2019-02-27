@@ -17,49 +17,6 @@ import javax.xml.soap.Text;
 import java.util.ArrayList;
 import java.util.Vector;
 
-class RobotTest implements IRenderable {
-    private Vector2D pos;
-    private Vector2D dir;
-    private Texture texture;
-
-    RobotTest(int x, int y) {
-        this.dir = new Vector2D(1, 0);
-        this.pos = new Vector2D(x, y);
-        this.texture = new Texture("./resources/robot1.png");
-    }
-
-    public void forward(int d) {
-        this.pos.move(dir, d);
-    }
-
-    public void backward(int d) {
-        this.pos.move(dir, d);
-    }
-
-    public void rot(int deg) {
-        this.dir.rotate((double) deg);
-    }
-
-    @Override
-    public Vector2D getPos() {
-        return pos;
-    }
-
-    public Vector2D getDir(){
-        return dir;
-    }
-
-    @Override
-    public Texture getTexture() {
-        return texture;
-    }
-
-    @Override
-    public int compareTo(IRenderable o) {
-        return 0;
-    }
-}
-
 public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private static int[][] robot_start_positions = {
             {6, 5},
