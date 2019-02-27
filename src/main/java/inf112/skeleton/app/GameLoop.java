@@ -35,6 +35,8 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private Robot my_robot;
     private Game game;
 
+    int start_pw, start_ph;
+
     @Override
     public void create () {
         int w = Gdx.graphics.getWidth();
@@ -68,11 +70,14 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         this.game = new Game(map_dim.getX(), map_dim.getY(), robots);
 
         Gdx.input.setInputProcessor(this);
+
+        start_pw = w;
+        start_ph = h;
     }
 
     public Vector2D toPixelCoordinate(Vector2D vec) {
-        int pw = Gdx.graphics.getWidth();
-        int ph = Gdx.graphics.getHeight();
+        int pw = start_pw;
+        int ph = start_ph;
         int w = map_dim.getX();
         int h = map_dim.getY();
         return new Vector2D(vec.getX() * (pw / w), vec.getY() * (ph / h));
@@ -94,8 +99,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        System.out.println("DOWN");
-        System.out.flush();
         int dir = 1;
         switch (keycode) {
             case Input.Keys.DOWN:
@@ -132,7 +135,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyUp(int keycode) {
-        System.out.println("UP");
         return false;
     }
 
