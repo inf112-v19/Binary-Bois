@@ -2,6 +2,8 @@ package inf112.skeleton.app;
 
 import com.badlogic.gdx.graphics.Texture;
 
+import java.io.File;
+
 public class Robot extends IItem implements IRenderable {
 
     private Vector2D pos;
@@ -15,7 +17,15 @@ public class Robot extends IItem implements IRenderable {
     Robot(int x, int y) {
         this.dir = new Vector2D(1, 0);
         this.pos = new Vector2D(x, y);
-        this.texture = new Texture("./resources/robot" + nameInt + ".png");
+
+        // FIXME: This is a temporary workaround, later on we should have a more generalized way
+        //        to create the robot texture by doing color variations on the fly.
+        String img_path = "./resources/robot" + nameInt + ".png";
+        if (!(new File(img_path)).exists()) {
+            img_path = "./resources/robot1.png";
+        }
+
+        this.texture = new Texture(img_path);
         this.name = "Robot " + String.valueOf(nameInt++);
     }
 
