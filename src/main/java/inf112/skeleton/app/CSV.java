@@ -1,3 +1,8 @@
+package inf112.skeleton.app;
+
+import java.lang.reflect.Type;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Vector;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -8,9 +13,9 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /** Object representing a CSV data file. */
-class CSV {
-    Vector<String> matrix;
-    int w = 0, h = 1;
+public class CSV implements Iterable<CSV.Row> {
+    private Vector<String> matrix;
+    private int w = 0, h = 1;
 
     public class CSVError extends Exception {
         public CSVError(String message) {
@@ -27,11 +32,8 @@ class CSV {
      *                  number of columns per line
      */
     public CSV(String path) throws IOException, CSVError {
-        BufferedReader istream = null;
         matrix = new Vector<String>();
-
-        try {	
-            istream = new BufferedReader(new FileReader(path));		
+        try (BufferedReader istream = new BufferedReader(new FileReader(path))) {
             String header_line = istream.readLine();
             if (header_line == null)
                 throw new CSVError("No content in file");
@@ -40,15 +42,11 @@ class CSV {
             w = header.size();
             for (String line = istream.readLine(); line != null; line = istream.readLine()) {
                 Vector<String> csv_line = csvSplitLine(line);
-                System.out.println(csv_line);
                 h++;
                 if (csv_line.size() != w)
                     throw new CSVError("Found csv line of different size at " + path + ":" + h);
                 matrix.addAll(csv_line);
             }
-        } finally {
-            if (istream != null)
-                istream.close();
         }
     }
 
@@ -65,7 +63,7 @@ class CSV {
      * @param comma The separation character, for most csv files this will be ','.
      * @return A list of substrings from the given line.
      */
-    public static Vector<String> csvSplitLine(String line, char comma) {
+    private static Vector<String> csvSplitLine(String line, char comma) {
         Vector<String> subs = new Vector<>();
         int beg = 0,
             i = 0;
@@ -100,12 +98,12 @@ class CSV {
     }
 
     /** Call csvSplitLine(String, char) with the default separator (',') */
-    public static Vector<String> csvSplitLine(String line) {
+    private static Vector<String> csvSplitLine(String line) {
         return csvSplitLine(line, ',');
     }
 
     /** Read a csv cell and turn escaped/quoted strings back into normal ones. */
-    public static String readCell(String cell) {
+    private static String readCell(String cell) {
         if (cell.length() == 0 || cell.charAt(0) != '"')
             // Cell is empty or not quoted, no modification needed.
             return cell;
@@ -114,7 +112,7 @@ class CSV {
     }
 
     /** Format a cell to be outputted into a csv-formatted file. */
-    private String fmtCell(String s) {
+    private static String fmtCell(String s) {
         char sarr[] = s.toCharArray();
         for (char c: sarr) {
             // Found character that needs to be escaped/quoted
@@ -163,7 +161,7 @@ class CSV {
     /**
      * Get all cells at column `idx`
      */
-    Vector<String> getColCells(int idx) {
+    public Vector<String> getColCells(int idx) {
         Vector<String> vec = new Vector<>();
         for (int i = w+idx; i < w*h; i += w)
             vec.add(matrix.get(i));
@@ -175,7 +173,7 @@ class CSV {
      * 
      * @return vector of cells, or null if the name is not found.
      */
-    Vector<String> getColCells(String name) throws CSVError {
+    public Vector<String> getColCells(String name) throws CSVError {
         int idx = getColIndex(name);
         if (idx < 0)
             throw new CSVError("No such name");
@@ -187,7 +185,7 @@ class CSV {
      *
      * @return column index, or -1 if no such name is found.
      */
-    private int getColIndex(String name) {
+    public int getColIndex(String name) {
         for (int i = 0; i < w; i++)
             if (matrix.get(i).equals(name))
                 return i;
@@ -200,31 +198,56 @@ class CSV {
      * @param idx The row number/index.
      * @return Vector of strings on the row.
      */
-    Vector<String> getRowCells(int idx) {
+    public Vector<String> getRowCells(int idx) {
         Vector<String> vec = new Vector<>();
-        for (int i = idx * w; i < idx*(w+1); i++)
+        for (int i = idx * w; i < (idx+1)*w; i++)
             vec.add(matrix.get(i));
         return vec;
     }
 
-    // 
-    /*
-    public static void main(String[] args) {
-        try {
-            CSV csv = new CSV("./test.csv");
-            System.out.println(csv.nCols());
-            System.out.println(csv.nRows());
-            System.out.println(csv.getColCells("other"));
-            System.out.println(csv.getRowCells(1));
-            System.out.println(csv.getColCells(0));
-        } catch (IOException e) {
-            System.out.println("Could not open file");
-            System.exit(1);
-        } catch (CSVError e ) {
-            System.out.println("Error in CSV format");
-            System.out.println(e);
-            System.exit(1);
+    public String getCell(int row, int col) {
+        return matrix.get((row * w) + col);
+    }
+
+    public class Row {
+        CSV csv;
+        int idx;
+
+        public Row(CSV csv, int idx) {
+            this.csv = csv;
+            this.idx = idx;
+        }
+
+        public String get(String name) {
+            return csv.getCell(idx, csv.getColIndex(name));
+        }
+
+        public int getInt(String name) {
+            return Integer.parseInt(get(name).trim());
+        }
+
+        public double getDouble(String name) {
+            return Double.parseDouble(get(name).trim());
         }
     }
-    */
+
+    @Override
+    public Iterator<Row> iterator() {
+        CSV csv = this;
+        return new Iterator<Row>() {
+            private int row = 1;
+
+            @Override
+            public boolean hasNext() { return row < nRows(); }
+
+            @Override
+            public Row next() {
+                if (!hasNext()) throw new NoSuchElementException();
+                return new Row(csv, row++);
+            }
+
+            @Override
+            public void remove() { throw new UnsupportedOperationException(); }
+        };
+    }
 }
