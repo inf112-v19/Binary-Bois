@@ -52,7 +52,7 @@ public class Map {
         cam = new OrthographicCamera();
         cam.setToOrtho(false, map_pw*2, map_ph*2);
         cam.position.y = 0f;
-        cam.position.x -= 192.0f;
+        cam.position.x -= map_pw/2f;
 
         System.out.println("Cam position: " + "(" + cam.position.x + ", " + cam.position.y + ")");
         System.out.println("Cam size: " + cam.viewportWidth + "x" + cam.viewportHeight);
@@ -60,8 +60,20 @@ public class Map {
 
         cam.update();
 
-        pw = dim.getX() * 32;
-        ph = dim.getY() * 32;
+        pw = map_pw;
+        ph = map_ph;
+    }
+
+    public void maximize() {
+        cam.position.y = ph/2f;
+        cam.zoom = 0.5f;
+        cam.update();
+    }
+
+    public void minimize() {
+        cam.position.y = 0f;
+        cam.zoom = 1.0f;
+        cam.update();
     }
 
     public Vector2D getDimensions() {

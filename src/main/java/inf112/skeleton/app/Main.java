@@ -26,11 +26,11 @@ public class Main {
         LwjglApplicationConfiguration cfg;
         cfg = new LwjglApplicationConfiguration();
         cfg.title = "Robo Rally";
-        cfg.width = MAP_PX_WIDTH * 2;
+        cfg.width = MAP_PX_WIDTH * 3;
         cfg.height = MAP_PX_HEIGHT * 2;
         // Resizing currently makes the game look like dragging a slow window in Windows XP, because
         // we don't update the area outside of the map. So I've disabled it for now.
-        cfg.resizable = false;
+        //cfg.resizable = false;
         new LwjglApplication(new GameLoop(MAP_PX_WIDTH, MAP_PX_HEIGHT), cfg);
     }
 }
