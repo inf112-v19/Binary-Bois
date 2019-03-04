@@ -48,6 +48,5 @@ public abstract class ICard {
         return priority;
     }
 
-    //Todo: 'type' getTexture(); method
 }
 
