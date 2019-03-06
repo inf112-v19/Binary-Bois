@@ -1,8 +1,6 @@
 package inf112.skeleton.app;
 
-public class ArchiveMarker extends IItem {
-
-
+public class Wrench extends IItem {
 
     @Override
     int getSize() {
@@ -11,6 +9,6 @@ public class ArchiveMarker extends IItem {
 
     @Override
     String getName() {
-        return "Archive Marker";
+        return "Wrench";
     }
 }

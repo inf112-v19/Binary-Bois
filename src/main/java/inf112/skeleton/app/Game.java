@@ -43,8 +43,8 @@ public class Game {
         if (itemlist.isEmpty())
             return;
         IItem itemInFront = itemlist.get(0);
-        if (itemInFront instanceof Flag) {
-            robot.setLastFlag((Flag) itemInFront);
+        if (itemInFront instanceof Flag || itemInFront instanceof Wrench) {
+            robot.setArchiveMarker(newpos);
             Player robotOwner = robotsToPlayers.get(robot);
             robotOwner.register(((Flag) itemInFront).getNumber());
         }
@@ -66,6 +66,16 @@ public class Game {
         board.get(pos).remove(robot);
         board.set(robot, newpos);
         registerFlag(pos, dir, robot);
+    }
+
+    public void isOnHole(Robot robot) {
+        Vector2D currentPos = robot.getPos();
+        ArrayList<IItem> itemsOnPos = board.get(currentPos);
+        for (IItem item : itemsOnPos) {
+            if (item instanceof Hole) {
+                robot.death();
+            }
+        }
     }
 
     public boolean canMoveTo(Vector2D pos, Vector2D dir, Robot my_robot){
@@ -130,12 +140,9 @@ public class Game {
                     } catch (Exception e){
 
                     }
-
-
                 }
             }
         }
-
         for (Robot robot : robots) {
             board.set(robot, robot.getPos());
         }
