@@ -127,10 +127,10 @@ public class Game {
         board.set(new Wall(), 8, 9);
         board.set(new Wall(), 9, 9);
         board.set(new Wall(), 2, 10);
-        board.set(new Flag(1), 2, 2);
-        board.set(new Flag(2), 8, 2);
-        board.set(new Flag(3), 6, 7);
-        board.set(new Flag(4), 3, 10);
+        board.set(new Flag(1, new Vector2D(2, 2)), 2, 2);
+        board.set(new Flag(2, new Vector2D(8, 2)), 8, 2);
+        board.set(new Flag(3, new Vector2D(6, 7)), 6, 7);
+        board.set(new Flag(4, new Vector2D(3, 10)), 3, 10);
 
         for (Robot robot : robots) {
             board.set(robot, robot.getPos());

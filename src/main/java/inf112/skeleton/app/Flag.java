@@ -3,9 +3,11 @@ package inf112.skeleton.app;
 public class Flag extends IItem {
 
     private int number;
+    private Vector2D pos;
 
-    public Flag(int number) {
+    public Flag(int number, Vector2D pos) {
         this.number = number;
+        this.pos = pos;
     }
 
     int getNumber() {
