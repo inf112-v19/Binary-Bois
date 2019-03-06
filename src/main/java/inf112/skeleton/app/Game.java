@@ -36,17 +36,22 @@ public class Game {
         boardSetup();
     }
 
-    public void registerFlag(Vector2D pos, Vector2D dir, Robot robot) {
+    public void registerFlagUpdateBackup(Vector2D pos, Vector2D dir, Robot robot) {
         Vector2D newpos = pos.copy();
         newpos.move(dir, 1);
         ArrayList<IItem> itemlist = board.get(newpos);
         if (itemlist.isEmpty())
             return;
-        IItem itemInFront = itemlist.get(0);
-        if (itemInFront instanceof Flag || itemInFront instanceof Wrench) {
-            robot.setArchiveMarker(newpos);
-            Player robotOwner = robotsToPlayers.get(robot);
-            robotOwner.register(((Flag) itemInFront).getNumber());
+        for (IItem item : itemlist) {
+            if (item instanceof Flag) {
+                robot.setArchiveMarker(newpos);
+                Player robotOwner = robotsToPlayers.get(robot);
+                robotOwner.register(((Flag) item).getNumber());
+                return;
+            } else if (item instanceof Wrench) {
+                robot.setArchiveMarker(newpos);
+                return;
+            }
         }
     }
 
@@ -61,11 +66,20 @@ public class Game {
         printFlags(0);
     }
 
+    public void jumpOnBoard(Robot robot) {
+        Vector2D currentPos = robot.getPos();
+        Vector2D backupPos = robot.getArchiveMarkerPos();
+        board.get(currentPos).remove(robot);
+        board.set(robot, backupPos);
+        robot.setPos(backupPos);
+        robot.setArchiveMarker(backupPos);
+    }
+
     public void moveOnBoard(Robot robot, Vector2D newpos, Vector2D dir) {
         Vector2D pos = robot.getPos();
         board.get(pos).remove(robot);
         board.set(robot, newpos);
-        registerFlag(pos, dir, robot);
+        registerFlagUpdateBackup(pos, dir, robot);
     }
 
     public void isOnHole(Robot robot) {
@@ -74,6 +88,8 @@ public class Game {
         for (IItem item : itemsOnPos) {
             if (item instanceof Hole) {
                 robot.death();
+                jumpOnBoard(robot);
+                return;
             }
         }
     }
