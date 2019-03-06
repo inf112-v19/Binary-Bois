@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 public class Game {
 
+    //public static StringBuilder printLogMessage;
     private final int height;
     private final int width;
     private IBoard board;
@@ -83,6 +84,7 @@ public class Game {
             Vector2D otherBotPos = ((Robot) itemInFront).getPos();
             if (canMoveTo(otherBotPos, dir, (Robot) itemInFront)) {
                 System.out.println("Pushed other robot");
+                //printLogMessage.append("Pushed other robot");
                 otherBotPos.move(dir, 1);
                 moveOnBoard(my_robot, newpos, dir);
                 return true;
@@ -97,6 +99,10 @@ public class Game {
         }
         return false;
     }
+
+    /*public static String printLog(){
+        return printLogMessage.toString();
+    }*/
 
     private void boardSetup() {
 
@@ -114,6 +120,12 @@ public class Game {
                         if (cell.getTile().getProperties().get("MapObject", String.class).equals("flag")) {
                             board.set(new Flag(flagCounter, new Vector2D(i, j)), i, j);
                             flagCounter += 1;
+                        }
+                        if (cell.getTile().getProperties().get("MapObject", String.class).equals("hole")) {
+                            board.set(new Hole(), i, j);
+                        }
+                        if (cell.getTile().getProperties().get("MapObject", String.class).equals("wrench")) {
+                            board.set(new Wrench(), i, j);
                         }
                     } catch (Exception e){
 
