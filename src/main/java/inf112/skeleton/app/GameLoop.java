@@ -56,6 +56,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         Gdx.input.setInputProcessor(this);
     }
 
+
     public void render () {
         // Clear the screen with a black color.
         Gdx.gl.glClearColor( 0, 0, 0, 1 );

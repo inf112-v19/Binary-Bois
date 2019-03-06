@@ -1,5 +1,8 @@
 package inf112.skeleton.app;
 
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -29,7 +32,7 @@ public class Game {
             robotsToPlayers.put(r, p);
             players.add(p);
         }
-        horribleBoardSetup();
+        boardSetup();
     }
 
     public void registerFlag(Vector2D pos, Vector2D dir, Robot robot) {
@@ -95,42 +98,31 @@ public class Game {
         return false;
     }
 
-    private void horribleBoardSetup() {
-        /* Hardcoded board */
-        for (int i = 0; i < width; i++) {
-            board.set(new Wall(), i, 0);
+    private void boardSetup() {
+
+        TiledMap tiledMap = Map.getTiledMap();
+        int flagCounter = 1;
+        for(int k = 0; k < tiledMap.getLayers().size(); k++){
+            TiledMapTileLayer layer = (TiledMapTileLayer)tiledMap.getLayers().get(k);
+            for(int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
+                    TiledMapTileLayer.Cell cell = layer.getCell(i, j);
+                    try{
+                        if (cell.getTile().getProperties().get("MapObject", String.class).equals("wall")) {
+                            board.set(new Wall(), i, j);
+                        }
+                        if (cell.getTile().getProperties().get("MapObject", String.class).equals("flag")) {
+                            board.set(new Flag(flagCounter, new Vector2D(i, j)), i, j);
+                            flagCounter += 1;
+                        }
+                    } catch (Exception e){
+
+                    }
+
+
+                }
+            }
         }
-        for (int i = 0; i < width; i++) {
-            board.set(new Wall(), i, height-1);
-        }
-        for (int i = 0; i < height; i++) {
-            board.set(new Wall(), 0, i);
-        }
-        for (int i = 0; i < height; i++) {
-            board.set(new Wall(), width-1, i);
-        }
-        board.set(new Wall(), 3, 2);
-        board.set(new Wall(), 3, 3);
-        board.set(new Wall(), 9, 3);
-        board.set(new Wall(), 10, 3);
-        board.set(new Wall(), 2, 4);
-        board.set(new Wall(), 3, 4);
-        board.set(new Wall(), 4, 4);
-        board.set(new Wall(), 5, 4);
-        board.set(new Wall(), 5, 5);
-        board.set(new Wall(), 8, 5);
-        board.set(new Wall(), 2, 6);
-        board.set(new Wall(), 8, 6);
-        board.set(new Wall(), 2, 7);
-        board.set(new Wall(), 2, 9);
-        board.set(new Wall(), 3, 9);
-        board.set(new Wall(), 8, 9);
-        board.set(new Wall(), 9, 9);
-        board.set(new Wall(), 2, 10);
-        board.set(new Flag(1, new Vector2D(2, 2)), 2, 2);
-        board.set(new Flag(2, new Vector2D(8, 2)), 8, 2);
-        board.set(new Flag(3, new Vector2D(6, 7)), 6, 7);
-        board.set(new Flag(4, new Vector2D(3, 10)), 3, 10);
 
         for (Robot robot : robots) {
             board.set(robot, robot.getPos());

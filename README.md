@@ -1,8 +1,17 @@
-# INF112 Maven template 
-Simple skeleton with libgdx. 
+# INF112 - Robo Rally - Gruppe 1 Team 5
+![alt text](http://img.dafont.com/preview.php?text=Binary+Bois&amp;ttf=doctor_glitch0&amp;ext=2&amp;size=55&amp;psize=m&amp;y=60)
+
+![alt text](Deliverables/screenshot_roborally.JPG)
 
 
-## Known bugs
-Currently throws "WARNING: An illegal reflective access operation has occurred", 
-when the java version used is >8. This has no effect on function or performance, and is just a warning.
+## Team staff
+![alt text](resources/robot1.png)Tellev Sundt (Team Lead) 
+
+![alt text](resources/robot1.png)Martin Strømme Særsten (Kundekontakt)
+
+![alt text](resources/robot1.png)Lars-Eskild Jahnke
+
+![alt text](resources/robot1.png)Jonas Møller
+
+![alt text](resources/robot1.png)Eirik Torheim Lauritsen
 
