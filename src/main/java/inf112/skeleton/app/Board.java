@@ -46,9 +46,4 @@ public class Board implements IBoard {
     public int getWidth() {
         return width;
     }
-
-    @Override
-    public boolean validMove(int x, int y) {
-        return false;
-    }
 }
