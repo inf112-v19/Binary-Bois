@@ -8,7 +8,8 @@ import java.util.HashMap;
 
 public class Game {
 
-    //public static StringBuilder printLogMessage;
+    static StringBuilder logBuilder = new StringBuilder();
+    static String printLog;
     private final int height;
     private final int width;
     private IBoard board;
@@ -74,6 +75,15 @@ public class Game {
         robot.setPos(backupPos);
         robot.setArchiveMarker(backupPos);
     }
+    
+    public void appendToLogBuilder(String string){
+        logBuilder.append("\r\n" + string);
+    }
+
+    public static String getPrintLog(){
+        printLog = logBuilder.toString();
+        return printLog;
+    }
 
     public void moveOnBoard(Robot robot, Vector2D newpos, Vector2D dir) {
         Vector2D pos = robot.getPos();
@@ -110,7 +120,7 @@ public class Game {
             Vector2D otherBotPos = ((Robot) itemInFront).getPos();
             if (canMoveTo(otherBotPos, dir, (Robot) itemInFront)) {
                 System.out.println("Pushed other robot");
-                //printLogMessage.append("Pushed other robot");
+                appendToLogBuilder("Pushed other robot");
                 otherBotPos.move(dir, 1);
                 moveOnBoard(my_robot, newpos, dir);
                 return true;
@@ -125,10 +135,6 @@ public class Game {
         }
         return false;
     }
-
-    /*public static String printLog(){
-        return printLogMessage.toString();
-    }*/
 
     private void boardSetup() {
 
