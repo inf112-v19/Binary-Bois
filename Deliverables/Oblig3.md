@@ -12,7 +12,7 @@ Gruppen har også gitt forskjellige ansvarsområder til de øvrige medlemmene so
 
 Gruppedynamikken er god, det er gjensidig kommunikasjon, enkelt for medlemmene å spørre om og ytre det de ønsker, og samarbeidet fungerer bra. 
 
-Det er ikke satt en spesifikk prosjektmetodikk som gruppen følger slavisk men har i stedet valgt å trekke ut prinsipper fra både Kanvan og Scrum metodikkene. Project board blir brukt aktivt gjennom utførelsen av de forskjellige arbeidsoppgavene og er trolig den beste forbedringen i gruppen med tanke på oversikten over prosjektets fremgang. Det blir satt egne interne tidsfrister for arbeidet fram mot endelig innleveringsfrist for vurdering av arbeidet og medlemmene har mulighet for parprogrammering. 
+Det er ikke satt en spesifikk prosjektmetodikk som gruppen følger slavisk men har i stedet valgt å trekke ut prinsipper fra både Kanban og Scrum metodikkene. Project board blir brukt aktivt gjennom utførelsen av de forskjellige arbeidsoppgavene og er trolig den beste forbedringen i gruppen med tanke på oversikten over prosjektets fremgang. Det blir satt egne interne tidsfrister for arbeidet fram mot endelig innleveringsfrist for vurdering av arbeidet og medlemmene har mulighet for parprogrammering. 
 
 Gruppen har noen forbedringsområder: 
 Hyppigheten på arbeid med oppgaver kan økes for å oppnå en jevnere arbeidsflyt.
