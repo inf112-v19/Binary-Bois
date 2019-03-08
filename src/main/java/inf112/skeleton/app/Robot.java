@@ -12,7 +12,7 @@ public class Robot extends IItem implements IRenderable {
     private int size;
     private String name;
     private static int nameInt = 1;
-    private Flag lastFlag;
+    private Vector2D archiveMarker;
 
     Robot(int x, int y) {
         this.dir = new Vector2D(1, 0);
@@ -26,7 +26,7 @@ public class Robot extends IItem implements IRenderable {
         }
 
         this.texture = new Texture(img_path);
-        this.name = "Robot " + String.valueOf(nameInt++);
+        this.name = "Robot " + nameInt++;
     }
 
     /**
@@ -45,12 +45,23 @@ public class Robot extends IItem implements IRenderable {
         return dir;
     }
 
-    public void setLastFlag(Flag lastFlag) {
-        this.lastFlag = lastFlag;
+    public void setArchiveMarker(Vector2D archiveMarker) {
+        this.archiveMarker = archiveMarker.copy();
     }
 
-    public Flag getLastFlag() {
-        return lastFlag;
+    public Vector2D getArchiveMarkerPos() {
+        return archiveMarker;
+    }
+
+    /**
+     * Robo RIP
+     */
+    public void death() {
+        //TODO: Lose life etc.
+    }
+
+    public void setPos(Vector2D pos) {
+        this.pos = pos;
     }
 
     @Override

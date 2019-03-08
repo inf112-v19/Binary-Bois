@@ -22,7 +22,7 @@ public class Map {
     private final boolean FUN_ENABLED = false;
 
     private OrthographicCamera cam;
-    private TiledMap tiledMap;
+    private static TiledMap tiledMap;
     private TiledMapRenderer tiledMapRenderer;
     private SpriteBatch batch;
     private Vector<IRenderable> render_queue;
@@ -78,6 +78,10 @@ public class Map {
 
     public Vector2D getDimensions() {
         return dim;
+    }
+
+    public static TiledMap getTiledMap() {
+        return tiledMap;
     }
 
     public Vector2D toPixelCoordinate(Vector2D vec) {

@@ -6,18 +6,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.tiled.*;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Matrix4;
 
-import javax.xml.soap.Text;
 import java.util.ArrayList;
-import java.util.Vector;
 
 public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private static int[][] robot_start_positions = {
@@ -34,6 +28,8 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private Map map;
 
     int map_px_w, map_px_h;
+    private BitmapFont font;
+    private SpriteBatch batch;
 
     public GameLoop(int map_px_w, int map_px_h) {
         super();
@@ -63,12 +59,25 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         this.game = new Game(map_dim.getX(), map_dim.getY(), robots);
 
         Gdx.input.setInputProcessor(this);
+
+        batch = new SpriteBatch();
+        font = new BitmapFont();
+        font.setColor(Color.BLACK);
     }
+
 
     public void render () {
         // Clear the screen with a black color.
-        Gdx.gl.glClearColor( 0, 0, 0, 1 );
+        Gdx.gl.glClearColor( 1, 1, 1, 1 );
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+
+        if(Game.getPrintLog() != null){
+            batch.begin();
+            font.draw(batch, Game.getPrintLog(), 70, 700);
+            batch.end();
+        }
+
 
         map.render();
 
@@ -87,6 +96,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 if (game.canMoveTo(my_robot.getPos(), dir_v, my_robot)) {
                     my_robot.move(dir);
                 }
+                game.isOnHole(my_robot);
+                System.out.println("GameLoop marker: " + my_robot.getArchiveMarkerPos());
+
                 /*
                 System.out.println(my_robot.getPos());
                 TiledMapTileLayer layer = (TiledMapTileLayer)tiledMap.getLayers().get(0); // assuming the layer at index on contains tiles

@@ -1,10 +1,15 @@
 package inf112.skeleton.app;
 
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Game {
 
+    static StringBuilder logBuilder = new StringBuilder();
+    static String printLog;
     private final int height;
     private final int width;
     private IBoard board;
@@ -29,20 +34,25 @@ public class Game {
             robotsToPlayers.put(r, p);
             players.add(p);
         }
-        horribleBoardSetup();
+        boardSetup();
     }
 
-    public void registerFlag(Vector2D pos, Vector2D dir, Robot robot) {
+    public void registerFlagUpdateBackup(Vector2D pos, Vector2D dir, Robot robot) {
         Vector2D newpos = pos.copy();
         newpos.move(dir, 1);
         ArrayList<IItem> itemlist = board.get(newpos);
         if (itemlist.isEmpty())
             return;
-        IItem itemInFront = itemlist.get(0);
-        if (itemInFront instanceof Flag) {
-            robot.setLastFlag((Flag) itemInFront);
-            Player robotOwner = robotsToPlayers.get(robot);
-            robotOwner.register(((Flag) itemInFront).getNumber());
+        for (IItem item : itemlist) {
+            if (item instanceof Flag) {
+                robot.setArchiveMarker(newpos);
+                Player robotOwner = robotsToPlayers.get(robot);
+                robotOwner.register(((Flag) item).getNumber());
+                return;
+            } else if (item instanceof Wrench) {
+                robot.setArchiveMarker(newpos);
+                return;
+            }
         }
     }
 
@@ -57,11 +67,41 @@ public class Game {
         printFlags(0);
     }
 
+    public void jumpOnBoard(Robot robot) {
+        Vector2D currentPos = robot.getPos();
+        Vector2D backupPos = robot.getArchiveMarkerPos();
+        board.get(currentPos).remove(robot);
+        board.set(robot, backupPos);
+        robot.setPos(backupPos);
+        robot.setArchiveMarker(backupPos);
+    }
+    
+    public void appendToLogBuilder(String string){
+        logBuilder.append("\r\n" + string);
+    }
+
+    public static String getPrintLog(){
+        printLog = logBuilder.toString();
+        return printLog;
+    }
+
     public void moveOnBoard(Robot robot, Vector2D newpos, Vector2D dir) {
         Vector2D pos = robot.getPos();
         board.get(pos).remove(robot);
         board.set(robot, newpos);
-        registerFlag(pos, dir, robot);
+        registerFlagUpdateBackup(pos, dir, robot);
+    }
+
+    public void isOnHole(Robot robot) {
+        Vector2D currentPos = robot.getPos();
+        ArrayList<IItem> itemsOnPos = board.get(currentPos);
+        for (IItem item : itemsOnPos) {
+            if (item instanceof Hole) {
+                robot.death();
+                jumpOnBoard(robot);
+                return;
+            }
+        }
     }
 
     public boolean canMoveTo(Vector2D pos, Vector2D dir, Robot my_robot){
@@ -80,6 +120,7 @@ public class Game {
             Vector2D otherBotPos = ((Robot) itemInFront).getPos();
             if (canMoveTo(otherBotPos, dir, (Robot) itemInFront)) {
                 System.out.println("Pushed other robot");
+                appendToLogBuilder("Pushed other robot");
                 otherBotPos.move(dir, 1);
                 moveOnBoard(my_robot, newpos, dir);
                 return true;
@@ -95,43 +136,35 @@ public class Game {
         return false;
     }
 
-    private void horribleBoardSetup() {
-        /* Hardcoded board */
-        for (int i = 0; i < width; i++) {
-            board.set(new Wall(), i, 0);
-        }
-        for (int i = 0; i < width; i++) {
-            board.set(new Wall(), i, height-1);
-        }
-        for (int i = 0; i < height; i++) {
-            board.set(new Wall(), 0, i);
-        }
-        for (int i = 0; i < height; i++) {
-            board.set(new Wall(), width-1, i);
-        }
-        board.set(new Wall(), 3, 2);
-        board.set(new Wall(), 3, 3);
-        board.set(new Wall(), 9, 3);
-        board.set(new Wall(), 10, 3);
-        board.set(new Wall(), 2, 4);
-        board.set(new Wall(), 3, 4);
-        board.set(new Wall(), 4, 4);
-        board.set(new Wall(), 5, 4);
-        board.set(new Wall(), 5, 5);
-        board.set(new Wall(), 8, 5);
-        board.set(new Wall(), 2, 6);
-        board.set(new Wall(), 8, 6);
-        board.set(new Wall(), 2, 7);
-        board.set(new Wall(), 2, 9);
-        board.set(new Wall(), 3, 9);
-        board.set(new Wall(), 8, 9);
-        board.set(new Wall(), 9, 9);
-        board.set(new Wall(), 2, 10);
-        board.set(new Flag(1), 2, 2);
-        board.set(new Flag(2), 8, 2);
-        board.set(new Flag(3), 6, 7);
-        board.set(new Flag(4), 3, 10);
+    private void boardSetup() {
 
+        TiledMap tiledMap = Map.getTiledMap();
+        int flagCounter = 1;
+        for(int k = 0; k < tiledMap.getLayers().size(); k++){
+            TiledMapTileLayer layer = (TiledMapTileLayer)tiledMap.getLayers().get(k);
+            for(int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
+                    TiledMapTileLayer.Cell cell = layer.getCell(i, j);
+                    try{
+                        if (cell.getTile().getProperties().get("MapObject", String.class).equals("wall")) {
+                            board.set(new Wall(), i, j);
+                        }
+                        if (cell.getTile().getProperties().get("MapObject", String.class).equals("flag")) {
+                            board.set(new Flag(flagCounter, new Vector2D(i, j)), i, j);
+                            flagCounter += 1;
+                        }
+                        if (cell.getTile().getProperties().get("MapObject", String.class).equals("hole")) {
+                            board.set(new Hole(), i, j);
+                        }
+                        if (cell.getTile().getProperties().get("MapObject", String.class).equals("wrench")) {
+                            board.set(new Wrench(), i, j);
+                        }
+                    } catch (Exception e){
+
+                    }
+                }
+            }
+        }
         for (Robot robot : robots) {
             board.set(robot, robot.getPos());
         }

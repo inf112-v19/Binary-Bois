@@ -48,14 +48,4 @@ public interface IBoard {
      * @return width of board
      */
     int getWidth();
-
-    /**
-     * Checks if moving to this location is valid
-     * Holes are valid, but will destroy the robot
-     * @param x
-     * @param y
-     * @return if location can be moved to
-     */
-    boolean validMove(int x, int y);
-
 }

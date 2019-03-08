@@ -24,17 +24,36 @@
    <property name="MapObject" value="flag"/>
   </properties>
   <tile id="0">
+   <properties>
+    <property name="MapObject" value="flag"/>
+   </properties>
    <image width="32" height="32" source="flag.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="4" name="hole" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="hole.png" width="32" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="MapObject" value="hole"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="5" name="wrench" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="wrench.png" width="32" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="MapObject" value="wrench"/>
+   </properties>
   </tile>
  </tileset>
  <layer id="4" name="Rutelag 1" width="12" height="12">
   <data encoding="base64" compression="zlib">
-   eJxjYmBgYCIRMyLR+DC6emx6iFFDrPnUUM+EQz0+Nfj8gs9P6HKE1BGrnpD7CaknBQMA7FgAzw==
+   eJxjYmBgYCIRMyLR+DC6emx6iFFDrPkgmoVE9djUYFOPTw0+v+DzE7ocIXXEqifkfkLqScEA8KgA0g==
   </data>
  </layer>
  <layer id="5" name="Rutelag 2" width="12" height="12">
   <data encoding="base64" compression="zlib">
-   eJxjYCAfMFOgl9ZgMLuNGgCX/+jtbwAPbAAN
+   eJxjYCAfMFOgl5UCvcQAStw2FAAu/9Hb3wAYVAAS
   </data>
  </layer>
 </map>
