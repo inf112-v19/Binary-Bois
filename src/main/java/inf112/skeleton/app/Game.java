@@ -113,27 +113,61 @@ public class Game {
             moveOnBoard(my_robot, newpos, dir);
             return true;
         }
+        ArrayList<IItem> itemsUnderYou = board.get(my_robot.getPos());
+        IItem itemUnderYou = itemsUnderYou.get(0);
+        System.out.println("Item under you was: " + itemUnderYou);
+        if (itemUnderYou instanceof Wall)
+            if (blockedByWallUnder(dir, ((Wall) itemUnderYou)))
+                return false;
         int listLength = itemlist.size();
         IItem itemInFront = itemlist.get(listLength-1);
         System.out.println("iteminfront was: " + itemInFront.getName());
-        if (itemInFront instanceof Robot) {
+        if (itemInFront instanceof Wall) {
+            if (blockedByWallInfront(dir, ((Wall) itemInFront)))
+                return false;
+        } else if (itemInFront instanceof Robot) {
             Vector2D otherBotPos = ((Robot) itemInFront).getPos();
             if (canMoveTo(otherBotPos, dir, (Robot) itemInFront)) {
                 System.out.println("Pushed other robot");
                 appendToLogBuilder("Pushed other robot");
                 otherBotPos.move(dir, 1);
-                moveOnBoard(my_robot, newpos, dir);
-                return true;
             } else {
                 System.out.println("Unable to push other robot!");
                 return false;
             }
         }
-        if (!(itemInFront instanceof Wall)) {
-            moveOnBoard(my_robot, newpos, dir);
-            return true;
+        moveOnBoard(my_robot, newpos, dir);
+        return true;
+    }
+
+    /** Returns true if you CANNOT move here*/
+    public boolean blockedByWallUnder(Vector2D dir, Wall wall) {
+        if (dir.getY() == 1) {
+            return wall.wallN();
+        } else if (dir.getX() == 1) {
+            return wall.wallE();
+        } else if (dir.getY() == -1) {
+            return wall.wallS();
+        } else if (dir.getX() == -1) {
+            return wall.wallW();
+        } else {
+            return false;
         }
-        return false;
+    }
+
+    /** Returns true if you CANNOT move here*/
+    public boolean blockedByWallInfront(Vector2D dir, Wall wall) {
+        if (dir.getY() == 1) {
+            return wall.wallS();
+        } else if (dir.getX() == 1) {
+            return wall.wallW();
+        } else if (dir.getY() == -1) {
+            return wall.wallN();
+        } else if (dir.getX() == -1) {
+            return wall.wallE();
+        } else {
+            return false;
+        }
     }
 
     private void boardSetup() {
