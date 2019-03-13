@@ -96,6 +96,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 if (game.canMoveTo(my_robot.getPos(), dir_v, my_robot)) {
                     my_robot.move(dir);
                 }
+                game.isOnHole(my_robot);
+                System.out.println("GameLoop marker: " + my_robot.getArchiveMarkerPos());
+
                 /*
                 System.out.println(my_robot.getPos());
                 TiledMapTileLayer layer = (TiledMapTileLayer)tiledMap.getLayers().get(0); // assuming the layer at index on contains tiles

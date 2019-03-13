@@ -46,7 +46,7 @@ public class Robot extends IItem implements IRenderable {
     }
 
     public void setArchiveMarker(Vector2D archiveMarker) {
-        this.archiveMarker = archiveMarker;
+        this.archiveMarker = archiveMarker.copy();
     }
 
     public Vector2D getArchiveMarkerPos() {
@@ -57,8 +57,11 @@ public class Robot extends IItem implements IRenderable {
      * Robo RIP
      */
     public void death() {
-        pos = archiveMarker;
         //TODO: Lose life etc.
+    }
+
+    public void setPos(Vector2D pos) {
+        this.pos = pos;
     }
 
     @Override
