@@ -73,9 +73,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         Gdx.gl.glClearColor(bgcolor.r, bgcolor.g, bgcolor.b, bgcolor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if (Game.getPrintLog() != null) {
+        if (game.getPrintLog() != null) {
             batch.begin();
-            font.draw(batch, Game.getPrintLog(), 70, 700);
+            font.draw(batch, game.getPrintLog(), 0, 750);
             batch.end();
         }
 

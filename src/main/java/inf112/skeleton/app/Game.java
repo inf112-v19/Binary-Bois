@@ -16,6 +16,7 @@ public class Game {
     private HashMap<Robot, Player> robotsToPlayers;
     private ArrayList<Robot> robots;
     private ArrayList<Player> players;
+    private GameLog game_log;
 
     public Game(int height, int width, ArrayList<Robot> robots) {
         this.height = height;
@@ -24,6 +25,7 @@ public class Game {
         this.players = new ArrayList<>();
         robotsToPlayers = new HashMap<>();
         board = new Board(height, width);
+        game_log = new GameLog(5);
         setup();
     }
 
@@ -77,12 +79,13 @@ public class Game {
     }
     
     public void appendToLogBuilder(String string){
-        logBuilder.append("\r\n" + string);
+        game_log.append("", string);
+        //logBuilder.append("\r\n" + string);
     }
 
-    public static String getPrintLog(){
-        printLog = logBuilder.toString();
-        return printLog;
+    public String getPrintLog(){
+        //printLog = logBuilder.toString();
+        return game_log.toString();
     }
 
     public void moveOnBoard(Robot robot, Vector2D newpos, Vector2D dir) {
@@ -110,8 +113,10 @@ public class Game {
         newpos.move(dir, 1);
 
         for (IItem item : board.get(orig_pos))
-            if (item instanceof Wall && ((Wall) item).hasEdge(dir))
+            if (item instanceof Wall && ((Wall) item).hasEdge(dir)) {
+                appendToLogBuilder("Blocked by wall");
                 return false;
+            }
 
         ArrayList<IItem> itemlist = board.get(newpos);
         if (itemlist.isEmpty()) {
@@ -124,6 +129,7 @@ public class Game {
         Vector2D dir_opposite = dir.copy();
         dir_opposite.mul(-1);
         if (itemInFront instanceof Wall && ((Wall) itemInFront).hasEdge(dir_opposite)) {
+            appendToLogBuilder("Blocked by wall");
             return false;
         } else if (itemInFront instanceof Robot) {
             Vector2D otherBotPos = ((Robot) itemInFront).getPos();
