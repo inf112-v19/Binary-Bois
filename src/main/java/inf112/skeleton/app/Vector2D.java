@@ -109,4 +109,15 @@ public class Vector2D {
     public String toString() {
         return "<Vector2D: [" + x + ", " + y + "]>";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj instanceof Vector2D) {
+            Vector2D other = (Vector2D) obj;
+            return other.x == x && other.y == y;
+        }
+        return false;
+    }
 }

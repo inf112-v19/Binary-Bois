@@ -30,11 +30,13 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     int map_px_w, map_px_h;
     private BitmapFont font;
     private SpriteBatch batch;
+    private Color bgcolor;
 
     public GameLoop(int map_px_w, int map_px_h) {
         super();
         this.map_px_w = map_px_w;
         this.map_px_h = map_px_h;
+        bgcolor = new Color(1, 1, 1, 1);
     }
 
     @Override
@@ -67,17 +69,15 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
 
     public void render () {
-        // Clear the screen with a black color.
-        Gdx.gl.glClearColor( 1, 1, 1, 1 );
+        // Clear the screen with the background color.
+        Gdx.gl.glClearColor(bgcolor.r, bgcolor.g, bgcolor.b, bgcolor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-
-        if(Game.getPrintLog() != null){
+        if (Game.getPrintLog() != null) {
             batch.begin();
             font.draw(batch, Game.getPrintLog(), 70, 700);
             batch.end();
         }
-
 
         map.render();
 
@@ -97,7 +97,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                     my_robot.move(dir);
                 }
                 game.isOnHole(my_robot);
-                System.out.println("GameLoop marker: " + my_robot.getArchiveMarkerPos());
 
                 /*
                 System.out.println(my_robot.getPos());

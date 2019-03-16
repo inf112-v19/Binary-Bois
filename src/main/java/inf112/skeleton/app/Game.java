@@ -105,69 +105,38 @@ public class Game {
     }
 
     public boolean canMoveTo(Vector2D pos, Vector2D dir, Robot my_robot){
-        Vector2D newpos = new Vector2D(pos.getX(), pos.getY());
-        System.out.println("Checking for " + pos + " along " + dir + " for " + my_robot);
+        Vector2D orig_pos = pos.copy();
+        Vector2D newpos = pos.copy();
         newpos.move(dir, 1);
+
+        for (IItem item : board.get(orig_pos))
+            if (item instanceof Wall && ((Wall) item).hasEdge(dir))
+                return false;
+
         ArrayList<IItem> itemlist = board.get(newpos);
         if (itemlist.isEmpty()) {
             moveOnBoard(my_robot, newpos, dir);
             return true;
         }
-        ArrayList<IItem> itemsUnderYou = board.get(my_robot.getPos());
-        IItem itemUnderYou = itemsUnderYou.get(0);
-        System.out.println("Item under you was: " + itemUnderYou);
-        if (itemUnderYou instanceof Wall)
-            if (blockedByWallUnder(dir, ((Wall) itemUnderYou)))
-                return false;
+
         int listLength = itemlist.size();
         IItem itemInFront = itemlist.get(listLength-1);
-        System.out.println("iteminfront was: " + itemInFront.getName());
-        if (itemInFront instanceof Wall) {
-            if (blockedByWallInfront(dir, ((Wall) itemInFront)))
-                return false;
+        Vector2D dir_opposite = dir.copy();
+        dir_opposite.mul(-1);
+        if (itemInFront instanceof Wall && ((Wall) itemInFront).hasEdge(dir_opposite)) {
+            return false;
         } else if (itemInFront instanceof Robot) {
             Vector2D otherBotPos = ((Robot) itemInFront).getPos();
             if (canMoveTo(otherBotPos, dir, (Robot) itemInFront)) {
-                System.out.println("Pushed other robot");
                 appendToLogBuilder("Pushed other robot");
                 otherBotPos.move(dir, 1);
             } else {
-                System.out.println("Unable to push other robot!");
+                appendToLogBuilder("Unable to push other robot!");
                 return false;
             }
         }
         moveOnBoard(my_robot, newpos, dir);
         return true;
-    }
-
-    /** Returns true if you CANNOT move here*/
-    public boolean blockedByWallUnder(Vector2D dir, Wall wall) {
-        if (dir.getY() == 1) {
-            return wall.wallN();
-        } else if (dir.getX() == 1) {
-            return wall.wallE();
-        } else if (dir.getY() == -1) {
-            return wall.wallS();
-        } else if (dir.getX() == -1) {
-            return wall.wallW();
-        } else {
-            return false;
-        }
-    }
-
-    /** Returns true if you CANNOT move here*/
-    public boolean blockedByWallInfront(Vector2D dir, Wall wall) {
-        if (dir.getY() == 1) {
-            return wall.wallS();
-        } else if (dir.getX() == 1) {
-            return wall.wallW();
-        } else if (dir.getY() == -1) {
-            return wall.wallN();
-        } else if (dir.getX() == -1) {
-            return wall.wallE();
-        } else {
-            return false;
-        }
     }
 
     private void boardSetup() {
@@ -179,22 +148,20 @@ public class Game {
             for(int i = 0; i < width; i++) {
                 for (int j = 0; j < height; j++) {
                     TiledMapTileLayer.Cell cell = layer.getCell(i, j);
-                    try{
-                        if (cell.getTile().getProperties().get("MapObject", String.class).equals("wall")) {
-                            board.set(new Wall(), i, j);
-                        }
-                        if (cell.getTile().getProperties().get("MapObject", String.class).equals("flag")) {
-                            board.set(new Flag(flagCounter, new Vector2D(i, j)), i, j);
-                            flagCounter += 1;
-                        }
-                        if (cell.getTile().getProperties().get("MapObject", String.class).equals("hole")) {
-                            board.set(new Hole(), i, j);
-                        }
-                        if (cell.getTile().getProperties().get("MapObject", String.class).equals("wrench")) {
-                            board.set(new Wrench(), i, j);
-                        }
-                    } catch (Exception e){
-
+                    if (cell == null)
+                        continue;
+                    if (cell.getTile().getProperties().get("MapObject", String.class).equals("wall")) {
+                        board.set(Wall.getFullWall(), i, j);
+                    }
+                    if (cell.getTile().getProperties().get("MapObject", String.class).equals("flag")) {
+                        board.set(new Flag(flagCounter, new Vector2D(i, j)), i, j);
+                        flagCounter += 1;
+                    }
+                    if (cell.getTile().getProperties().get("MapObject", String.class).equals("hole")) {
+                        board.set(new Hole(), i, j);
+                    }
+                    if (cell.getTile().getProperties().get("MapObject", String.class).equals("wrench")) {
+                        board.set(new Wrench(), i, j);
                     }
                 }
             }
