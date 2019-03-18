@@ -100,7 +100,7 @@ public class Map {
         for (IRenderable r : render_queue) {
             Vector2D pos = r.getPos();
             Vector2D px_pos = toPixelCoordinate(pos);
-            batch.draw(r.getTexture(), px_pos.getX(), px_pos.getY());
+            r.render(batch, px_pos);
         }
         batch.end();
 

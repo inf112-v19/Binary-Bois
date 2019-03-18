@@ -9,10 +9,9 @@ public class Commands {
         Vector2D dir_v = robot.getDir().copy();
         dir_v.mul(sgn);
         for (int i = 0; i < Math.abs(amount); i++) {
-            if (game.canMoveTo(robot.getPos(), dir_v, robot))
-                robot.move(sgn);
-            else
+            if (!game.canMoveTo(robot.getPos(), dir_v, robot))
                 return false;
+            robot.move(sgn);
             game.isOnHole(robot);
         }
         return true;
