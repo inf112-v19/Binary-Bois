@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import jdk.tools.jaotc.collect.classname.ClassNameSource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,42 +43,43 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public void create () {
-        FileHandle file = new FileHandle("resources/RoboLazer.mp3");
-        player = Gdx.audio.newMusic(file);
-        player.setLooping(true);
-
-        map = new Map(180, 0, 320, 320, "./resources/map.tmx");
-
-        ArrayList<Robot> robots = new ArrayList<>();
-        for (int[] pos : robot_start_positions) {
-            Robot robut = new Robot(pos[0], pos[1]);
-            robots.add(robut);
-            map.addDrawJob(robut);
-        }
-        my_robot = robots.get(robots.size() - 1);
-        my_robot.rot(-90);
-
-        Vector2D map_dim = map.getDimensions();
-        System.out.println("Map Dimensions: " + map_dim);
         try {
+            player = Resources.getMusic("RoboLazer.mp3");
+            player.setLooping(true);
+
+            map = new Map(180, 0, 320, 320, "map.tmx");
+
+            ArrayList<Robot> robots = new ArrayList<>();
+            for (int[] pos : robot_start_positions) {
+                Robot robut = new Robot(pos[0], pos[1]);
+                robots.add(robut);
+                map.addDrawJob(robut);
+            }
+            my_robot = robots.get(robots.size() - 1);
+            my_robot.rot(-90);
+
+            Vector2D map_dim = map.getDimensions();
+            System.out.println("Map Dimensions: " + map_dim);
             this.game = new Game(map_dim.getX(), map_dim.getY(), robots);
+
+            try {
+                this.game.handOutCards();
+            } catch (CardDeck.NoMoreCards e) {
+                // NOTE: There is a check for this in the Game() constructor, so this
+                //       exception will never happen directly after the Game is instantiated.
+            }
+
+            Gdx.input.setInputProcessor(this);
+
+            batch = new SpriteBatch();
+            font = new BitmapFont();
+            font.setColor(Color.BLACK);
+        } catch (NoSuchResource e) {
+            System.out.println("Unable to load: " + e.getMessage());
         } catch (Game.InitError e) {
             System.out.println(e.getMessage());
             System.exit(1);
         }
-
-        try {
-            this.game.handOutCards();
-        } catch (CardDeck.NoMoreCards e) {
-            // NOTE: There is a check for this in the Game() constructor, so this
-            //       exception will never happen directly after the Game is instantiated.
-        }
-
-        Gdx.input.setInputProcessor(this);
-
-        batch = new SpriteBatch();
-        font = new BitmapFont();
-        font.setColor(Color.BLACK);
     }
 
 

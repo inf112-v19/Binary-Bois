@@ -14,18 +14,10 @@ public class Robot extends IItem implements IRenderable {
     private static int nameInt = 1;
     private Vector2D archiveMarker;
 
-    Robot(int x, int y) {
+    Robot(int x, int y) throws NoSuchResource {
         this.dir = new Vector2D(1, 0);
         this.pos = new Vector2D(x, y);
-
-        // FIXME: This is a temporary workaround, later on we should have a more generalized way
-        //        to create the robot texture by doing color variations on the fly.
-        String img_path = "./resources/robot" + nameInt + ".png";
-        if (!(new File(img_path)).exists()) {
-            img_path = "./resources/robot1.png";
-        }
-
-        this.texture = new Texture(img_path);
+        this.texture = Resources.getTexture("robot1.png");
         this.name = "Robot " + nameInt++;
     }
 

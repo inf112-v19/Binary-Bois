@@ -33,10 +33,10 @@ public class Map {
     // FIXME: This should be retrived from the map later on.
     private final int tile_dim = 32;
 
-    public Map(int px, int py, int dim_pw, int dim_ph, String map_file) {
+    public Map(int px, int py, int dim_pw, int dim_ph, String map_file) throws NoSuchResource {
         pos = new Vector2D(px, py);
 
-        tiledMap = new TmxMapLoader().load(map_file);
+        tiledMap = Resources.getTiledMap(map_file);
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
         batch = new SpriteBatch();
         render_queue = new Vector<>();

@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import org.lwjgl.opengl.EXTAbgr;
 
 import java.io.File;
@@ -12,8 +14,8 @@ import java.util.HashMap;
 import java.util.function.Function;
 
 class NoSuchResource extends Exception {
-    public NoSuchResource() {
-        super();
+    public NoSuchResource(String filename) {
+        super(filename);
     }
 }
 
@@ -31,7 +33,7 @@ public class Resources {
         try {
             return new File(resources_path + rel_path).getCanonicalPath();
         } catch (IOException e) {
-            throw new NoSuchResource();
+            throw new NoSuchResource(rel_path);
         }
     }
 
@@ -42,7 +44,7 @@ public class Resources {
         if (obj != null)
             return obj;
         if ((obj = fn.apply(path)) == null)
-            throw new NoSuchResource();
+            throw new NoSuchResource(rel_path);
         cache.put(path, obj);
         return obj;
     }
@@ -67,5 +69,9 @@ public class Resources {
                 return null;
             }
         });
+    }
+
+    public static TiledMap getTiledMap(String rp) throws NoSuchResource {
+        return get(rp, (String p) -> new TmxMapLoader().load(p));
     }
 }
