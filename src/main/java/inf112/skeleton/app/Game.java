@@ -3,22 +3,31 @@ package inf112.skeleton.app;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Game {
+    public static final String cards_src = "resources/Programcards.csv";
+    public static final int NUM_CARDS_PER_PLAYER = 9;
 
-    static StringBuilder logBuilder = new StringBuilder();
-    static String printLog;
-    private final int height;
-    private final int width;
+    private int height = 0;
+    private int width = 0;
     private IBoard board;
     private HashMap<Robot, Player> robotsToPlayers;
     private ArrayList<Robot> robots;
     private ArrayList<Player> players;
     private GameLog game_log;
+    private CardDeck deck;
+    private int active_player_num = 0;
 
-    public Game(int height, int width, ArrayList<Robot> robots) {
+    public class InitError extends Exception {
+        public InitError(String msg) {
+            super(msg);
+        }
+    }
+
+    public Game(int height, int width, ArrayList<Robot> robots) throws InitError {
         this.height = height;
         this.width = width;
         this.robots = robots;
@@ -26,7 +35,30 @@ public class Game {
         robotsToPlayers = new HashMap<>();
         board = new Board(height, width);
         game_log = new GameLog(5);
+        try {
+            deck = new CardDeck(cards_src);
+        } catch (CSV.CSVError e) {
+            throw new InitError("Card source CSV file was incorrectly formed: " + cards_src);
+        } catch (IOException e) {
+            throw new InitError("Unable to read card source CSV file: " + cards_src);
+        }
         setup();
+
+        if (NUM_CARDS_PER_PLAYER * players.size() > deck.size())
+            throw new InitError("Not enough cards for " + players.size() + " players, have " + deck.size() + " cards");
+    }
+
+    public Player getActivePlayer() {
+        return players.get(active_player_num);
+    }
+
+    public void nextPlayer() {
+        active_player_num = (active_player_num+1) % players.size();
+    }
+
+    public void handOutCards() throws CardDeck.NoMoreCards {
+        for (Player p : players)
+            p.giveDeck(deck.get(NUM_CARDS_PER_PLAYER));
     }
 
     private void setup() {
@@ -73,9 +105,15 @@ public class Game {
         Vector2D currentPos = robot.getPos();
         Vector2D backupPos = robot.getArchiveMarkerPos();
         board.get(currentPos).remove(robot);
-        board.set(robot, backupPos);
-        robot.setPos(backupPos);
-        robot.setArchiveMarker(backupPos);
+        // FIXME: I'm not actually sure what should happen if there is no backup position
+        //        (according to the game rules.)
+        //        For now I'll assume they just die.
+        if (backupPos != null) {
+            robot.death();
+            board.set(robot, backupPos);
+            robot.setPos(backupPos);
+            robot.setArchiveMarker(backupPos);
+        }
     }
     
     public void appendToLogBuilder(String string){

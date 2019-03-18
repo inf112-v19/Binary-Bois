@@ -2,14 +2,20 @@ package inf112.skeleton.app;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * A "deck" or stack of command cards.
  */
 public class CardDeck {
-    private Vector<Card> commands_orig = new Vector<>();
-    private Vector<Card> commands = new Vector<>();
+    private ArrayList<Card> cards_orig = new ArrayList<>();
+    private ArrayList<Card> cards = new ArrayList<>();
+
+    public class NoMoreCards extends Exception {
+        public NoMoreCards() {
+            super();
+        }
+    }
 
     /**
      * Load a card deck from a CSV file.
@@ -22,6 +28,11 @@ public class CardDeck {
      *   TypeID: int
      *   Priority: int
      *
+     * After the cards are loaded, the list is shuffled.
+     * If you want to keep the order of the cards from the
+     * input file, use #{CardDeck.restore()} after instantiating
+     * the deck.
+     *
      * @param path Path to the csv file.
      * @throws IOException If the file is inaccessible.
      * @throws CSV.CSVError If the file is not valid CSV, or if a
@@ -32,31 +43,45 @@ public class CardDeck {
         for (CSV.Row row : csv) {
             String type = row.get("Type");
             ICommand cmd = Commands.getComand(type);
-            commands.add(new Card(cmd,
+            cards.add(new Card(cmd,
                                   type,
                                   row.getInt("Amount"),
                                   row.getInt("TypeID"),
                                   row.getInt("Priority")));
         }
-        commands_orig.addAll(commands);
+        cards_orig.addAll(cards);
+        shuffle();
     }
 
     /**
      * Shuffle the deck.
      */
     public void shuffle() {
-        Collections.shuffle(commands);
+        Collections.shuffle(cards);
     }
 
     /**
      * @return The card on top of the deck.
      */
-    public Card get() {
-        if (commands.size() == 0)
-            return null;
-        Card card = commands.get(0);
-        commands.removeElementAt(0);
+    public Card get() throws NoMoreCards {
+        if (cards.size() == 0)
+            throw new NoMoreCards();
+        Card card = cards.get(0);
+        cards.remove(0);
         return card;
+    }
+
+    public ArrayList<Card> get(int n) throws NoMoreCards {
+        ArrayList<Card> cards = new ArrayList<>();
+        for (int i = 0; i < n; i++)
+            try {
+                cards.add(get());
+            } catch (NoMoreCards e) {
+                // Add cards back and rethrow exception.
+                this.cards.addAll(cards);
+                throw e;
+            }
+        return cards;
     }
 
     /**
@@ -64,14 +89,20 @@ public class CardDeck {
      * @param c The card to place on top.
      */
     public void put(Card c) {
-        commands.insertElementAt(c, 0);
+        cards.add(0, c);
     }
 
     /**
-     * Restore the deck to its original state.
+     * Restore the deck to its original state, meaning in the exact
+     * same order as the cards appeared in the CSV file the deck was
+     * loaded from.
      */
     public void restore() {
-        commands.clear();
-        commands.addAll(commands_orig);
+        cards.clear();
+        cards.addAll(cards_orig);
+    }
+
+    public int size() {
+        return cards.size();
     }
 }

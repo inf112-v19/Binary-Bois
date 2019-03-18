@@ -55,6 +55,11 @@ public class Card {
         return name;
     }
 
+    @Override
+    public String toString() {
+        return String.format("<%s(%d) p%d>", name, amount, priority);
+    }
+
     /**
      * Run the card command.
      *

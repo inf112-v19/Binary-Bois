@@ -1,6 +1,7 @@
 package inf112.skeleton.app;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * The players.
@@ -39,6 +40,15 @@ public class Player {
     public void giveDeck(ArrayList<Card> newHand) {
         hand.clear();
         hand.addAll(newHand);
+        System.out.println(name + " Cards: " + Arrays.toString(newHand.toArray()));
+    }
+
+    public Card popCard() {
+        if (hand.size() == 0)
+            return null;
+        Card c = hand.get(0);
+        hand.remove(0);
+        return c;
     }
 
     public ArrayList<Card> getHand() {

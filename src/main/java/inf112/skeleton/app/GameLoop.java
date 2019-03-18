@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private static int[][] robot_start_positions = {
@@ -58,7 +59,19 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
         Vector2D map_dim = map.getDimensions();
         System.out.println("Map Dimensions: " + map_dim);
-        this.game = new Game(map_dim.getX(), map_dim.getY(), robots);
+        try {
+            this.game = new Game(map_dim.getX(), map_dim.getY(), robots);
+        } catch (Game.InitError e) {
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
+
+        try {
+            this.game.handOutCards();
+        } catch (CardDeck.NoMoreCards e) {
+            // NOTE: There is a check for this in the Game() constructor, so this
+            //       exception will never happen directly after the Game is instantiated.
+        }
 
         Gdx.input.setInputProcessor(this);
 
@@ -108,6 +121,13 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             case Input.Keys.F:
                 game.printFlags();
                 break;
+
+            // Execute a card command (this is just a test.)
+            case Input.Keys.E:
+                Card c = game.getActivePlayer().popCard();
+                if (c != null)
+                    c.exec(my_robot, game);
+                System.out.println(game.getActivePlayer().getName() + " Cards: " + Arrays.toString(game.getActivePlayer().getHand().toArray()));
         }
         return false;
     }
