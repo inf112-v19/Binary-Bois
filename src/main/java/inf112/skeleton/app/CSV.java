@@ -218,15 +218,18 @@ public class CSV implements Iterable<CSV.Row> {
             this.idx = idx;
         }
 
-        public String get(String name) {
-            return csv.getCell(idx, csv.getColIndex(name));
+        public String get(String name) throws CSVError {
+            int col = csv.getColIndex(name);
+            if (idx == -1)
+                throw new CSVError("No such column name: '" + name + "'");
+            return csv.getCell(idx, col);
         }
 
-        public int getInt(String name) {
+        public int getInt(String name) throws CSVError {
             return Integer.parseInt(get(name).trim());
         }
 
-        public double getDouble(String name) {
+        public double getDouble(String name) throws CSVError {
             return Double.parseDouble(get(name).trim());
         }
     }

@@ -1,85 +1,85 @@
-Movement,Card # of type,Priority
-Rotate 90°,1,80
-Rotate 90°,2,100
-Rotate 90°,3,120
-Rotate 90°,4,140
-Rotate 90°,5,160
-Rotate 90°,6,180
-Rotate 90°,7,200
-Rotate 90°,8,220
-Rotate 90°,9,240
-Rotate 90°,10,260
-Rotate 90°,11,280
-Rotate 90°,12,300
-Rotate 90°,13,320
-Rotate 90°,14,340
-Rotate 90°,15,360
-Rotate 90°,16,380
-Rotate 90°,17,400
-Rotate 90°,18,420
-Rotate -90°,1,70
-Rotate -90°,2,90
-Rotate -90°,3,110
-Rotate -90°,4,130
-Rotate -90°,5,150
-Rotate -90°,6,170
-Rotate -90°,7,190
-Rotate -90°,8,210
-Rotate -90°,9,230
-Rotate -90°,10,250
-Rotate -90°,11,270
-Rotate -90°,12,290
-Rotate -90°,13,310
-Rotate -90°,14,330
-Rotate -90°,15,350
-Rotate -90°,16,370
-Rotate -90°,17,390
-Rotate -90°,18,410
-Rotate 180°,1,10
-Rotate 180°,2,20
-Rotate 180°,3,30
-Rotate 180°,4,40
-Rotate 180°,5,50
-Rotate 180°,6,60
-Forward 1,1,490
-Forward 1,2,500
-Forward 1,3,510
-Forward 1,4,520
-Forward 1,5,530
-Forward 1,6,540
-Forward 1,7,550
-Forward 1,8,560
-Forward 1,9,570
-Forward 1,10,580
-Forward 1,11,590
-Forward 1,12,600
-Forward 1,13,610
-Forward 1,14,620
-Forward 1,15,630
-Forward 1,16,640
-Forward 1,17,650
-Forward 1,18,660
-Forward 2,1,670
-Forward 2,2,680
-Forward 2,3,690
-Forward 2,4,700
-Forward 2,5,710
-Forward 2,6,720
-Forward 2,7,730
-Forward 2,8,740
-Forward 2,9,750
-Forward 2,10,760
-Forward 2,11,770
-Forward 2,12,780
-Forward 3,1,790
-Forward 3,2,800
-Forward 3,3,810
-Forward 3,4,820
-Forward 3,5,830
-Forward 3,6,840
-Backward 1,1,430
-Backward 1,2,440
-Backward 1,3,450
-Backward 1,4,460
-Backward 1,5,470
-Backward 1,6,480
+Type,Amount,TypeID,Priority
+rotate,90,1,80
+rotate,90,2,100
+rotate,90,3,120
+rotate,90,4,140
+rotate,90,5,160
+rotate,90,6,180
+rotate,90,7,200
+rotate,90,8,220
+rotate,90,9,240
+rotate,90,10,260
+rotate,90,11,280
+rotate,90,12,300
+rotate,90,13,320
+rotate,90,14,340
+rotate,90,15,360
+rotate,90,16,380
+rotate,90,17,400
+rotate,90,18,420
+rotate,-90,1,70
+rotate,-90,2,90
+rotate,-90,3,110
+rotate,-90,4,130
+rotate,-90,5,150
+rotate,-90,6,170
+rotate,-90,7,190
+rotate,-90,8,210
+rotate,-90,9,230
+rotate,-90,10,250
+rotate,-90,11,270
+rotate,-90,12,290
+rotate,-90,13,310
+rotate,-90,14,330
+rotate,-90,15,350
+rotate,-90,16,370
+rotate,-90,17,390
+rotate,-90,18,410
+rotate,180,1,10
+rotate,180,2,20
+rotate,180,3,30
+rotate,180,4,40
+rotate,180,5,50
+rotate,180,6,60
+move,1,1,490
+move,1,2,500
+move,1,3,510
+move,1,4,520
+move,1,5,530
+move,1,6,540
+move,1,7,550
+move,1,8,560
+move,1,9,570
+move,1,10,580
+move,1,11,590
+move,1,12,600
+move,1,13,610
+move,1,14,620
+move,1,15,630
+move,1,16,640
+move,1,17,650
+move,1,18,660
+move,2,1,670
+move,2,2,680
+move,2,3,690
+move,2,4,700
+move,2,5,710
+move,2,6,720
+move,2,7,730
+move,2,8,740
+move,2,9,750
+move,2,10,760
+move,2,11,770
+move,2,12,780
+move,3,1,790
+move,3,2,800
+move,3,3,810
+move,3,4,820
+move,3,5,830
+move,3,6,840
+move,-1,1,430
+move,-1,2,440
+move,-1,3,450
+move,-1,4,460
+move,-1,5,470
+move,-1,6,480

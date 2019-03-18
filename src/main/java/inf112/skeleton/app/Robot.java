@@ -30,6 +30,14 @@ public class Robot extends IItem implements IRenderable {
     }
 
     /**
+     * Constructor for testing, instantiating Texture will throw a NullPointerException.
+     */
+    Robot() {
+        this.pos = new Vector2D(0, 0);
+        this.dir = new Vector2D(1, 0);
+    }
+
+    /**
      * Move the robot d units along it's direction vector.
      * @param d Positive or negative number.
      */

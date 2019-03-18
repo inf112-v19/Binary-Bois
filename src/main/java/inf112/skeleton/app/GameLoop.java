@@ -86,30 +86,18 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        int dir = 1;
+        int move_amount = 1;
         switch (keycode) {
             case Input.Keys.DOWN:
-                dir = -1;
+                move_amount = -1;
             case Input.Keys.UP:
-                Vector2D dir_v = my_robot.getDir().copy();
-                dir_v.mul(dir);
-                if (game.canMoveTo(my_robot.getPos(), dir_v, my_robot)) {
-                    my_robot.move(dir);
-                }
-                game.isOnHole(my_robot);
-
-                /*
-                System.out.println(my_robot.getPos());
-                TiledMapTileLayer layer = (TiledMapTileLayer)tiledMap.getLayers().get(0); // assuming the layer at index on contains tiles
-                TiledMapTileLayer.Cell cell = layer.getCell(my_robot.getPos().getX(), my_robot.getPos().getY());
-                System.out.println(cell.getTile().getProperties().get("MapObject", String.class));
-                */
+                Commands.moveCommand.exec(move_amount, my_robot, game);
                 break;
             case Input.Keys.RIGHT:
-                my_robot.rot(-90);
+                Commands.rotateCommand.exec(-90, my_robot, game);
                 break;
             case Input.Keys.LEFT:
-                my_robot.rot(90);
+                Commands.rotateCommand.exec(90, my_robot, game);
                 break;
             case Input.Keys.M:
                 if (!player.isPlaying())
