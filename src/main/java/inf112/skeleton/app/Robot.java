@@ -69,6 +69,8 @@ public class Robot extends Renderable implements IItem {
 
     public void setPos(Vector2Di pos) {
         this.pos = pos;
+        clearAnimations();
+        setDrawPos(pos.tof());
     }
 
     public Vector2Di getPos() {
