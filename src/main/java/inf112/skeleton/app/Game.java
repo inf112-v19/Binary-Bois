@@ -109,20 +109,19 @@ public class Game {
         //        (according to the game rules.)
         //        For now I'll assume they just die.
         if (backupPos != null) {
-            robot.death();
             board.set(robot, backupPos);
             robot.setPos(backupPos);
             robot.setArchiveMarker(backupPos);
+        } else {
+            robot.death();
         }
     }
     
     public void appendToLogBuilder(String string){
         game_log.append("", string);
-        //logBuilder.append("\r\n" + string);
     }
 
     public String getPrintLog(){
-        //printLog = logBuilder.toString();
         return game_log.toString();
     }
 
