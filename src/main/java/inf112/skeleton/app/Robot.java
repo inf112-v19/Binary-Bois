@@ -2,31 +2,31 @@ package inf112.skeleton.app;
 
 import com.badlogic.gdx.graphics.Texture;
 
-import java.io.File;
+public class Robot extends Renderable implements IItem {
 
-public class Robot extends IItem implements IRenderable {
-
-    private Vector2D pos;
-    private Vector2D dir;
+    private Vector2Di pos;
+    private Vector2Di dir;
     private Texture texture;
     private int size;
     private String name;
     private static int nameInt = 1;
-    private Vector2D archiveMarker;
+    private Vector2Di archiveMarker;
 
     Robot(int x, int y) throws NoSuchResource {
-        this.dir = new Vector2D(1, 0);
-        this.pos = new Vector2D(x, y);
+        super();
+        this.dir = new Vector2Di(1, 0);
+        this.pos = new Vector2Di(x, y);
         this.texture = Resources.getTexture("robot1.png");
         this.name = "Robot " + nameInt++;
+        setDrawPos(new Vector2Df(x, y));
     }
 
     /**
      * Constructor for testing, instantiating Texture will throw a NullPointerException.
      */
     Robot() {
-        this.pos = new Vector2D(0, 0);
-        this.dir = new Vector2D(1, 0);
+        this.pos = new Vector2Di(0, 0);
+        this.dir = new Vector2Di(1, 0);
     }
 
     /**
@@ -34,22 +34,29 @@ public class Robot extends IItem implements IRenderable {
      * @param d Positive or negative number.
      */
     public void move(int d) {
+        move(dir, d);
+    }
+
+    public void move(Vector2Di dir, int d) {
         this.pos.move(dir, d);
+        Vector2Df anim_move = dir.copy().tof();
+        anim_move.mul(d);
+        this.addAnimation(new Animation(anim_move, 0f, 0.25f));
     }
 
     public void rot(int deg) {
         this.dir.rotate((double) deg);
     }
 
-    public Vector2D getDir(){
+    public Vector2Di getDir(){
         return dir;
     }
 
-    public void setArchiveMarker(Vector2D archiveMarker) {
+    public void setArchiveMarker(Vector2Di archiveMarker) {
         this.archiveMarker = archiveMarker.copy();
     }
 
-    public Vector2D getArchiveMarkerPos() {
+    public Vector2Di getArchiveMarkerPos() {
         return archiveMarker;
     }
 
@@ -60,23 +67,17 @@ public class Robot extends IItem implements IRenderable {
         //TODO: Lose life etc.
     }
 
-    public void setPos(Vector2D pos) {
+    public void setPos(Vector2Di pos) {
         this.pos = pos;
     }
 
-    @Override
-    public Vector2D getPos() {
+    public Vector2Di getPos() {
         return pos;
     }
 
     @Override
     public Texture getTexture() {
         return texture;
-    }
-
-    @Override
-    public int compareTo(IRenderable o) {
-        return 0;
     }
 
     @Override

@@ -71,8 +71,8 @@ public class Game {
         boardSetup();
     }
 
-    public void registerFlagUpdateBackup(Vector2D pos, Vector2D dir, Robot robot) {
-        Vector2D newpos = pos.copy();
+    public void registerFlagUpdateBackup(Vector2Di pos, Vector2Di dir, Robot robot) {
+        Vector2Di newpos = pos.copy();
         newpos.move(dir, 1);
         ArrayList<IItem> itemlist = board.get(newpos);
         if (itemlist.isEmpty())
@@ -102,8 +102,8 @@ public class Game {
     }
 
     public void jumpOnBoard(Robot robot) {
-        Vector2D currentPos = robot.getPos();
-        Vector2D backupPos = robot.getArchiveMarkerPos();
+        Vector2Di currentPos = robot.getPos();
+        Vector2Di backupPos = robot.getArchiveMarkerPos();
         board.get(currentPos).remove(robot);
         // FIXME: I'm not actually sure what should happen if there is no backup position
         //        (according to the game rules.)
@@ -125,15 +125,15 @@ public class Game {
         return game_log.toString();
     }
 
-    public void moveOnBoard(Robot robot, Vector2D newpos, Vector2D dir) {
-        Vector2D pos = robot.getPos();
+    public void moveOnBoard(Robot robot, Vector2Di newpos, Vector2Di dir) {
+        Vector2Di pos = robot.getPos();
         board.get(pos).remove(robot);
         board.set(robot, newpos);
         registerFlagUpdateBackup(pos, dir, robot);
     }
 
     public void isOnHole(Robot robot) {
-        Vector2D currentPos = robot.getPos();
+        Vector2Di currentPos = robot.getPos();
         ArrayList<IItem> itemsOnPos = board.get(currentPos);
         for (IItem item : itemsOnPos) {
             if (item instanceof Hole) {
@@ -144,9 +144,9 @@ public class Game {
         }
     }
 
-    public boolean canMoveTo(Vector2D pos, Vector2D dir, Robot my_robot){
-        Vector2D orig_pos = pos.copy();
-        Vector2D newpos = pos.copy();
+    public boolean canMoveTo(Vector2Di pos, Vector2Di dir, Robot my_robot){
+        Vector2Di orig_pos = pos.copy();
+        Vector2Di newpos = pos.copy();
         newpos.move(dir, 1);
 
         for (IItem item : board.get(orig_pos))
@@ -163,16 +163,16 @@ public class Game {
 
         int listLength = itemlist.size();
         IItem itemInFront = itemlist.get(listLength-1);
-        Vector2D dir_opposite = dir.copy();
+        Vector2Di dir_opposite = dir.copy();
         dir_opposite.mul(-1);
         if (itemInFront instanceof Wall && ((Wall) itemInFront).hasEdge(dir_opposite)) {
             appendToLogBuilder("Blocked by wall");
             return false;
         } else if (itemInFront instanceof Robot) {
-            Vector2D otherBotPos = ((Robot) itemInFront).getPos();
+            Vector2Di otherBotPos = ((Robot) itemInFront).getPos();
             if (canMoveTo(otherBotPos, dir, (Robot) itemInFront)) {
                 appendToLogBuilder("Pushed other robot");
-                otherBotPos.move(dir, 1);
+                ((Robot) itemInFront).move(dir, 1);
             } else {
                 appendToLogBuilder("Unable to push other robot!");
                 return false;
@@ -197,7 +197,7 @@ public class Game {
                         board.set(Wall.getFullWall(), i, j);
                     }
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("flag")) {
-                        board.set(new Flag(flagCounter, new Vector2D(i, j)), i, j);
+                        board.set(new Flag(flagCounter, new Vector2Di(i, j)), i, j);
                         flagCounter += 1;
                     }
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("hole")) {

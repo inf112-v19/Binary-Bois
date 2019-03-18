@@ -4,9 +4,8 @@ package inf112.skeleton.app;
  * Represents all items on the board, like walls, holes, power-ups
  * and robots
  */
-public abstract class IItem {
-
-    public int compareTo(IItem other) {
+public interface IItem extends Comparable<IItem> {
+    default int compareTo(IItem other) {
         return Integer.compare(getSize(), other.getSize());
     }
 
@@ -14,19 +13,11 @@ public abstract class IItem {
      * 'Might' be used to choose layer in which the item is drawn
      * @return undefined
      */
-    abstract int getSize();
+    int getSize();
 
     /**
      * Identifies the item type
      * @return String used for identification
      */
-    abstract String getName();
-
-
-    /** Todo
-     * Representing the item. Used for graphics
-     * @return 'type' used for graphics
-     */
-    //abstract String getSymbol();
-
+    String getName();
 }

@@ -6,7 +6,7 @@ public class Commands {
     /** Move a robot along its direction vector. */
     public static ICommand moveCommand = (int amount, Robot robot, Game game) -> {
         int sgn = (int) Math.signum(amount);
-        Vector2D dir_v = robot.getDir().copy();
+        Vector2Di dir_v = robot.getDir().copy();
         dir_v.mul(sgn);
         for (int i = 0; i < Math.abs(amount); i++) {
             if (!game.canMoveTo(robot.getPos(), dir_v, robot))

@@ -1,30 +1,30 @@
 package inf112.skeleton.app;
 
 public class Wall extends TilePiece {
-    private Vector2D edges[];
+    private Vector2Di edges[];
 
-    public Wall(Vector2D... edges) {
-        this.edges = new Vector2D[edges.length];
+    public Wall(Vector2Di... edges) {
+        this.edges = new Vector2Di[edges.length];
         for (int i = 0; i < edges.length; i++)
             this.edges[i] = edges[i];
     }
 
-    public boolean hasEdge(Vector2D edge) {
-        for (Vector2D e : edges)
+    public boolean hasEdge(Vector2Di edge) {
+        for (Vector2Di e : edges)
             if (e.equals(edge))
                 return true;
         return false;
     }
 
     public static Wall getFullWall() {
-        return new Wall(new Vector2D(1, 0),
-                        new Vector2D(-1, 0),
-                        new Vector2D(0, 1),
-                        new Vector2D(0, -1));
+        return new Wall(new Vector2Di(1, 0),
+                        new Vector2Di(-1, 0),
+                        new Vector2Di(0, 1),
+                        new Vector2Di(0, -1));
     }
 
     @Override
-    String getName() {
+    public String getName() {
         return "Wall";
     }
 }

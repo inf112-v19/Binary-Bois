@@ -5,8 +5,8 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class Vector2DTest {
-    public static Vector2D mkRot(double rot) {
-        Vector2D vec = new Vector2D(1, 0);
+    public static Vector2Di mkRot(double rot) {
+        Vector2Di vec = new Vector2Di(1, 0);
         vec.rotate(rot);
         System.out.println(rot);
         System.out.println(vec);

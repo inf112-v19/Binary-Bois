@@ -5,9 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 
 import java.util.Vector;
@@ -25,22 +23,22 @@ public class Map {
     private static TiledMap tiledMap;
     private TiledMapRenderer tiledMapRenderer;
     private SpriteBatch batch;
-    private Vector<IRenderable> render_queue;
-    private Vector2D dim;
-    private Vector2D pos;
+    private Vector<Renderable> render_queue;
+    private Vector2Di dim;
+    private Vector2Di pos;
     private int pw, ph;
 
     // FIXME: This should be retrived from the map later on.
     private final int tile_dim = 32;
 
     public Map(int px, int py, int dim_pw, int dim_ph, String map_file) throws NoSuchResource {
-        pos = new Vector2D(px, py);
+        pos = new Vector2Di(px, py);
 
         tiledMap = Resources.getTiledMap(map_file);
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
         batch = new SpriteBatch();
         render_queue = new Vector<>();
-        dim = new Vector2D(
+        dim = new Vector2Di(
                 tiledMap.getProperties().get("width", Integer.class),
                 tiledMap.getProperties().get("height", Integer.class)
         );
@@ -76,7 +74,7 @@ public class Map {
         cam.update();
     }
 
-    public Vector2D getDimensions() {
+    public Vector2Di getDimensions() {
         return dim;
     }
 
@@ -84,9 +82,9 @@ public class Map {
         return tiledMap;
     }
 
-    public Vector2D toPixelCoordinate(Vector2D vec) {
-        Vector2D pos = new Vector2D(0, 0); // TODO: Remove this, it is a test
-        return new Vector2D(
+    public Vector2Di toPixelCoordinate(Vector2Di vec) {
+        Vector2Di pos = new Vector2Di(0, 0); // TODO: Remove this, it is a test
+        return new Vector2Di(
                 pos.getX() + vec.getX() * (pw / dim.getX()),
                 pos.getY() + vec.getY() * (ph / dim.getY())
         );
@@ -97,10 +95,10 @@ public class Map {
         tiledMapRenderer.render();
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
-        for (IRenderable r : render_queue) {
-            Vector2D pos = r.getPos();
-            Vector2D px_pos = toPixelCoordinate(pos);
-            r.render(batch, px_pos);
+        for (Renderable r : render_queue) {
+            //Vector2Di pos = r.getPos();
+            //Vector2Di px_pos = toPixelCoordinate(pos);
+            r.render(batch, 32);
         }
         batch.end();
 
@@ -120,7 +118,7 @@ public class Map {
         cam.update();
     }
 
-    public void addDrawJob(IRenderable obj) {
+    public void addDrawJob(Renderable obj) {
         render_queue.add(obj);
     }
 }

@@ -20,7 +20,7 @@ public interface IBoard {
     ArrayList<IItem> get(int x, int y);
 
     /** See get(int, int) */
-    default ArrayList<IItem> get(Vector2D pos) {
+    default ArrayList<IItem> get(Vector2Di pos) {
         return get(pos.getX(), pos.getY());
     }
 
@@ -35,7 +35,7 @@ public interface IBoard {
     void set(IItem item, int x, int y);
 
     /** See set(IItem, int, int) */
-    default void set(IItem item, Vector2D pos) {
+    default void set(IItem item, Vector2Di pos) {
         set(item, pos.getX(), pos.getY());
     }
 

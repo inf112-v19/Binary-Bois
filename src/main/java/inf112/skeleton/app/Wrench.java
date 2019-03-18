@@ -1,14 +1,13 @@
 package inf112.skeleton.app;
 
-public class Wrench extends IItem {
-
+public class Wrench implements IItem {
     @Override
-    int getSize() {
+    public int getSize() {
         return 0;
     }
 
     @Override
-    String getName() {
+    public String getName() {
         return "Wrench";
     }
 }

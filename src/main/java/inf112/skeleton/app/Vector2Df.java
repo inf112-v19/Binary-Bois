@@ -1,18 +1,24 @@
 package inf112.skeleton.app;
 
 /**
- * Mutable 2D integer vector class.
+ * Mutable 2D float vector.
+ *
+ * Note:
+ * Unfortunately Java is dumb and does not allow generic parameters
+ * to be primitive types. This means that Vector2Di and Vector2Df need
+ * to be separate classes. You could use Integer/Double/Float, but that
+ * comes at a performance cost.
  */
-public class Vector2D {
-    private int x;
-    private int y;
+public class Vector2Df {
+    private float x;
+    private float y;
 
-    public Vector2D(int x, int y) {
+    public Vector2Df(float x, float y) {
         this.x = x;
         this.y = y;
     }
 
-    public Vector2D(double deg) {
+    public Vector2Df(float deg) {
         this.x = 1;
         this.y = 0;
         this.rotate(deg);
@@ -22,19 +28,19 @@ public class Vector2D {
      * Perform "integer" rotation, this means that the only results from this rotation
      * on a unit vector are: {[0,1], [0,-1], [1,0], [1, 1], [1, -1], [-1,0], [-1,1], [-1,-1]}
      * Note that a rotation might change the magnitude of a vector, as they have to be rounded.
-     * This introduces a lot of error and makes the class unsuitable for certain applications, but this 
+     * This introduces a lot of error and makes the class unsuitable for certain applications, but this
      * suits our use case of moving discretely along grids.
      *
      * @param deg Degrees to rotate
      */
-    public void rotate(double deg) {
-        double rad = Math.toRadians(deg);
-        double cs = Math.cos(rad);
-        double sn = Math.sin(rad);
-        double x = this.x * cs - this.y * sn;
-        double y = this.x * sn + this.y * cs;
-        this.x = (int) Math.round(x);
-        this.y = (int) Math.round(y);
+    public void rotate(float deg) {
+        float rad = (float) Math.toRadians(deg);
+        float cs = (float) Math.cos(rad);
+        float sn = (float) Math.sin(rad);
+        float x = this.x * cs - this.y * sn;
+        float y = this.x * sn + this.y * cs;
+        this.x = x;
+        this.y = y;
     }
 
     /**
@@ -43,7 +49,7 @@ public class Vector2D {
      * @param other The vector B in: this . B
      * @return A_x*B_x + A_y*B_y
      */
-    public double dot(Vector2D other) {
+    public float dot(Vector2Df other) {
         return x*other.getX() + y*other.getY();
     }
 
@@ -53,19 +59,19 @@ public class Vector2D {
      * @param other The vector to compute angle according to.
      * @return The angle in degrees.
      */
-    public double angle(Vector2D other) {
+    public float angle(Vector2Df other) {
         /* TODO: This computation is fairly heavy and doesn't change every 1/60th of a second,
          *       so for a few common "other" vectors like [1, 0] the result should probably be
          *       cached until x/y changes.
          */
-        return Math.toDegrees(Math.acos(this.dot(other) / (this.magnitude() * other.magnitude())));
+        return (float) Math.toDegrees(Math.acos(this.dot(other) / (this.magnitude() * other.magnitude())));
     }
 
     /**
      * @return Angle between this vector and the vector [1, 0]
      */
-    public double angle() {
-        return angle(new Vector2D(1, 0));
+    public float angle() {
+        return angle(new Vector2Df(1, 0));
     }
 
     /**
@@ -73,51 +79,64 @@ public class Vector2D {
      *
      * @return Length.
      */
-    public double magnitude() {
-        return Math.sqrt(x*x + y*y);
+    public float magnitude() {
+        return (float) Math.sqrt(x*x + y*y);
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public int getY() {
+    public void normalize() {
+        mul(1.0f/magnitude());
+    }
+
+    public float getY() {
         return y;
     }
 
-    public void mul(int d) {
+    public void mul(float d) {
         this.x *= d;
         this.y *= d;
     }
 
-    public Vector2D copy() {
-        return new Vector2D(x, y);
+    public Vector2Df copy() {
+        return new Vector2Df(x, y);
     }
 
-    public void add(Vector2D vec) {
+    public void add(Vector2Df vec) {
         x += vec.x;
         y += vec.y;
     }
 
-    public void move(Vector2D dir, int d) {
-        Vector2D new_dir = dir.copy();
+    public void sub(Vector2Df vec) {
+        x -= vec.x;
+        y -= vec.y;
+    }
+
+    public void move(Vector2Df dir, float d) {
+        Vector2Df new_dir = dir.copy();
         new_dir.mul(d);
         this.add(new_dir);
     }
 
     @Override
     public String toString() {
-        return "<Vector2D: [" + x + ", " + y + "]>";
+        return "<Vector2Df: [" + x + ", " + y + "]>";
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
-        if (obj instanceof Vector2D) {
-            Vector2D other = (Vector2D) obj;
+        if (obj instanceof Vector2Df) {
+            Vector2Df other = (Vector2Df) obj;
             return other.x == x && other.y == y;
         }
         return false;
+    }
+
+    public Vector2Di toi() {
+        return new Vector2Di(Math.round(x), Math.round(y));
     }
 }

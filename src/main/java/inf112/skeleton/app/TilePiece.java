@@ -3,15 +3,15 @@ package inf112.skeleton.app;
 /**
  * Every piece of floor, including holes, walls, automatic bands and power up tiles
  */
-public class TilePiece extends  IItem {
+public class TilePiece implements IItem {
 
     @Override
-    int getSize() {
+    public int getSize() {
         return 0;
     }
 
     @Override
-    String getName() {
+    public String getName() {
         return "TilePiece";
     }
 }

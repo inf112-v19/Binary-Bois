@@ -1,16 +1,11 @@
 package inf112.skeleton.app;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import jdk.tools.jaotc.collect.classname.ClassNameSource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,7 +53,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             my_robot = robots.get(robots.size() - 1);
             my_robot.rot(-90);
 
-            Vector2D map_dim = map.getDimensions();
+            Vector2Di map_dim = map.getDimensions();
             System.out.println("Map Dimensions: " + map_dim);
             this.game = new Game(map_dim.getX(), map_dim.getY(), robots);
 
@@ -69,7 +64,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 //       exception will never happen directly after the Game is instantiated.
             }
 
-            Gdx.input.setInputProcessor(this);
+            InputMultiplexer input_multi = new InputMultiplexer();
+            input_multi.addProcessor(this);
+            Gdx.input.setInputProcessor(input_multi);
 
             batch = new SpriteBatch();
             font = new BitmapFont();
@@ -87,6 +84,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         // Clear the screen with the background color.
         Gdx.gl.glClearColor(bgcolor.r, bgcolor.g, bgcolor.b, bgcolor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Renderable.updateAll();
 
         if (game.getPrintLog() != null) {
             batch.begin();
@@ -107,6 +105,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 move_amount = -1;
             case Input.Keys.UP:
                 Commands.moveCommand.exec(move_amount, my_robot, game);
+                break;
+            case Input.Keys.NUM_3:
+                Commands.moveCommand.exec(3, my_robot, game);
                 break;
             case Input.Keys.RIGHT:
                 Commands.rotateCommand.exec(-90, my_robot, game);
@@ -130,8 +131,11 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 if (c != null)
                     c.exec(my_robot, game);
                 System.out.println(game.getActivePlayer().getName() + " Cards: " + Arrays.toString(game.getActivePlayer().getHand().toArray()));
+
+            default:
+                return false;
         }
-        return false;
+        return true;
     }
 
     @Override

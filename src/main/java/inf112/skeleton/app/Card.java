@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 /**
  * An action that can be executed on a game/robot.
  */
-public class Card {
+public class Card extends Renderable {
     private int amount;
     private int type_id;
     private int priority;
@@ -23,7 +23,11 @@ public class Card {
     /**
      * @return The visual representation of the command as a card.
      */
-    public Texture getCardTexture() {
+    public Texture getTexture() {
+        return null;
+    }
+
+    public Vector2Di getPos() {
         return null;
     }
 

@@ -1,11 +1,11 @@
 package inf112.skeleton.app;
 
-public class Flag extends IItem {
+public class Flag implements IItem {
 
     private int number;
-    private Vector2D pos;
+    private Vector2Di pos;
 
-    public Flag(int number, Vector2D pos) {
+    public Flag(int number, Vector2Di pos) {
         this.number = number;
         this.pos = pos;
     }
@@ -15,12 +15,12 @@ public class Flag extends IItem {
     }
 
     @Override
-    int getSize() {
+    public int getSize() {
         return 0;
     }
 
     @Override
-    String getName() {
+    public String getName() {
         return "Flag";
     }
 }
