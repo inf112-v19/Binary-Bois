@@ -11,20 +11,27 @@ public class Card extends Renderable {
     private int priority;
     private String name;
     private ICommand cmd;
+    private Texture tx;
 
-    public Card(ICommand cmd, String name, int amount, int type_id, int priority) {
+    public Card(ICommand cmd, String name, int amount, int type_id, int priority) throws NoSuchResource {
         this.name = name;
         this.amount = amount;
         this.type_id = type_id;
         this.priority = priority;
         this.cmd = cmd;
+        try {
+            tx = Resources.getTexture("cards/175x250/" + this.name + "_" + this.amount + ".png");
+            // TODO: Draw priority
+        } catch (NoSuchResource e) {
+            tx = Resources.getTexture("cards/175x250/unknown.png");
+        }
     }
 
     /**
      * @return The visual representation of the command as a card.
      */
     public Texture getTexture() {
-        return null;
+        return tx;
     }
 
     public Vector2Di getPos() {

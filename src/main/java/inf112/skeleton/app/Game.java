@@ -41,6 +41,8 @@ public class Game {
             throw new InitError("Card source CSV file was incorrectly formed: " + cards_src);
         } catch (IOException e) {
             throw new InitError("Unable to read card source CSV file: " + cards_src);
+        } catch (NoSuchResource e) {
+            throw new InitError("Unable to load resource: " + e.getMessage());
         }
         setup();
 

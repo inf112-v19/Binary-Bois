@@ -88,7 +88,10 @@ public class Vector2Df {
     }
 
     public void normalize() {
-        mul(1.0f/magnitude());
+        float mag = magnitude();
+        if (mag < 0.00001f)
+            return;
+        mul(1.0f/mag);
     }
 
     public float getY() {

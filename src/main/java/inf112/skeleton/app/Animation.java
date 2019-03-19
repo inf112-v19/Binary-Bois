@@ -40,6 +40,32 @@ public class Animation {
         num_ticks = Math.round(time / Renderable.ANIMATION_TIMESTEP);
     }
 
+    /**
+     * Idle animation, used for timing subsequent animations.
+     * @param t How long to idle.
+     * @return Idle-animation.
+     */
+    public static Animation idle(float t) {
+        return new Animation(new Vector2Df(0, 0), 0, t);
+    }
+
+    /**
+     * Create an animation for a renderable that moves it to a new position.
+     *
+     * FIXME: moveTo needs to take existing animations on `r` into account when calculating
+     *        the movement vector.
+     *
+     * @param r The renderable to be move-animated.
+     * @param newpos The destination position.
+     * @param t The animation time.
+     * @return Move-animation
+     */
+    public static Animation moveTo(Renderable r, Vector2Di newpos, float t) {
+        Vector2Df vec = newpos.copy().tof();
+        vec.sub(r.getDrawPos(1).tof());
+        return new Animation(vec, 0, t);
+    }
+
     public boolean update(int ticks) {
         while (ticks-- > 0 && num_ticks-- > 0) {
             pos_offset.add(vel);

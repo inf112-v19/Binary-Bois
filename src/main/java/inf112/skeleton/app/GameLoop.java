@@ -28,6 +28,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private BitmapFont font;
     private SpriteBatch batch;
     private Color bgcolor;
+    private CardManager card_queue;
 
     public GameLoop(int map_px_w, int map_px_h) {
         super();
@@ -71,6 +72,14 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             batch = new SpriteBatch();
             font = new BitmapFont();
             font.setColor(Color.BLACK);
+
+            card_queue = new CardManager(new Vector2Di(850 + (175/2), 500), 5);
+            card_queue.setCards(game.getActivePlayer().getHand());
+
+            game.appendToLogBuilder("Fix for this bug will come shortly");
+            game.appendToLogBuilder("Pressing q/h quickly reveals a bug");
+            game.appendToLogBuilder("Press h to hide all cards");
+            game.appendToLogBuilder("Press q to show all cards");
         } catch (NoSuchResource e) {
             System.out.println("Unable to load: " + e.getMessage());
         } catch (Game.InitError e) {
@@ -93,6 +102,8 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         }
 
         map.render();
+
+        card_queue.render(batch, 1);
 
         // TODO: The UI will be drawn here later.
     }
@@ -131,6 +142,14 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 if (c != null)
                     c.exec(my_robot, game);
                 System.out.println(game.getActivePlayer().getName() + " Cards: " + Arrays.toString(game.getActivePlayer().getHand().toArray()));
+
+            case Input.Keys.Q:
+                card_queue.showCards();
+                break;
+
+            case Input.Keys.H:
+                card_queue.hideCards();
+                break;
 
             default:
                 return false;

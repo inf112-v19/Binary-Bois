@@ -24,6 +24,9 @@ public abstract class Renderable {//implements Comparable<Renderable> {
     public static final float ANIMATION_TIMESTEP = 1.0f/60.0f;
     private static float time_acc = 0.0f;
     private static int ticks = 0;
+    /** Useful when you want to know if an animation has finished.
+     *  TODO: Implement animationHasFinished(Animation) */
+    private static long total_ticks = 0;
 
     private Vector2Df pos = new Vector2Df(0, 0);
     private float angle = 0;
@@ -70,6 +73,7 @@ public abstract class Renderable {//implements Comparable<Renderable> {
      * knows how much to advance their animations.
      */
     public static void updateAll() {
+        total_ticks += ticks;
         time_acc += Gdx.graphics.getDeltaTime();
         ticks = (int) (time_acc / ANIMATION_TIMESTEP);
         time_acc -= ticks * ANIMATION_TIMESTEP;

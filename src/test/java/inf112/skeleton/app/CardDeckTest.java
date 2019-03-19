@@ -16,7 +16,7 @@ public class CardDeckTest {
         CardDeck deck = null;
         try {
             deck = new CardDeck(card_file);
-        } catch (IOException | CSV.CSVError e) {
+        } catch (IOException | NoSuchResource | CSV.CSVError e) {
             fail();
         }
     }

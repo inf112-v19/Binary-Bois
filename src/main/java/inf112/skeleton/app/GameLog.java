@@ -31,9 +31,9 @@ class LogItem {
     @Override
     public String toString() {
         return (from
-                + "@"
-                + fmtTime()
-                + ": "
+                //+ "@"
+                //+ fmtTime()
+                //+ ": "
                 + msg
                 + (num <= 1 ? "" : String.format(" (x%02d)", num)));
     }
