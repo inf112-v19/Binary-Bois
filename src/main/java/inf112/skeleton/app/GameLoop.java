@@ -34,7 +34,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         super();
         this.map_px_w = map_px_w;
         this.map_px_h = map_px_h;
-        bgcolor = new Color(1, 1, 1, 1);
+        bgcolor = new Color(0.5f, 0.5f, 0.5f, 1);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             font = new BitmapFont();
             font.setColor(Color.BLACK);
 
-            card_queue = new CardManager(new Vector2Di(850 + (175/2), 500), 5);
+            card_queue = new CardManager(5);
             card_queue.setCards(game.getActivePlayer().getHand());
 
             game.appendToLogBuilder("Fix for this bug will come shortly");

@@ -2,9 +2,11 @@ package inf112.skeleton.app;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -12,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import java.util.ArrayList;
 
@@ -21,8 +24,10 @@ import java.util.ArrayList;
  */
 public class CardManager extends Renderable {
     private final int CARD_WIDTH = 175;
+    private final int CARD_HEIGHT = 250;
     private final Vector2Di CARD_SPACING = new Vector2Di(CARD_WIDTH + 10, 0);
     private final Vector2Di FIRST_CARD_POS = new Vector2Di(0, 300);
+    private final Vector2Di DECK_BG_OFFSET = new Vector2Di(-12, -12);
     private final Vector2Di FIRST_SLOT_POS;
     private final float MOVE_TIME = 0.5f;
     private Vector2Di start_pos;
@@ -31,17 +36,28 @@ public class CardManager extends Renderable {
     private ArrayList<Card> active_cards = new ArrayList<>();
     private Texture slot_back;
     private Texture slot_front;
+    private Texture slot_sep;
+    private Texture deck_bg;
+    private Vector2Di deck_bg_pos;
     private int num_slots;
+    private ShapeRenderer shape_renderer;
+    private final float bg_gray = 0.40f;
+    private Color bgcolor = new Color(bg_gray, bg_gray, bg_gray, 1.0f);
 
     private Stage stage;
 
-    public CardManager(Vector2Di deck_pos, int num_slots) throws NoSuchResource {
-        start_pos = deck_pos;
+    public CardManager(int num_slots) throws NoSuchResource {
+        start_pos = new Vector2Di(CARD_SPACING.getX() * num_slots + 20, 10);
         stage = new Stage();
         slot_back = Resources.getTexture("cards/175x250/slot/slot_back.png");
         slot_front = Resources.getTexture("cards/175x250/slot/slot_front.png");
+        slot_sep = Resources.getTexture("cards/175x250/slot/separator.png");
+        deck_bg = Resources.getTexture("cards/175x250/deck/deck_background.png");
         this.num_slots = num_slots;
         FIRST_SLOT_POS = new Vector2Di(0, 0);
+        shape_renderer = new ShapeRenderer();
+        deck_bg_pos = start_pos.copy();
+        deck_bg_pos.add(DECK_BG_OFFSET);
     }
 
     public Stage getStage() {
@@ -89,11 +105,19 @@ public class CardManager extends Renderable {
 
     @Override
     public void render(SpriteBatch batch, Vector2Di pos) {
+        Vector2Di bg_sz = new Vector2Di(Gdx.graphics.getWidth(), CARD_HEIGHT + 20);
+        shape_renderer.begin(ShapeRenderer.ShapeType.Filled);
+        shape_renderer.setColor(bgcolor);
+        shape_renderer.rect(0, 0, bg_sz.getX(), bg_sz.getY());
+        shape_renderer.end();
+
         // FIXME: The fact that we call batch begin()/end() *inside* of render makes the
         //        system very inconsistent. We have to do it in this case because stage.draw()
         //        needs to come directly after the first batch, but *before* the rendering of
         //        slot_front. And it produces odd behaviour if called between begin()/end() calls.
         batch.begin();
+        batch.draw(deck_bg, deck_bg_pos.getX(), deck_bg_pos.getY());
+
         for (int i = inactive_cards.size()-1; i >= 0; i--)
             inactive_cards.get(i).render(batch, 1);
 
