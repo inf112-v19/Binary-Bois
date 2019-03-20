@@ -22,7 +22,7 @@ import java.util.ArrayList;
  * Handles everything related to drawing and interacting with cards using
  * the mouse.
  */
-public class CardManager extends Renderable {
+public class CardManager {
     private final int CARD_WIDTH = 175;
     private final int CARD_HEIGHT = 250;
     private final Vector2Di CARD_SPACING = new Vector2Di(CARD_WIDTH + 10, 0);
@@ -85,6 +85,7 @@ public class CardManager extends Renderable {
             card_pos.add(CARD_SPACING);
 
             // Add drag event:
+            //makeDragable(c);
         }
     }
 
@@ -103,8 +104,77 @@ public class CardManager extends Renderable {
         stage.act(Gdx.graphics.getDeltaTime());
     }
 
-    @Override
-    public void render(SpriteBatch batch, Vector2Di pos) {
+    public void makeDragable(Card c) {
+        Skin skin = new Skin();
+        skin.add("card", c.getTexture());
+
+        Image sourceImage = new Image(skin, "card");
+        Vector2Di draw_pos = c.getDrawPos(1);
+        sourceImage.setBounds(draw_pos.getX(), draw_pos.getY(), 175, 250);
+        stage.addActor(sourceImage);
+
+        // TODO: Create a separate target image
+        Image target_img = new Image(skin, "card");
+        target_img.setBounds(400, 50, 175,250);
+        stage.addActor(target_img);
+
+        DragAndDrop dragAndDrop = new DragAndDrop();
+        dragAndDrop.addSource(new DragAndDrop.Source(sourceImage) {
+            public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
+                DragAndDrop.Payload payload = new DragAndDrop.Payload();
+                payload.setObject("Dragable card");
+                Image img = new Image(skin, "card");
+                img.setBounds(80, 80, 175, 250);
+                payload.setObject(img);
+
+                payload.setDragActor(img);
+                dragAndDrop.setDragActorPosition(x, y - img.getHeight());
+                sourceImage.setColor(0, 0, 0, 0);
+
+                return payload;
+            }
+
+            // FIXME: This method doesn't seem to exist in the current version of libgdx.
+            //        Emulate this by using mouseMove in an InputProcessor
+            //
+            // This function should correct the position of the card so that it slides in
+            // properly into the slot.
+            //
+            public void drag(InputEvent event, float x, float y, int pointer) {
+                System.out.println("Drag(x, y) = " + x + ", " + y + ")");
+            }
+
+            public void dragStop(InputEvent event,
+                                 float x,
+                                 float y,
+                                 int pointer,
+                                 DragAndDrop.Payload payload,
+                                 DragAndDrop.Target target) {
+                if (target == null) {
+                    sourceImage.setColor(1, 1, 1, 1);
+                    return;
+                }
+                sourceImage.remove();
+            }
+        });
+        dragAndDrop.addTarget(new DragAndDrop.Target(target_img) {
+            public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                getActor().setColor(Color.GREEN);
+                return true;
+            }
+
+            public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {
+                getActor().setColor(Color.WHITE);
+            }
+
+            public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                sourceImage.remove();
+                System.out.println("Accepted: " + payload.getObject() + " " + x + ", " + y);
+            }
+        });
+    }
+
+    public void render(SpriteBatch batch) {
         Vector2Di bg_sz = new Vector2Di(Gdx.graphics.getWidth(), CARD_HEIGHT + 20);
         shape_renderer.begin(ShapeRenderer.ShapeType.Filled);
         shape_renderer.setColor(bgcolor);

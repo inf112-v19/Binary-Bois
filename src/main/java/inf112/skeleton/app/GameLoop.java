@@ -65,19 +65,19 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 //       exception will never happen directly after the Game is instantiated.
             }
 
+            card_queue = new CardManager(5);
+            card_queue.setCards(game.getActivePlayer().getHand());
+
             InputMultiplexer input_multi = new InputMultiplexer();
+            input_multi.addProcessor(card_queue.getStage());
             input_multi.addProcessor(this);
             Gdx.input.setInputProcessor(input_multi);
+            card_queue.showCards();
 
             batch = new SpriteBatch();
             font = new BitmapFont();
             font.setColor(Color.BLACK);
 
-            card_queue = new CardManager(5);
-            card_queue.setCards(game.getActivePlayer().getHand());
-
-            game.appendToLogBuilder("Fix for this bug will come shortly");
-            game.appendToLogBuilder("Pressing q/h quickly reveals a bug");
             game.appendToLogBuilder("Press h to hide all cards");
             game.appendToLogBuilder("Press q to show all cards");
         } catch (NoSuchResource e) {
@@ -103,7 +103,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
         map.render();
 
-        card_queue.render(batch, 1);
+        card_queue.render(batch);
 
         // TODO: The UI will be drawn here later.
     }
