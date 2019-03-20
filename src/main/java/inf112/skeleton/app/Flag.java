@@ -15,11 +15,6 @@ public class Flag implements IItem {
     }
 
     @Override
-    public int getSize() {
-        return 0;
-    }
-
-    @Override
     public String getName() {
         return "Flag";
     }

@@ -18,6 +18,7 @@ public class Robot extends Renderable implements IItem {
         this.pos = new Vector2Di(x, y);
         this.texture = Resources.getTexture("robot1.png");
         this.name = "Robot " + nameInt++;
+        archiveMarker = this.pos.copy();
         setDrawPos(new Vector2Df(x, y));
     }
 
@@ -80,11 +81,6 @@ public class Robot extends Renderable implements IItem {
     @Override
     public Texture getTexture() {
         return texture;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 
     @Override
