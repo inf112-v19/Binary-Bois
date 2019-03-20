@@ -43,6 +43,8 @@ public abstract class Renderable {//implements Comparable<Renderable> {
     private ArrayList<Animation> animations = new ArrayList<>();
     private Animation current_animation = null;
 
+    private boolean do_draw = true;
+
     private static ArrayList<AnimationCallback> callbacks = new ArrayList<>();
 
     /**
@@ -50,13 +52,27 @@ public abstract class Renderable {//implements Comparable<Renderable> {
      * @return The tick number that finishes the animation.
      */
     public long addAnimation(Animation new_anim) {
-        long ticks = total_ticks;
         animations.add(new_anim);
+        return getFinalAnimationTick();
+    }
+
+    public long getFinalAnimationTick() {
+        long ticks = total_ticks;
         if (current_animation != null)
             ticks += current_animation.getTicks();
         for (Animation a : animations)
             ticks += a.getTicks();
         return ticks;
+    }
+
+    /**
+     * Add callback for when the final animation finishes, as per the calling
+     * of the function. If there are more animations added after this function
+     * returns they will not be taken into account.
+     * @param fn The callback to run.
+     */
+    public void addAnimationCallback(Runnable fn) {
+        addAnimationCallback(getFinalAnimationTick(), fn);
     }
 
     public static void addAnimationCallback(long ticks, Runnable fn) {
@@ -123,7 +139,8 @@ public abstract class Renderable {//implements Comparable<Renderable> {
         time_acc -= ticks * ANIMATION_TIMESTEP;
 
         ArrayList<AnimationCallback> dead_callbacks = new ArrayList<>();
-        for (AnimationCallback cb : callbacks)
+        ArrayList<AnimationCallback> callbacks_cpy = new ArrayList<>(callbacks);
+        for (AnimationCallback cb : callbacks_cpy)
             if (cb.ticks <= total_ticks) {
                 dead_callbacks.add(cb);
                 cb.r.run();
@@ -149,6 +166,8 @@ public abstract class Renderable {//implements Comparable<Renderable> {
     }
 
     public void render(SpriteBatch batch, Vector2Di pos) {
+        if (!do_draw)
+            return;
         Texture tx = getTexture();
         if (tx == null)
             return;
@@ -157,6 +176,14 @@ public abstract class Renderable {//implements Comparable<Renderable> {
         TextureRegion rtx = new TextureRegion(tx);
         batch.draw(rtx, pos.getX(), pos.getY(), rx, ry, tx.getWidth(), tx.getHeight(), 1, 1, angle);
         update();
+    }
+
+    public void hide() {
+        do_draw = false;
+    }
+
+    public void show() {
+        do_draw = true;
     }
 
     /*

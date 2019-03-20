@@ -80,6 +80,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
             game.appendToLogBuilder("Press h to hide all cards");
             game.appendToLogBuilder("Press q to show all cards");
+            game.appendToLogBuilder("Press e to run selected cards");
         } catch (NoSuchResource e) {
             System.out.println("Unable to load: " + e.getMessage());
         } catch (Game.InitError e) {
@@ -136,12 +137,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 game.printFlags();
                 break;
 
-            // Execute a card command (this is just a test.)
+            // Execute all cards that are queued
             case Input.Keys.E:
-                Card c = game.getActivePlayer().popCard();
-                if (c != null)
-                    c.exec(my_robot, game);
-                System.out.println(game.getActivePlayer().getName() + " Cards: " + Arrays.toString(game.getActivePlayer().getHand().toArray()));
+                card_queue.getSequenceAsCommand().exec(1, my_robot, game);
+                break;
 
             case Input.Keys.Q:
                 card_queue.showCards();
