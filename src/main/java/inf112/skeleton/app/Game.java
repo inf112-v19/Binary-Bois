@@ -163,21 +163,24 @@ public class Game {
             return true;
         }
 
-        int listLength = itemlist.size();
-        IItem itemInFront = itemlist.get(listLength-1);
         Vector2Di dir_opposite = dir.copy();
         dir_opposite.mul(-1);
-        if (itemInFront instanceof Wall && ((Wall) itemInFront).hasEdge(dir_opposite)) {
-            appendToLogBuilder("Blocked by wall");
-            return false;
-        } else if (itemInFront instanceof Robot) {
-            Vector2Di otherBotPos = ((Robot) itemInFront).getPos();
-            if (canMoveTo(otherBotPos, dir, (Robot) itemInFront)) {
-                appendToLogBuilder("Pushed other robot");
-                ((Robot) itemInFront).move(dir, 1);
-            } else {
-                appendToLogBuilder("Unable to push other robot!");
+        for (IItem itemInFront : itemlist)
+            if (itemInFront instanceof Wall && ((Wall) itemInFront).hasEdge(dir_opposite)) {
+                appendToLogBuilder("Blocked by wall");
                 return false;
+            }
+        ArrayList<IItem> tmp_list = new ArrayList<>(itemlist);
+        for (IItem itemInFront : tmp_list) {
+            if (itemInFront instanceof Robot) {
+                Vector2Di otherBotPos = ((Robot) itemInFront).getPos();
+                if (canMoveTo(otherBotPos, dir, (Robot) itemInFront)) {
+                    appendToLogBuilder("Pushed other robot");
+                    ((Robot) itemInFront).move(dir, 1);
+                } else {
+                    appendToLogBuilder("Unable to push other robot!");
+                    return false;
+                }
             }
         }
         moveOnBoard(my_robot, newpos, dir);
