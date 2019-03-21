@@ -39,6 +39,7 @@ public abstract class Renderable {//implements Comparable<Renderable> {
 
     private Vector2Df pos = new Vector2Df(0, 0);
     private float angle = 0;
+    private float scale = 1.0f;
 
     private ArrayList<Animation> animations = new ArrayList<>();
     private Animation current_animation = null;
@@ -88,6 +89,8 @@ public abstract class Renderable {//implements Comparable<Renderable> {
         }
         current_animation = animations.get(0);
         animations.remove(0);
+        angle += current_animation.getAngleOffset();
+        scale += current_animation.getScaleOffset();
         pos.add(current_animation.getPosOffset());
     }
 
@@ -103,12 +106,31 @@ public abstract class Renderable {//implements Comparable<Renderable> {
         return pos.toi();
     }
 
+    public float getAnimatedAngle() {
+        if (current_animation == null)
+            return angle;
+        return angle - current_animation.getAngleOffset();
+    }
+
+    public float getAnimatedScale() {
+        if (current_animation == null)
+            return scale;
+        return scale - current_animation.getScaleOffset();
+    }
+
     public Vector2Di getFinalAnimationPos(float scale) {
         Vector2Df pos = this.pos.copy();
         for (Animation a : animations)
             pos.add(a.getPosOffset());
         pos.mul(scale);
         return pos.toi();
+    }
+
+    public float getFinalAnimationScale() {
+        float scale = this.scale;
+        for (Animation a : animations)
+            scale += a.getScaleOffset();
+        return scale;
     }
 
     public Vector2Di getDrawPos(float scale) {
@@ -174,7 +196,7 @@ public abstract class Renderable {//implements Comparable<Renderable> {
         int rx = tx.getWidth() / 2;
         int ry = tx.getHeight() / 2;
         TextureRegion rtx = new TextureRegion(tx);
-        batch.draw(rtx, pos.getX(), pos.getY(), rx, ry, tx.getWidth(), tx.getHeight(), 1, 1, angle);
+        batch.draw(rtx, pos.getX(), pos.getY(), rx, ry, tx.getWidth(), tx.getHeight(), getAnimatedScale(), getAnimatedScale(), getAnimatedAngle());
         update();
     }
 

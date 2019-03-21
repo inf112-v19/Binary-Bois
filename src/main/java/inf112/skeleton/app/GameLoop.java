@@ -9,8 +9,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+
 
 public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private static int[][] robot_start_positions = {
@@ -21,8 +21,8 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     };
     // All positions are in board dimensions, not in pixel dimensions.
     private Music player;
-    Sound fxPlayer;
-    private Robot my_robot;
+    private Sound fxPlayer;
+    private Robot current_robot;
     private Game game;
 
     private Map map;
@@ -53,12 +53,12 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
             ArrayList<Robot> robots = new ArrayList<>();
             for (int[] pos : robot_start_positions) {
-                Robot robut = new Robot(pos[0], pos[1]);
+                Robot robut = new Robot(pos[0], pos[1]); //Robut
                 robots.add(robut);
                 map.addDrawJob(robut);
             }
-            my_robot = robots.get(robots.size() - 1);
-            my_robot.rot(-90);
+            current_robot = robots.get(robots.size() - 1);
+            current_robot.rot(-90);
 
             Vector2Di map_dim = map.getDimensions();
             System.out.println("Map Dimensions: " + map_dim);
@@ -78,7 +78,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             input_multi.addProcessor(card_queue.getStage());
             input_multi.addProcessor(this);
             Gdx.input.setInputProcessor(input_multi);
-            card_queue.showCards();
 
             batch = new SpriteBatch();
             font = new BitmapFont();
@@ -89,6 +88,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             game.appendToLogBuilder("Press e to run selected cards");
         } catch (NoSuchResource e) {
             System.out.println("Unable to load: " + e.getMessage());
+            System.exit(1);
         } catch (Game.InitError e) {
             System.out.println(e.getMessage());
             System.exit(1);
@@ -123,21 +123,29 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
+        final int KEY_NUM_END = 16;
+        final int KEY_NUM_BEGIN = 8;
         int move_amount = 1;
+        if (keycode <= KEY_NUM_END && keycode >= KEY_NUM_BEGIN) {
+            int number = keycode - KEY_NUM_BEGIN;
+            try {
+                current_robot = game.getRobot(number);
+            } catch (IndexOutOfBoundsException e) {
+                game.appendToLogBuilder("No such robot");
+            }
+            return true;
+        }
         switch (keycode) {
             case Input.Keys.DOWN:
                 move_amount = -1;
             case Input.Keys.UP:
-                Commands.moveCommand.exec(move_amount, my_robot, game);
-                break;
-            case Input.Keys.NUM_3:
-                Commands.moveCommand.exec(3, my_robot, game);
+                Commands.moveCommand.exec(move_amount, current_robot, game);
                 break;
             case Input.Keys.RIGHT:
-                Commands.rotateCommand.exec(-90, my_robot, game);
+                Commands.rotateCommand.exec(-90, current_robot, game);
                 break;
             case Input.Keys.LEFT:
-                Commands.rotateCommand.exec(90, my_robot, game);
+                Commands.rotateCommand.exec(90, current_robot, game);
                 break;
             case Input.Keys.M:
                 if (!player.isPlaying())
@@ -145,14 +153,18 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 else
                     player.stop();
                 break;
-            case Input.Keys.F:
-                game.printFlags();
 
+            case Input.Keys.S:
+                current_robot.addAnimation(Animation.scaleTo(current_robot, 3, 1f));
+                break;
+
+            case Input.Keys.K:
+                game.killRobot(current_robot);
                 break;
 
             // Execute all cards that are queued
             case Input.Keys.E:
-                card_queue.getSequenceAsCommand().exec(1, my_robot, game);
+                card_queue.getSequenceAsCommand().exec(1, current_robot, game);
                 break;
 
             case Input.Keys.Q:

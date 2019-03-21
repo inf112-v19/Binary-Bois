@@ -42,11 +42,12 @@ public class Robot extends Renderable implements IItem {
         this.pos.move(dir, d);
         Vector2Df anim_move = dir.copy().tof();
         anim_move.mul(d);
-        this.addAnimation(new Animation(anim_move, 0f, 0.25f));
+        addAnimation(Animation.moveBy(anim_move.toi(), 0.25f));
     }
 
     public void rot(int deg) {
         this.dir.rotate((double) deg);
+        addAnimation(Animation.rotateBy(this, deg, 0.25f));
     }
 
     public Vector2Di getDir(){
@@ -65,13 +66,17 @@ public class Robot extends Renderable implements IItem {
      * Robo RIP
      */
     public void death() {
-        //TODO: Lose life etc.
+        addAnimation(new Animation(new Vector2Df(0, 0), 360*2, -1, 1f));
+        addAnimation(Animation.moveTo(this, archiveMarker, 0.1f));
+        addAnimation(new Animation(new Vector2Df(0, 0), 0, 1, 0.5f));
+        this.pos = archiveMarker.copy();
     }
 
     public void setPos(Vector2Di pos) {
         this.pos = pos;
         clearAnimations();
-        setDrawPos(pos.tof());
+        addAnimation(Animation.moveTo(this, pos, 0.4f));
+        //setDrawPos(pos.tof());
     }
 
     public Vector2Di getPos() {

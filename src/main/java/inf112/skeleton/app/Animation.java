@@ -20,12 +20,14 @@ public class Animation {
     private float angle_vel;
     /** How many animation ticks before the animation is finished. */
     private int num_ticks;
+    private float scale_offset;
+    private float scale_vel;
 
     /**
      * @param vec The movement vector.
      * @param time How long you want it to take.
      */
-    Animation(Vector2Df vec, float rot, float time) {
+    Animation(Vector2Df vec, float rot, float scale, float time) {
         vel = vec.copy();
         vel.mul(-1.0f/time * Renderable.ANIMATION_TIMESTEP);
 
@@ -38,6 +40,9 @@ public class Animation {
         angle_vel = rot / time;
 
         num_ticks = Math.round(time / Renderable.ANIMATION_TIMESTEP);
+
+        scale_offset = scale;
+        scale_vel = scale / time;
     }
 
     /**
@@ -46,7 +51,7 @@ public class Animation {
      * @return Idle-animation.
      */
     public static Animation idle(float t) {
-        return new Animation(new Vector2Df(0, 0), 0, t);
+        return new Animation(new Vector2Df(0, 0), 0, 0, t);
     }
 
     /**
@@ -63,13 +68,26 @@ public class Animation {
     public static Animation moveTo(Renderable r, Vector2Di newpos, float t) {
         Vector2Df vec = newpos.copy().tof();
         vec.sub(r.getFinalAnimationPos(1).tof());
-        return new Animation(vec, 0, t);
+        return new Animation(vec, 0, 0, t);
+    }
+
+    public static Animation moveBy(Vector2Di amount, float t) {
+        return new Animation(amount.tof(), 0, 0, t);
+    }
+
+    public static Animation rotateBy(Renderable r, float amount, float t) {
+        return new Animation(new Vector2Df(0, 0), amount, 0, t);
+    }
+
+    public static Animation scaleTo(Renderable r, float scale, float t) {
+        return new Animation(new Vector2Df(0, 0), 0, scale - r.getFinalAnimationScale(), t);
     }
 
     public boolean update(int ticks) {
         while (ticks-- > 0 && num_ticks-- > 0) {
             pos_offset.add(vel);
             angle_offset -= angle_vel * Renderable.ANIMATION_TIMESTEP;
+            scale_offset -= scale_vel * Renderable.ANIMATION_TIMESTEP;
         }
         return num_ticks > 0;
     }
@@ -84,5 +102,9 @@ public class Animation {
 
     public float getAngleOffset() {
         return angle_offset;
+    }
+
+    public float getScaleOffset() {
+        return scale_offset;
     }
 }

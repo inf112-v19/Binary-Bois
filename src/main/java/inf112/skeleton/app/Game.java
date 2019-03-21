@@ -70,6 +70,14 @@ public class Game {
         return tmp;
     }
 
+    public Robot getRobot(int playerNumber) throws IndexOutOfBoundsException {
+        return robots.get(playerNumber);
+    }
+
+    public Robot getRobot(Player player) {
+        return robots.get(players.indexOf(player));
+    }
+
     private void setup() {
         int player_num = 0;
         for (Robot r : robots) {
@@ -110,20 +118,13 @@ public class Game {
         printFlags(0);
     }
 
-    public void jumpOnBoard(Robot robot) {
+    public void killRobot(Robot robot) {
         Vector2Di currentPos = robot.getPos();
         Vector2Di backupPos = robot.getArchiveMarkerPos();
         board.get(currentPos).remove(robot);
-        // FIXME: I'm not actually sure what should happen if there is no backup position
-        //        (according to the game rules.)
-        //        For now I'll assume they just die.
-        if (backupPos != null) {
-            board.set(robot, backupPos);
-            robot.setPos(backupPos);
-            robot.setArchiveMarker(backupPos);
-        } else {
-            robot.death();
-        }
+        board.set(robot, backupPos);
+        robot.death();
+        robot.setArchiveMarker(backupPos);
     }
     
     public void appendToLogBuilder(String string){
@@ -146,10 +147,8 @@ public class Game {
         ArrayList<IItem> itemsOnPos = board.get(currentPos);
         for (IItem item : itemsOnPos) {
             if (item instanceof Hole) {
-                robot.death();
                 soundFx.add("Death");
-                System.out.println("Sound should play");
-                jumpOnBoard(robot);
+                killRobot(robot);
                 return;
             }
         }
@@ -186,6 +185,7 @@ public class Game {
                 if (canMoveTo(otherBotPos, dir, (Robot) itemInFront)) {
                     appendToLogBuilder("Pushed other robot");
                     ((Robot) itemInFront).move(dir, 1);
+                    isOnHole((Robot) itemInFront);
                 } else {
                     appendToLogBuilder("Unable to push other robot!");
                     return false;
