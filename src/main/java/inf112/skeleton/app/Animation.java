@@ -62,7 +62,7 @@ public class Animation {
      */
     public static Animation moveTo(Renderable r, Vector2Di newpos, float t) {
         Vector2Df vec = newpos.copy().tof();
-        vec.sub(r.getDrawPos(1).tof());
+        vec.sub(r.getFinalAnimationPos(1).tof());
         return new Animation(vec, 0, t);
     }
 
@@ -72,6 +72,10 @@ public class Animation {
             angle_offset -= angle_vel * Renderable.ANIMATION_TIMESTEP;
         }
         return num_ticks > 0;
+    }
+
+    public int getTicks() {
+        return Math.max(num_ticks, 0);
     }
 
     public Vector2Df getPosOffset() {

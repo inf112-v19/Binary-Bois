@@ -6,7 +6,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
+class AnimationCallback {
+    public Runnable r;
+    public long ticks;
+
+    public AnimationCallback(long ticks, Runnable r) {
+        this.r = r;
+        this.ticks = ticks;
+    }
+}
 
 /**
  * Renderable things.
@@ -32,11 +41,54 @@ public abstract class Renderable {//implements Comparable<Renderable> {
     private float angle = 0;
 
     private ArrayList<Animation> animations = new ArrayList<>();
+    private Animation current_animation = null;
 
-    public void addAnimation(Animation a) {
-        if (animations.size() == 0)
-            pos.add(a.getPosOffset());
-        animations.add(a);
+    private boolean do_draw = true;
+
+    private static ArrayList<AnimationCallback> callbacks = new ArrayList<>();
+
+    /**
+     * @param new_anim Animation to add.
+     * @return The tick number that finishes the animation.
+     */
+    public long addAnimation(Animation new_anim) {
+        animations.add(new_anim);
+        return getFinalAnimationTick();
+    }
+
+    public long getFinalAnimationTick() {
+        long ticks = total_ticks;
+        if (current_animation != null)
+            ticks += current_animation.getTicks();
+        for (Animation a : animations)
+            ticks += a.getTicks();
+        return ticks;
+    }
+
+    /**
+     * Add callback for when the final animation finishes, as per the calling
+     * of the function. If there are more animations added after this function
+     * returns they will not be taken into account.
+     * @param fn The callback to run.
+     */
+    public void addAnimationCallback(Runnable fn) {
+        addAnimationCallback(getFinalAnimationTick(), fn);
+    }
+
+    public static void addAnimationCallback(long ticks, Runnable fn) {
+        if (ticks <= total_ticks)
+            fn.run();
+        callbacks.add(new AnimationCallback(ticks, fn));
+    }
+
+    private void nextAnimation() {
+        if (animations.size() == 0) {
+            current_animation = null;
+            return;
+        }
+        current_animation = animations.get(0);
+        animations.remove(0);
+        pos.add(current_animation.getPosOffset());
     }
 
     public void clearAnimations() {
@@ -45,8 +97,16 @@ public abstract class Renderable {//implements Comparable<Renderable> {
 
     public Vector2Di getAnimatedDrawPos(float scale) {
         Vector2Df pos = this.pos.copy();
-        if (animations.size() > 0)
-            pos.sub(animations.get(0).getPosOffset());
+        if (current_animation != null)
+            pos.sub(current_animation.getPosOffset());
+        pos.mul(scale);
+        return pos.toi();
+    }
+
+    public Vector2Di getFinalAnimationPos(float scale) {
+        Vector2Df pos = this.pos.copy();
+        for (Animation a : animations)
+            pos.add(a.getPosOffset());
         pos.mul(scale);
         return pos.toi();
     }
@@ -77,6 +137,15 @@ public abstract class Renderable {//implements Comparable<Renderable> {
         time_acc += Gdx.graphics.getDeltaTime();
         ticks = (int) (time_acc / ANIMATION_TIMESTEP);
         time_acc -= ticks * ANIMATION_TIMESTEP;
+
+        ArrayList<AnimationCallback> dead_callbacks = new ArrayList<>();
+        ArrayList<AnimationCallback> callbacks_cpy = new ArrayList<>(callbacks);
+        for (AnimationCallback cb : callbacks_cpy)
+            if (cb.ticks <= total_ticks) {
+                dead_callbacks.add(cb);
+                cb.r.run();
+            }
+        callbacks.removeAll(dead_callbacks);
     }
 
     public Texture getTexture() {
@@ -92,18 +161,13 @@ public abstract class Renderable {//implements Comparable<Renderable> {
     }
 
     private void update() {
-        if (animations.size() == 0)
-            return;
-        Animation anim = animations.get(0);
-        if (!anim.update(ticks)) {
-            animations.remove(0);
-            if (animations.size() == 0)
-                return;
-            pos.add(animations.get(0).getPosOffset());
-        }
+        if (current_animation == null || !current_animation.update(ticks))
+            nextAnimation();
     }
 
     public void render(SpriteBatch batch, Vector2Di pos) {
+        if (!do_draw)
+            return;
         Texture tx = getTexture();
         if (tx == null)
             return;
@@ -112,6 +176,14 @@ public abstract class Renderable {//implements Comparable<Renderable> {
         TextureRegion rtx = new TextureRegion(tx);
         batch.draw(rtx, pos.getX(), pos.getY(), rx, ry, tx.getWidth(), tx.getHeight(), 1, 1, angle);
         update();
+    }
+
+    public void hide() {
+        do_draw = false;
+    }
+
+    public void show() {
+        do_draw = true;
     }
 
     /*

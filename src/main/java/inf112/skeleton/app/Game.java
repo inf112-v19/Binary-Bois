@@ -208,7 +208,26 @@ public class Game {
                     if (cell == null)
                         continue;
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("wall")) {
-                        board.set(Wall.getFullWall(), i, j);
+                        ArrayList<Vector2Di> edgesArrayList = new ArrayList<>();
+                        if(cell.getTile().getProperties().get("N", Boolean.class)){
+                            edgesArrayList.add(new Vector2Di(0,1));
+                        }
+                        if(cell.getTile().getProperties().get("E", Boolean.class)){
+                            edgesArrayList.add(new Vector2Di(1,0));
+                        }
+                        if(cell.getTile().getProperties().get("S", Boolean.class)){
+                            edgesArrayList.add(new Vector2Di(0,-1));
+                        }
+
+                        if(cell.getTile().getProperties().get("W", Boolean.class)){
+                            edgesArrayList.add(new Vector2Di(-1,0));
+                        }
+                        Vector2Di[] edgesArray = new Vector2Di[edgesArrayList.size()];
+                        for(int l = 0; l < edgesArrayList.size(); l++){
+                            edgesArray[l] = edgesArrayList.get(l);
+                        }
+                        board.set(new Wall(edgesArray), i, j);
+
                     }
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("flag")) {
                         board.set(new Flag(flagCounter, new Vector2Di(i, j)), i, j);

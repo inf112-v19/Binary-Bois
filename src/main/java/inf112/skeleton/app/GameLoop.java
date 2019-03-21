@@ -71,21 +71,22 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 //       exception will never happen directly after the Game is instantiated.
             }
 
+            card_queue = new CardManager(5);
+            card_queue.setCards(game.getActivePlayer().getHand());
+
             InputMultiplexer input_multi = new InputMultiplexer();
+            input_multi.addProcessor(card_queue.getStage());
             input_multi.addProcessor(this);
             Gdx.input.setInputProcessor(input_multi);
+            card_queue.showCards();
 
             batch = new SpriteBatch();
             font = new BitmapFont();
             font.setColor(Color.BLACK);
 
-            card_queue = new CardManager(5);
-            card_queue.setCards(game.getActivePlayer().getHand());
-
-            game.appendToLogBuilder("Fix for this bug will come shortly");
-            game.appendToLogBuilder("Pressing q/h quickly reveals a bug");
             game.appendToLogBuilder("Press h to hide all cards");
             game.appendToLogBuilder("Press q to show all cards");
+            game.appendToLogBuilder("Press e to run selected cards");
         } catch (NoSuchResource e) {
             System.out.println("Unable to load: " + e.getMessage());
         } catch (Game.InitError e) {
@@ -115,7 +116,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
         map.render();
 
-        card_queue.render(batch, 1);
+        card_queue.render(batch);
 
         // TODO: The UI will be drawn here later.
     }
@@ -149,12 +150,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
                 break;
 
-            // Execute a card command (this is just a test.)
+            // Execute all cards that are queued
             case Input.Keys.E:
-                Card c = game.getActivePlayer().popCard();
-                if (c != null)
-                    c.exec(my_robot, game);
-                System.out.println(game.getActivePlayer().getName() + " Cards: " + Arrays.toString(game.getActivePlayer().getHand().toArray()));
+                card_queue.getSequenceAsCommand().exec(1, my_robot, game);
+                break;
 
             case Input.Keys.Q:
                 card_queue.showCards();
