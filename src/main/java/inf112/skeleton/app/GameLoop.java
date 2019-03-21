@@ -2,6 +2,7 @@ package inf112.skeleton.app;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private static int[][] robot_start_positions = {
@@ -19,6 +21,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     };
     // All positions are in board dimensions, not in pixel dimensions.
     private Music player;
+    Sound fxPlayer;
     private Robot my_robot;
     private Game game;
 
@@ -29,6 +32,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private SpriteBatch batch;
     private Color bgcolor;
     private CardManager card_queue;
+    private HashMap<String, Sound> soundNametoFile = new HashMap<>();
 
     public GameLoop(int map_px_w, int map_px_h) {
         super();
@@ -40,7 +44,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     @Override
     public void create () {
         try {
-            player = Resources.getMusic("RoboLazer.mp3");
+            soundNametoFile.put("Death", Resources.getSound("d.e.a.t.h.ogg"));
+            player = Resources.getMusic("iRobot.ogg");
+            player.setVolume(0.8f);
             player.setLooping(true);
 
             map = new Map(180, 0, 320, 320, "map.tmx");
@@ -91,6 +97,12 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
     public void render () {
         // Clear the screen with the background color.
+        ArrayList<String> sounds = game.checkPlaySound();
+        for (String sound : sounds) {
+            fxPlayer = soundNametoFile.get(sound);
+            fxPlayer.play();
+        }
+
         Gdx.gl.glClearColor(bgcolor.r, bgcolor.g, bgcolor.b, bgcolor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Renderable.updateAll();
@@ -134,6 +146,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 break;
             case Input.Keys.F:
                 game.printFlags();
+
                 break;
 
             // Execute a card command (this is just a test.)

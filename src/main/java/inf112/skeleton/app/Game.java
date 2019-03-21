@@ -20,6 +20,7 @@ public class Game {
     private GameLog game_log;
     private CardDeck deck;
     private int active_player_num = 0;
+    private ArrayList<String> soundFx = new ArrayList<>();
 
     public class InitError extends Exception {
         public InitError(String msg) {
@@ -61,6 +62,12 @@ public class Game {
     public void handOutCards() throws CardDeck.NoMoreCards {
         for (Player p : players)
             p.giveDeck(deck.get(NUM_CARDS_PER_PLAYER));
+    }
+
+    public ArrayList<String> checkPlaySound() {
+        ArrayList<String> tmp = new ArrayList<>(soundFx);
+        soundFx = new ArrayList<>();
+        return tmp;
     }
 
     private void setup() {
@@ -140,6 +147,8 @@ public class Game {
         for (IItem item : itemsOnPos) {
             if (item instanceof Hole) {
                 robot.death();
+                soundFx.add("Death");
+                System.out.println("Sound should play");
                 jumpOnBoard(robot);
                 return;
             }

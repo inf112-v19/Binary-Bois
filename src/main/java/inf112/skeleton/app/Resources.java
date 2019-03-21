@@ -2,6 +2,7 @@ package inf112.skeleton.app;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -57,6 +58,13 @@ public class Resources {
         return get(rp, (String p) -> {
             FileHandle file = new FileHandle(p);
             return Gdx.audio.newMusic(file);
+        });
+    }
+
+    public static Sound getSound(String rp) throws NoSuchResource {
+        return get(rp, (String p) -> {
+            FileHandle file = new FileHandle(p);
+            return Gdx.audio.newSound(file);
         });
     }
 
