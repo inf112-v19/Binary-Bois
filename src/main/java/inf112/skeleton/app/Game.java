@@ -6,6 +6,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class Game {
     public static final String cards_src = "resources/Programcards.csv";
@@ -21,6 +22,7 @@ public class Game {
     private CardDeck deck;
     private int active_player_num = 0;
     private ArrayList<String> soundFx = new ArrayList<>();
+    private Random rnd = new Random();
 
     public class InitError extends Exception {
         public InitError(String msg) {
@@ -96,6 +98,7 @@ public class Game {
             return;
         for (IItem item : itemlist) {
             if (item instanceof Flag) {
+                soundFx.add("Flag");
                 robot.setArchiveMarker(newpos);
                 Player robotOwner = robotsToPlayers.get(robot);
                 robotOwner.register(((Flag) item).getNumber());
@@ -105,17 +108,6 @@ public class Game {
                 return;
             }
         }
-    }
-
-    public void printFlags(int player_id) {
-        System.out.println("Flags: ");
-        for (Integer flag : players.get(player_id).getFlags())
-            System.out.print(flag + " ");
-        System.out.println();
-    }
-
-    public void printFlags() {
-        printFlags(0);
     }
 
     public void killRobot(Robot robot) {
@@ -136,6 +128,8 @@ public class Game {
     }
 
     public void moveOnBoard(Robot robot, Vector2Di newpos, Vector2Di dir) {
+        soundFx.add("Move" + (rnd.nextInt(3) + 1));
+        // ^ It's a bit ugly. TODO: Suggestions?
         Vector2Di pos = robot.getPos();
         board.get(pos).remove(robot);
         board.set(robot, newpos);
@@ -153,6 +147,7 @@ public class Game {
             }
         }
     }
+
 
     public boolean canMoveTo(Vector2Di pos, Vector2Di dir, Robot my_robot){
         Vector2Di orig_pos = pos.copy();

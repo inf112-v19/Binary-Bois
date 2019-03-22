@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Timer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +21,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             {6, 8}
     };
     // All positions are in board dimensions, not in pixel dimensions.
-    private Music player;
+    private Music musicPlayer;
     private Sound fxPlayer;
     private Robot current_robot;
     private Game game;
@@ -44,10 +45,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     @Override
     public void create () {
         try {
-            soundNametoFile.put("Death", Resources.getSound("d.e.a.t.h.ogg"));
-            player = Resources.getMusic("iRobot.ogg");
-            player.setVolume(0.8f);
-            player.setLooping(true);
+            addSounds();
 
             map = new Map(180, 0, 320, 320, "map.tmx");
 
@@ -95,12 +93,32 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         }
     }
 
+    private void addSounds() throws NoSuchResource {
+        soundNametoFile.put("Death", Resources.getSound("d.e.a.t.h.ogg"));
+        soundNametoFile.put("Move1", Resources.getSound("Move1.ogg"));
+        soundNametoFile.put("Move2", Resources.getSound("Move2.ogg"));
+        soundNametoFile.put("Move3", Resources.getSound("Move3.ogg"));
+        soundNametoFile.put("Flag", Resources.getSound("Flag.ogg"));
+        musicPlayer = Resources.getMusic("iRobot.ogg");
+        musicPlayer.setVolume(0.6f);
+        musicPlayer.setLooping(true);
+    }
+
 
     public void render () {
         // Clear the screen with the background color.
         ArrayList<String> sounds = game.checkPlaySound();
         for (String sound : sounds) {
             fxPlayer = soundNametoFile.get(sound);
+            if (musicPlayer.isPlaying()) {
+                musicPlayer.setVolume(0.4f);
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        musicPlayer.setVolume(0.6f);
+                    }
+                }, 0.05f);
+            }
             fxPlayer.play();
         }
 
@@ -148,10 +166,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 Commands.rotateCommand.exec(90, current_robot, game);
                 break;
             case Input.Keys.M:
-                if (!player.isPlaying())
-                    player.play();
+                if (!musicPlayer.isPlaying())
+                    musicPlayer.play();
                 else
-                    player.stop();
+                    musicPlayer.stop();
                 break;
 
             case Input.Keys.S:
