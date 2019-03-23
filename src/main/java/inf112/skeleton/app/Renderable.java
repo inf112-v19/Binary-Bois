@@ -161,6 +161,7 @@ public abstract class Renderable {//implements Comparable<Renderable> {
         time_acc -= ticks * ANIMATION_TIMESTEP;
 
         ArrayList<AnimationCallback> dead_callbacks = new ArrayList<>();
+        // Callbacks can also add new animation callbacks, therefore the list needs to be copied.
         ArrayList<AnimationCallback> callbacks_cpy = new ArrayList<>(callbacks);
         for (AnimationCallback cb : callbacks_cpy)
             if (cb.ticks <= total_ticks) {

@@ -106,11 +106,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         musicPlayer.setLooping(true);
     }
 
-
     public void render () {
-        // Clear the screen with the background color.
-        ArrayList<String> sounds = game.checkPlaySound();
-        for (String sound : sounds) {
+        // Check for sounds to play
+        for (String sound : game.checkPlaySound()) {
             fxPlayer = soundNametoFile.get(sound);
             if (musicPlayer.isPlaying()) {
                 musicPlayer.setVolume(0.4f);
@@ -124,6 +122,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             fxPlayer.play();
         }
 
+        // Clear the screen with the background color.
         Gdx.gl.glClearColor(bgcolor.r, bgcolor.g, bgcolor.b, bgcolor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Renderable.updateAll();
