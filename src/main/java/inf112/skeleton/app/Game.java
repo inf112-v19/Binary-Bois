@@ -105,6 +105,7 @@ public class Game {
                 return;
             } else if (item instanceof Wrench) {
                 robot.setArchiveMarker(newpos);
+                soundFx.add("Wrench");
                 return;
             }
         }
