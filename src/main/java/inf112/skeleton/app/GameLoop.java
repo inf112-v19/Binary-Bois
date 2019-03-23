@@ -100,6 +100,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         soundNametoFile.put("Move3", Resources.getSound("Move3.ogg"));
         soundNametoFile.put("Flag", Resources.getSound("Flag.ogg"));
         soundNametoFile.put("Wrench", Resources.getSound( "Wrench.ogg"));
+        soundNametoFile.put("Oof", Resources.getSound( "Oof.ogg"));
         musicPlayer = Resources.getMusic("iRobot.ogg");
         musicPlayer.setVolume(0.6f);
         musicPlayer.setLooping(true);

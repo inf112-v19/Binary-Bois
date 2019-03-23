@@ -158,6 +158,7 @@ public class Game {
         for (IItem item : board.get(orig_pos))
             if (item instanceof Wall && ((Wall) item).hasEdge(dir)) {
                 appendToLogBuilder("Blocked by wall");
+                soundFx.add("Oof");
                 return false;
             }
 
@@ -172,6 +173,7 @@ public class Game {
         for (IItem itemInFront : itemlist)
             if (itemInFront instanceof Wall && ((Wall) itemInFront).hasEdge(dir_opposite)) {
                 appendToLogBuilder("Blocked by wall");
+                soundFx.add("Oof");
                 return false;
             }
         ArrayList<IItem> tmp_list = new ArrayList<>(itemlist);
