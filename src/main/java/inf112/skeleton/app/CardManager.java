@@ -45,7 +45,9 @@ public class CardManager implements InputProcessor {
     private Card dragged_card = null;
     private DragAndDrop dragndrop;
     private Skin ui_skin;
-    private HashMap<Object, Image> card_drag_sources = new HashMap<>();
+    private HashMap<Object, DragAndDrop.Source> card_drag_sources = new HashMap<>();
+    private HashMap<Object, Image> card_drag_source_images = new HashMap<>();
+    private Vector2Di mouse_pos = new Vector2Di(0, 0);
 
     private Stage stage;
 
@@ -76,8 +78,11 @@ public class CardManager implements InputProcessor {
         ui_skin.add("card", Resources.getTexture("cards/175x250/unknown.png"));
     }
 
-    public Stage getStage() {
-        return stage;
+    public ArrayList<InputProcessor> getInputProcessors() {
+        ArrayList<InputProcessor> processors = new ArrayList<>();
+        processors.add(this);
+        processors.add(stage);
+        return processors;
     }
 
     public void setCards(ArrayList<Card> cards) {
@@ -111,13 +116,15 @@ public class CardManager implements InputProcessor {
 
             last_card = c;
         }
-        for (int j = 0; j < num_slots; j++) {
-            Card c = active_cards[j];
-            if (c != null)
-                makeDraggable(c);
-        }
         if (last_card != null)
-            last_card.addAnimationCallback(this::setupDragTargets);
+            last_card.addAnimationCallback(() -> {
+                setupDragTargets();
+                for (int j = 0; j < num_slots; j++) {
+                    Card c = active_cards[j];
+                    if (c != null)
+                        makeDraggable(c);
+                }
+            });
     }
 
     public void hideCards() {
@@ -212,20 +219,21 @@ public class CardManager implements InputProcessor {
                                 }
                             Card prev_c = active_cards[slot_i];
                             active_cards[slot_i] = c;
-                            Image prev_source = (prev_c != null) ? card_drag_sources.get(prev_c) : null;
+                            Image prev_source_img = (prev_c != null) ? card_drag_source_images.get(prev_c) : null;
 
-                            // There are several possibilities here:
+                            // There are 4 possibilities here:
 
                             // 1. An inactive card dragged to an empty slot:
                             //    - Remove from inactive, and add to active_cards[slot_i]
                             if (idx != -1 && prev_c == null) {
                                 inactive_cards.remove(idx);
-                                // TODO: Reorganize cards
+                                moveCards(-CARD_SPACING.getX(), idx, 0.15f);
                             }
                             // 2. An inactive card dragged to an occupied slot
                             //    - Swap the two cards.
                             if (idx != -1 && prev_c != null) {
                                 inactive_cards.set(idx, prev_c);
+                                resetDrag(prev_c);
                             }
                             // 3. An active card dragged to an empty slot
                             //    - Set active_cards[prev_slot_i] to null and add to active_cards[slot_i]
@@ -238,18 +246,23 @@ public class CardManager implements InputProcessor {
                                 active_cards[active_idx] = prev_c;
                             }
 
+                            if (idx != -1) {
+                                makeUnDraggable(c);
+                                resetDrag(c);
+                            }
+
                             if (prev_c != null) {
                                 Vector2Df source_pos = new Vector2Df(source.getActor().getX(), source.getActor().getY());
-                                prev_source.setBounds(
+                                prev_source_img.setBounds(
                                         source_pos.getX(),
                                         source_pos.getY(),
                                         source_image.getImageWidth(),
                                         source_image.getImageHeight());
                                 prev_c.addAnimation(Animation.moveTo(prev_c, source_pos.toi(), 0.5f));
                                 // Hide source image
-                                prev_source.setColor(0f, 0f, 0f, 0f);
+                                prev_source_img.setColor(0f, 0f, 0f, 0f);
                                 // Show source image when animation is finished.
-                                prev_c.addAnimationCallback(() -> prev_source.setColor(1f, 1f, 1f, 1f));
+                                prev_c.addAnimationCallback(() -> prev_source_img.setColor(1f, 1f, 1f, 1f));
                             }
 
                             source_image.setBounds(cur_slot_pos.getX(), cur_slot_pos.getY(), card_w, card_h);
@@ -257,6 +270,77 @@ public class CardManager implements InputProcessor {
                     });
             slot_pos.add(CARD_SPACING);
         }
+
+        Image target_img = new Image(ui_skin, "card");
+        target_img.setColor(0, 0, 0, 0);
+        Vector2Di pos = deck_bg_pos.copy();
+        pos.sub(DECK_BG_OFFSET);
+        target_img.setBounds(pos.getX(), pos.getY(), card_w, card_h);
+        stage.addActor(target_img);
+
+        dragndrop.addTarget(
+                new DragAndDrop.Target(target_img) {
+                    public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                        getActor().setColor(1.0f, 0.25f, 0.25f, 1.00f);
+                        return true;
+                    }
+
+                    public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {
+                        getActor().setColor(0, 0, 0, 0);
+                    }
+
+                    public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                        DragData data = (DragData) payload.getObject();
+                        Card c = data.card;
+                        Image source_image = data.source_image;
+                        c.setDrawPos(pos.tof());
+                        c.show();
+                        int idx = inactive_cards.indexOf(c);
+                        int active_idx = -1;
+                        for (int i = 0; i < num_slots; i++)
+                            if (active_cards[i] == c) {
+                                active_idx = i;
+                                break;
+                            }
+
+                        // There are 2 possibilities here:
+                        // TODO: After putting a card back in the deck it should probably join the other inactive
+                        //       cards at the top if they are shown.
+
+                        // 1. An inactive card dragged to the deck
+                        if (idx != -1) {
+                            // Do nothing
+                        }
+                        // 2. An active card dragged to the deck
+                        //    - Swap the two cards.
+                        if (active_idx != -1) {
+                            active_cards[active_idx] = null;
+                            inactive_cards.add(c);
+                            makeUnDraggable(c);
+                            resetDrag(c);
+                        }
+
+                        source_image.setBounds(pos.getX(), pos.getY(), card_w, card_h);
+                    }
+                });
+    }
+
+    public void makeUnDraggable(Card c) {
+        Image source_image = card_drag_source_images.get(c);
+        DragAndDrop.Source source = card_drag_sources.get(c);
+        if (source_image != null)
+            source_image.remove();
+        if (source != null)
+            dragndrop.removeSource(source);
+    }
+
+    public void resetDrag(Card c) {
+        Image source_image = card_drag_source_images.get(c);
+        DragAndDrop.Source source = card_drag_sources.get(c);
+        if (source_image != null)
+            stage.addActor(source_image);
+        if (source != null)
+            dragndrop.addSource(source);
     }
 
     public void makeDraggable(Card c) {
@@ -270,9 +354,7 @@ public class CardManager implements InputProcessor {
         source_image.setColor(0, 0, 0, 0);
         stage.addActor(source_image);
 
-        card_drag_sources.put(c, source_image);
-
-        dragndrop.addSource(new DragAndDrop.Source(source_image) {
+        DragAndDrop.Source source = new DragAndDrop.Source(source_image) {
             public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
                 DragAndDrop.Payload payload = new DragAndDrop.Payload();
                 payload.setObject(new CardManager.DragData(c, source_image));
@@ -280,16 +362,29 @@ public class CardManager implements InputProcessor {
                 img.setBounds(80, 80, card_w, card_h);
                 c.hide();
 
+                mouse_start_drag_pos = new Vector2Di((int)x, (int)y);
+                dragged_card = c;
+
                 System.out.println("Start drag: " + new Vector2Df(x, y).toi());
                 payload.setDragActor(img);
                 dragndrop.setDragActorPosition(x, y - img.getHeight());
                 source_image.setColor(0.00f, 0.00f, 0.00f, 0.00f);
+
+                for (int i = 0; i < num_slots; i++) {
+                    Card ac = active_cards[i];
+                    if (ac != null && ac != c)
+                        makeUnDraggable(ac);
+                }
 
                 return payload;
             }
 
             // FIXME: This method doesn't seem to exist in the current version of libgdx.
             //        Emulate this by using mouseMove in an InputProcessor
+            // UPDATE: The stage seems to get exclusive mouse access after the drag has started,
+            //         this appears to happen no matter the order they are added to the input
+            //         multiplexer. You'll have to use the scrollwheel as a temporary solution
+            //         and investigate how to retrieve the drag(x, y) events.
             //
             // This function should correct the position of the card so that it slides in
             // properly into the slot.
@@ -305,8 +400,23 @@ public class CardManager implements InputProcessor {
                                  DragAndDrop.Payload payload,
                                  DragAndDrop.Target target) {
                 source_image.setColor(1, 1, 1, 1);
+                c.show();
+
+                for (int i = 0; i < num_slots; i++) {
+                    Card ac = active_cards[i];
+                    if (ac != null && ac != c)
+                        resetDrag(ac);
+                }
+
+                mouse_start_drag_pos = null;
+                dragged_card = null;
             }
-        });
+        };
+
+        dragndrop.addSource(source);
+
+        card_drag_source_images.put(c, source_image);
+        card_drag_sources.put(c, source);
     }
 
     public void render(SpriteBatch batch) {
@@ -385,12 +495,44 @@ public class CardManager implements InputProcessor {
     }
 
     @Override
-    public boolean mouseMoved(int i, int i1) {
+    public boolean mouseMoved(int x, int y) {
+        mouse_pos.set(x, y);
         return false;
+    }
+
+    // TODO: Add minimum/maximum left/right scrolling for cards
+    public void moveAllCards(int dist, float t) {
+        moveCards(dist, 0, t);
+    }
+
+    public void moveCards(int dist, int idx, float t) {
+        Vector2Di mov = new Vector2Di(dist, 0);
+        ArrayList<Image> src_images = new ArrayList<>();
+        for (Card c : inactive_cards) {
+            Image src = card_drag_source_images.get(c);
+            if (src == null)
+                return;
+            src_images.add(src);
+        }
+        for (int i = idx; i < inactive_cards.size(); i++) {
+            Card c = inactive_cards.get(i);
+            c.addAnimation(Animation.moveBy(mov, t));
+            Image source_image = src_images.get(i);
+            Vector2Di newpos = c.getFinalAnimationPos(1);
+            source_image.setColor(0, 0, 0, 0);
+            source_image.setBounds(newpos.getX(), newpos.getY(), card_w, card_h);
+        }
     }
 
     @Override
     public boolean scrolled(int i) {
+        if (dragged_card == null &&
+            mouse_pos.getY() > (FIRST_CARD_POS.getY() - (card_h/2)) &&
+            mouse_pos.getY() < (FIRST_CARD_POS.getY() + (card_h/2)))
+        {
+            moveAllCards(i * 30, 0.05f);
+            return true;
+        }
         return false;
     }
 }

@@ -66,6 +66,14 @@ public abstract class Renderable {//implements Comparable<Renderable> {
         return ticks;
     }
 
+    public static <T extends Renderable> long getFinalAnimationTick(ArrayList<T> rs) {
+        long max_ticks = Long.MIN_VALUE, ticks;
+        for (Renderable r : rs)
+            if ((ticks = r.getFinalAnimationTick()) > max_ticks)
+                max_ticks = ticks;
+        return max_ticks;
+    }
+
     /**
      * Add callback for when the final animation finishes, as per the calling
      * of the function. If there are more animations added after this function
@@ -74,6 +82,10 @@ public abstract class Renderable {//implements Comparable<Renderable> {
      */
     public void addAnimationCallback(Runnable fn) {
         addAnimationCallback(getFinalAnimationTick(), fn);
+    }
+
+    public static <T extends Renderable> void addAnimationCallback(ArrayList<T> rs, Runnable fn) {
+        addAnimationCallback(getFinalAnimationTick(rs), fn);
     }
 
     public static void addAnimationCallback(long ticks, Runnable fn) {

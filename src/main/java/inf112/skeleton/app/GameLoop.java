@@ -73,7 +73,8 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             card_queue.setCards(game.getActivePlayer().getHand());
 
             InputMultiplexer input_multi = new InputMultiplexer();
-            input_multi.addProcessor(card_queue.getStage());
+            for (InputProcessor p : card_queue.getInputProcessors())
+                input_multi.addProcessor(p);
             input_multi.addProcessor(this);
             Gdx.input.setInputProcessor(input_multi);
 

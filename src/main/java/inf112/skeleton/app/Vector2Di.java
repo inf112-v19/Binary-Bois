@@ -129,4 +129,9 @@ public class Vector2Di {
     public Vector2Df tof() {
         return new Vector2Df(x, y);
     }
+
+    public void set(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
 }
