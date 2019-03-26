@@ -48,6 +48,7 @@ public class CardManager implements InputProcessor {
     private HashMap<Object, DragAndDrop.Source> card_drag_sources = new HashMap<>();
     private HashMap<Object, Image> card_drag_source_images = new HashMap<>();
     private Vector2Di mouse_pos = new Vector2Di(0, 0);
+    int cardsScrolledBy;
 
     private Stage stage;
 
@@ -98,6 +99,8 @@ public class CardManager implements InputProcessor {
     }
 
     public void showCards() {
+        cardsScrolledBy = 0;
+        Game.addSoundFX("showCards");
         Vector2Di card_pos = FIRST_CARD_POS.copy();
         float idle_t = 0.0f;
         int i = 0;
@@ -128,6 +131,7 @@ public class CardManager implements InputProcessor {
     }
 
     public void hideCards() {
+        Game.addSoundFX("hideCards");
         float idle_t = 0.0f;
         for (int i = inactive_cards.size()-1; i >= 0; i--) {
             Card c = inactive_cards.get(i);
@@ -410,6 +414,7 @@ public class CardManager implements InputProcessor {
 
                 mouse_start_drag_pos = null;
                 dragged_card = null;
+                Game.addSoundFX("snapCard");
             }
         };
 
@@ -417,6 +422,7 @@ public class CardManager implements InputProcessor {
 
         card_drag_source_images.put(c, source_image);
         card_drag_sources.put(c, source);
+
     }
 
     public void render(SpriteBatch batch) {
@@ -524,13 +530,25 @@ public class CardManager implements InputProcessor {
         }
     }
 
+
+
     @Override
     public boolean scrolled(int i) {
         if (dragged_card == null &&
             mouse_pos.getY() > (FIRST_CARD_POS.getY() - (card_h/2)) &&
             mouse_pos.getY() < (FIRST_CARD_POS.getY() + (card_h/2)))
         {
-            moveAllCards(i * 30, 0.05f);
+            cardsScrolledBy += i;
+
+            if(cardsScrolledBy >= -17 && cardsScrolledBy <=0){
+                moveAllCards(i * 30, 0.05f);
+            } else if(cardsScrolledBy > 0){
+                cardsScrolledBy = 0;
+            } else if (cardsScrolledBy < -17){
+                cardsScrolledBy = -17;
+            }
+
+
             return true;
         }
         return false;
