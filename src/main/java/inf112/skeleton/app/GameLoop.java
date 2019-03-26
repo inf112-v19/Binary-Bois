@@ -47,7 +47,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         try {
             addSounds();
 
-            map = new Map(180, 0, 320, 320, "map.tmx");
+            map = new Map(180, 0, 300, 200, "map.tmx");
 
             ArrayList<Robot> robots = new ArrayList<>();
             for (int[] pos : robot_start_positions) {
@@ -75,6 +75,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             InputMultiplexer input_multi = new InputMultiplexer();
             for (InputProcessor p : card_queue.getInputProcessors())
                 input_multi.addProcessor(p);
+            input_multi.addProcessor(map);
             input_multi.addProcessor(this);
             Gdx.input.setInputProcessor(input_multi);
 

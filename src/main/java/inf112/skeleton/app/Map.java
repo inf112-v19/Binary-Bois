@@ -1,6 +1,7 @@
 package inf112.skeleton.app;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -15,7 +16,7 @@ import java.util.Vector;
  *
  * TODO: Make the positioning work properly, currently it just centers the map at the top.
  */
-public class Map {
+public class Map implements InputProcessor {
     /** Enable/disable fun */
     private final boolean FUN_ENABLED = false;
 
@@ -27,6 +28,7 @@ public class Map {
     private Vector2Di dim;
     private Vector2Di pos;
     private int pw, ph;
+    private Vector2Df last_mouse_pos = null;
 
     // FIXME: This should be retrived from the map later on.
     private final int tile_dim = 32;
@@ -48,13 +50,9 @@ public class Map {
         pw = Gdx.graphics.getWidth();
         ph = Gdx.graphics.getHeight();
         cam = new OrthographicCamera();
-        cam.setToOrtho(false, map_pw*2, map_ph*2);
-        cam.position.y = 0f;
-        cam.position.x -= map_pw/2f;
-
-        System.out.println("Cam position: " + "(" + cam.position.x + ", " + cam.position.y + ")");
-        System.out.println("Cam size: " + cam.viewportWidth + "x" + cam.viewportHeight);
-        System.out.println("Cam zoom: " + cam.zoom);
+        cam.setToOrtho(false, map_pw, map_ph * (((float) ph) / ((float)pw)));
+        float z = 1.50f;
+        cam.zoom += z;
 
         cam.update();
 
@@ -91,6 +89,7 @@ public class Map {
     }
 
     public void render() {
+        //tiledMapRenderer.setView(cam.combined, 0f, 0f, (float) pw, (float) ph);
         tiledMapRenderer.setView(cam);
         tiledMapRenderer.render();
         batch.setProjectionMatrix(cam.combined);
@@ -120,5 +119,57 @@ public class Map {
 
     public void addDrawJob(Renderable obj) {
         render_queue.add(obj);
+    }
+
+    @Override
+    public boolean keyDown(int i) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int i) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char c) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int i, int i1, int i2, int i3) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int i, int i1, int i2, int i3) {
+        last_mouse_pos = null;
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int x, int y, int pointer) {
+        if (last_mouse_pos == null) {
+            last_mouse_pos = new Vector2Df(x, y);
+            return false;
+        }
+        Vector2Df cur_pos = new Vector2Df(x, y);
+        Vector2Df diff = last_mouse_pos.copy();
+        diff.sub(cur_pos);
+        last_mouse_pos = cur_pos;
+        cam.position.x += diff.getX();
+        cam.position.y -= diff.getY();
+        cam.update();
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int i, int i1) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(int i) {
+        return false;
     }
 }
