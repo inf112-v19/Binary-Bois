@@ -524,13 +524,25 @@ public class CardManager implements InputProcessor {
         }
     }
 
+    int cardsScrolledBy = 0;
+
     @Override
     public boolean scrolled(int i) {
         if (dragged_card == null &&
             mouse_pos.getY() > (FIRST_CARD_POS.getY() - (card_h/2)) &&
             mouse_pos.getY() < (FIRST_CARD_POS.getY() + (card_h/2)))
         {
-            moveAllCards(i * 30, 0.05f);
+            cardsScrolledBy += i;
+
+            if(cardsScrolledBy >= -17 && cardsScrolledBy <=0){
+                moveAllCards(i * 30, 0.05f);
+            } else if(cardsScrolledBy > 0){
+                cardsScrolledBy = 0;
+            } else if (cardsScrolledBy < -17){
+                cardsScrolledBy = -17;
+            }
+
+
             return true;
         }
         return false;
