@@ -131,6 +131,7 @@ public class CardManager implements InputProcessor {
     }
 
     public void hideCards() {
+        Game.addSoundFX("hideCards");
         float idle_t = 0.0f;
         for (int i = inactive_cards.size()-1; i >= 0; i--) {
             Card c = inactive_cards.get(i);
