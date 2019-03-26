@@ -21,7 +21,7 @@ public class Game {
     private GameLog game_log;
     private CardDeck deck;
     private int active_player_num = 0;
-    private ArrayList<String> soundFx = new ArrayList<>();
+    public static ArrayList<String> soundFx = new ArrayList<>();
     private Random rnd = new Random();
 
     public class InitError extends Exception {
@@ -135,6 +135,10 @@ public class Game {
         board.get(pos).remove(robot);
         board.set(robot, newpos);
         registerFlagUpdateBackup(pos, dir, robot);
+    }
+    public static void addSoundFX (String soundName){
+        soundFx.add(soundName);
+
     }
 
     public void isOnHole(Robot robot) {

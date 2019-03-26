@@ -48,6 +48,7 @@ public class CardManager implements InputProcessor {
     private HashMap<Object, DragAndDrop.Source> card_drag_sources = new HashMap<>();
     private HashMap<Object, Image> card_drag_source_images = new HashMap<>();
     private Vector2Di mouse_pos = new Vector2Di(0, 0);
+    int cardsScrolledBy;
 
     private Stage stage;
 
@@ -98,6 +99,8 @@ public class CardManager implements InputProcessor {
     }
 
     public void showCards() {
+        cardsScrolledBy = 0;
+        Game.addSoundFX("showCards");
         Vector2Di card_pos = FIRST_CARD_POS.copy();
         float idle_t = 0.0f;
         int i = 0;
@@ -410,6 +413,7 @@ public class CardManager implements InputProcessor {
 
                 mouse_start_drag_pos = null;
                 dragged_card = null;
+                Game.addSoundFX("snapCard");
             }
         };
 
@@ -417,6 +421,7 @@ public class CardManager implements InputProcessor {
 
         card_drag_source_images.put(c, source_image);
         card_drag_sources.put(c, source);
+
     }
 
     public void render(SpriteBatch batch) {
@@ -524,7 +529,7 @@ public class CardManager implements InputProcessor {
         }
     }
 
-    int cardsScrolledBy = 0;
+
 
     @Override
     public boolean scrolled(int i) {
