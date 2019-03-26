@@ -1,13 +1,17 @@
 package inf112.skeleton.app;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector3;
+import org.lwjgl.Sys;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 /**
@@ -15,7 +19,7 @@ import java.util.Vector;
  *
  * TODO: Make the positioning work properly, currently it just centers the map at the top.
  */
-public class Map {
+public class Map implements InputProcessor {
     /** Enable/disable fun */
     private final boolean FUN_ENABLED = false;
 
@@ -26,9 +30,10 @@ public class Map {
     private Vector<Renderable> render_queue;
     private Vector2Di dim;
     private Vector2Di pos;
-    private int pw, ph;
+    private ArrayList<Vector2Di> tile_clicks = new ArrayList<>();
+    private int pw, ph, map_pw, map_ph;
 
-    // FIXME: This should be retrived from the map later on.
+    // FIXME: This should be retrieved from the map later on.
     private final int tile_dim = 32;
 
     public Map(int px, int py, int dim_pw, int dim_ph, String map_file) throws NoSuchResource {
@@ -120,5 +125,70 @@ public class Map {
 
     public void addDrawJob(Renderable obj) {
         render_queue.add(obj);
+    }
+
+    public Vector2Di pixToTile(Vector2Df pix) {
+        Vector2Df tmp_vec = pix.copy();
+        tmp_vec.mul(1f/tile_dim);
+        return tmp_vec.toi();
+    }
+
+    public ArrayList<Vector2Di> getTileClicks() {
+        ArrayList<Vector2Di> tile_clicks_cpy = new ArrayList<>(tile_clicks);
+        tile_clicks.clear();
+        return tile_clicks_cpy;
+    }
+
+    @Override
+    public boolean keyDown(int i) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int i) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char c) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if(button == Input.Buttons.LEFT) {
+            int offset_x = (pw - map_pw) / 2,
+                offset_y = ph - map_ph;
+
+            Vector2Di pos = pixToTile(new Vector2Df(screenX - offset_x, offset_y - screenY));
+            //if (pos.getX() > dim.getX() || pos.getX() < 0 || pos.getY() > dim.getY() || pos.getY() < 0)
+            //    return false;
+
+            System.out.println("Offset x: " + offset_x + "   Offset y: " + offset_y);
+            tile_clicks.add(pos);
+
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int i, int i1, int i2, int i3) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int i, int i1, int i2) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int i, int i1) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(int i) {
+        return false;
     }
 }

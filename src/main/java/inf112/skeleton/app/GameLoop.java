@@ -8,8 +8,10 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Timer;
+import org.lwjgl.Sys;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 
@@ -76,6 +78,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             for (InputProcessor p : card_queue.getInputProcessors())
                 input_multi.addProcessor(p);
             input_multi.addProcessor(this);
+            input_multi.addProcessor(map);
             Gdx.input.setInputProcessor(input_multi);
 
             batch = new SpriteBatch();
@@ -103,7 +106,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         soundNametoFile.put("Wrench", Resources.getSound( "Wrench.ogg"));
         soundNametoFile.put("Oof", Resources.getSound( "Oof.ogg"));
         musicPlayer = Resources.getMusic("iRobot.ogg");
-        musicPlayer.setVolume(0.6f);
+        musicPlayer.setVolume(0.5f);
         musicPlayer.setLooping(true);
     }
 
@@ -112,16 +115,20 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         for (String sound : game.checkPlaySound()) {
             fxPlayer = soundNametoFile.get(sound);
             if (musicPlayer.isPlaying()) {
-                musicPlayer.setVolume(0.4f);
+                musicPlayer.setVolume(0.3f);
                 Timer.schedule(new Timer.Task() {
                     @Override
                     public void run() {
-                        musicPlayer.setVolume(0.6f);
+                        musicPlayer.setVolume(0.5f);
                     }
                 }, 0.05f);
             }
             fxPlayer.play();
         }
+
+        ArrayList<Vector2Di> clicks = map.getTileClicks();
+        if (!clicks.isEmpty())
+            System.out.println(Arrays.toString(clicks.toArray()));
 
         // Clear the screen with the background color.
         Gdx.gl.glClearColor(bgcolor.r, bgcolor.g, bgcolor.b, bgcolor.a);
@@ -212,7 +219,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     }
 
     @Override
-    public boolean touchDown(int i, int i1, int i2, int i3) {
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         return false;
     }
 
