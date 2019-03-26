@@ -85,6 +85,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             game.appendToLogBuilder("Press h to hide all cards");
             game.appendToLogBuilder("Press q to show all cards");
             game.appendToLogBuilder("Press e to run selected cards");
+            game.appendToLogBuilder("Use scrollwheel to scroll cards");
         } catch (NoSuchResource e) {
             System.out.println("Unable to load: " + e.getMessage());
             System.exit(1);
