@@ -86,8 +86,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             font = new BitmapFont();
             font.setColor(Color.BLACK);
 
-            game.appendToLogBuilder("Press h to hide all cards");
-            game.appendToLogBuilder("Press q to show all cards");
+            game.appendToLogBuilder("Click on the deck to show all cards");
             game.appendToLogBuilder("Press e to run selected cards");
             game.appendToLogBuilder("Use scrollwheel to scroll cards");
         } catch (NoSuchResource e) {
