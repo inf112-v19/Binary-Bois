@@ -72,6 +72,22 @@ public class Robot extends Renderable implements IItem {
         this.pos = archiveMarker.copy();
     }
 
+    /**
+     * 10 HealthPoints per liv.
+     * Antall programcards man kan velge endrer seg ut i fra antall HealthPoints.
+     */
+    public void healthPoints() {
+
+    }
+
+    /**
+     * De 3 livene til robotene, vil miste et liv dersom du mister 10 healthPoints,
+     * eller faller ned i et hull.
+     */
+    public void lives() {
+
+    }
+
     public void setPos(Vector2Di pos) {
         this.pos = pos;
         clearAnimations();
