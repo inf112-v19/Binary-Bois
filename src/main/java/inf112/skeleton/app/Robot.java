@@ -1,6 +1,11 @@
 package inf112.skeleton.app;
 
 import com.badlogic.gdx.graphics.Texture;
+import jdk.nashorn.internal.runtime.arrays.ArrayLikeIterator;
+
+import java.util.ArrayList;
+
+
 
 public class Robot extends Renderable implements IItem {
 
@@ -11,8 +16,11 @@ public class Robot extends Renderable implements IItem {
     private String name;
     private static int nameInt = 1;
     private Vector2Di archiveMarker;
-    //private int maxLives = getMaxLives();
-    //private int maxHealth = getMaxHealth();
+    private final int MAX_DEATHS = 3;
+    private final int MAX_HEALTH = 10;
+    private int health = MAX_HEALTH;
+    private int deaths = 0;
+    private boolean powered_on = true;
 
     Robot(int x, int y) throws NoSuchResource {
         super();
@@ -31,6 +39,8 @@ public class Robot extends Renderable implements IItem {
         this.pos = new Vector2Di(0, 0);
         this.dir = new Vector2Di(1, 0);
     }
+
+
 
     /**
      * Move the robot d units along it's direction vector.
@@ -74,37 +84,42 @@ public class Robot extends Renderable implements IItem {
         this.pos = archiveMarker.copy();
     }
 
-    /**
-     * 10 HealthPoints per liv.
-     * Antall programcards man kan velge endrer seg ut i fra antall HealthPoints.
-     *
-    public int robotHealth(int maxHealth) {
-        //Todo
-        int robotHealth = maxHealth;
 
-        return robotHealth;
-    }
 
     /**
-     * De 3 livene til robotene, vil miste et liv dersom du mister 10 healthPoints,
-     * eller faller ned i et hull.
+     * Handles health and deaths for robot based on which damage type it recieves.
      *
-    public int robotLives(int maxHealth, int maxLives) {
-        //Todo
-        int robotLives = maxLives;
-        if (robotLives >= 1) {
-            if (maxHealth == 0) {
-                return robotLives -1;
-            }
-        }
-        if (robotLives == 0) {
-            //Roboten fjernes fra brettet og spiller kan ikke foreta seg flere actoins
-        }
-        return robotLives;
-    }
      */
 
-    public int handleDamage()
+    public void handleDamage(DamageType dtype) {
+        int dmg = DamageType.getDamage(dtype);
+        if ((health -= dmg) <= 0) {
+            if (++deaths >= MAX_DEATHS) {
+                switch (dtype) {
+                    case LASER:
+                        // Show laser animation
+                        break;
+                    case FALL:
+                        // Show fall animation
+                        break;
+                    default:
+                        throw new UnsupportedOperationException();
+                }
+            } else {
+                health = MAX_HEALTH;
+                powered_on = false;
+            }
+        }
+    }
+
+    public boolean isPoweredDown() {
+        return !powered_on;
+    }
+
+    public void powerOn() {
+        assert isPoweredDown();
+        powered_on = true;
+    }
 
     public void setPos(Vector2Di pos) {
         this.pos = pos;
@@ -127,21 +142,12 @@ public class Robot extends Renderable implements IItem {
         return name;
     }
 
-    /**public int getMaxHealth() {
-        return 10;
+    public int getHealth() {
+        return health;
     }
 
-    public int getMaxLives() {
-        return 3;
+    public int getDeaths() {
+        return deaths;
     }
-
-    public int getCurrentHealth() {
-        return maxHealth;
-    }
-
-    public int getCurrentLives(){
-        return maxLives;
-    }
-
 
 }
