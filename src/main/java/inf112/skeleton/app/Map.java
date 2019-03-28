@@ -29,6 +29,7 @@ public class Map implements InputProcessor {
     private Vector<Renderable> render_queue;
     private Vector2Di dim;
     private Vector2Di pos;
+    private Vector2Df last_mouse_pos = null;
     private ArrayList<Vector2Di> tile_clicks = new ArrayList<>();
     private int pw, ph, map_pw, map_ph;
 
@@ -52,13 +53,9 @@ public class Map implements InputProcessor {
         pw = Gdx.graphics.getWidth();
         ph = Gdx.graphics.getHeight();
         cam = new OrthographicCamera();
-        cam.setToOrtho(false, map_pw*2, map_ph*2);
-        cam.position.y = 0f;
-        cam.position.x -= map_pw/2f;
-
-        System.out.println("Cam position: " + "(" + cam.position.x + ", " + cam.position.y + ")");
-        System.out.println("Cam size: " + cam.viewportWidth + "x" + cam.viewportHeight);
-        System.out.println("Cam zoom: " + cam.zoom);
+        cam.setToOrtho(false, map_pw, map_ph * (((float) ph) / ((float)pw)));
+        float z = 1.50f;
+        cam.zoom += z;
 
         cam.update();
 
@@ -95,6 +92,7 @@ public class Map implements InputProcessor {
     }
 
     public void render() {
+        //tiledMapRenderer.setView(cam.combined, 0f, 0f, (float) pw, (float) ph);
         tiledMapRenderer.setView(cam);
         tiledMapRenderer.render();
         batch.setProjectionMatrix(cam.combined);
@@ -172,11 +170,23 @@ public class Map implements InputProcessor {
 
     @Override
     public boolean touchUp(int i, int i1, int i2, int i3) {
+        last_mouse_pos = null;
         return false;
     }
 
     @Override
-    public boolean touchDragged(int i, int i1, int i2) {
+    public boolean touchDragged(int x, int y, int pointer) {
+        if (last_mouse_pos == null) {
+            last_mouse_pos = new Vector2Df(x, y);
+            return false;
+        }
+        Vector2Df cur_pos = new Vector2Df(x, y);
+        Vector2Df diff = last_mouse_pos.copy();
+        diff.sub(cur_pos);
+        last_mouse_pos = cur_pos;
+        cam.position.x += diff.getX();
+        cam.position.y -= diff.getY();
+        cam.update();
         return false;
     }
 

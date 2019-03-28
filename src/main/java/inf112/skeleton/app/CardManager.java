@@ -1,6 +1,7 @@
 package inf112.skeleton.app;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -48,6 +49,9 @@ public class CardManager implements InputProcessor {
     private HashMap<Object, DragAndDrop.Source> card_drag_sources = new HashMap<>();
     private HashMap<Object, Image> card_drag_source_images = new HashMap<>();
     private Vector2Di mouse_pos = new Vector2Di(0, 0);
+    private int numberofcards = 0;
+    int cardsScrolledBy;
+    boolean cardsAutoHidden;
 
     private Stage stage;
 
@@ -88,8 +92,11 @@ public class CardManager implements InputProcessor {
     public void setCards(ArrayList<Card> cards) {
         inactive_cards.clear();
         inactive_cards.addAll(cards);
-        for (Card c : cards)
+        for (Card c : cards){
             c.setDrawPos(start_pos.tof());
+            numberofcards++;
+        }
+
 
         // TODO: Add click event to activate toggle hideCards()/showCards()
         //       when the cards have been moved after showCards() there should
@@ -98,6 +105,8 @@ public class CardManager implements InputProcessor {
     }
 
     public void showCards() {
+        cardsScrolledBy = 0;
+        Game.addSoundFX("showCards");
         Vector2Di card_pos = FIRST_CARD_POS.copy();
         float idle_t = 0.0f;
         int i = 0;
@@ -128,6 +137,7 @@ public class CardManager implements InputProcessor {
     }
 
     public void hideCards() {
+        Game.addSoundFX("hideCards");
         float idle_t = 0.0f;
         for (int i = inactive_cards.size()-1; i >= 0; i--) {
             Card c = inactive_cards.get(i);
@@ -262,7 +272,10 @@ public class CardManager implements InputProcessor {
                                 // Hide source image
                                 prev_source_img.setColor(0f, 0f, 0f, 0f);
                                 // Show source image when animation is finished.
-                                prev_c.addAnimationCallback(() -> prev_source_img.setColor(1f, 1f, 1f, 1f));
+
+
+                                /* Not sure why, but this messes with the autoHide. Everything seems to work without
+                                prev_c.addAnimationCallback(() -> prev_source_img.setColor(1f, 1f, 1f, 1f)); */
                             }
 
                             source_image.setBounds(cur_slot_pos.getX(), cur_slot_pos.getY(), card_w, card_h);
@@ -410,6 +423,10 @@ public class CardManager implements InputProcessor {
 
                 mouse_start_drag_pos = null;
                 dragged_card = null;
+                Game.addSoundFX("snapCard");
+                if(inactive_cards.size() == numberofcards - num_slots && !cardsAutoHidden){
+                    autoHideCards();
+                }
             }
         };
 
@@ -417,6 +434,7 @@ public class CardManager implements InputProcessor {
 
         card_drag_source_images.put(c, source_image);
         card_drag_sources.put(c, source);
+
     }
 
     public void render(SpriteBatch batch) {
@@ -486,6 +504,15 @@ public class CardManager implements InputProcessor {
 
     @Override
     public boolean touchUp(int i, int i1, int i2, int i3) {
+        int mouseX = mouse_pos.getX();
+        int mouseY = mouse_pos.getY();
+        int deck_bgX = start_pos.getX();
+        int deck_bgY = start_pos.getY();
+
+        if ( (mouseX > deck_bgX && mouseX <= deck_bgX+card_w) && (Gdx.graphics.getHeight() - mouseY <  deck_bgY + card_h)){
+            showCards();
+        }
+
         return false;
     }
 
@@ -497,6 +524,15 @@ public class CardManager implements InputProcessor {
     @Override
     public boolean mouseMoved(int x, int y) {
         mouse_pos.set(x, y);
+
+        if(mouse_pos.getX() < 230){
+            if(mouse_pos.getY() < 525 && mouse_pos.getY() > 395){
+                if(cardsAutoHidden){
+                    returnFromAutoHideCards();
+                }
+            }
+
+        }
         return false;
     }
 
@@ -524,7 +560,53 @@ public class CardManager implements InputProcessor {
         }
     }
 
-    int cardsScrolledBy = 0;
+    public void autoHideCards(){
+        Vector2Di mov = new Vector2Di(-40, -120);
+        ArrayList<Image> src_images = new ArrayList<>();
+        for (Card c : inactive_cards) {
+            Image src = card_drag_source_images.get(c);
+            if (src == null)
+                return;
+            src_images.add(src);
+        }
+        for (int i = 0; i < inactive_cards.size(); i++) {
+            Card c = inactive_cards.get(i);
+            if(i > 0){mov.add(new Vector2Di(-140, 0));}
+
+            c.addAnimation(new Animation(mov.tof(), 360, -0.65f, 1f));
+
+            Image source_image = src_images.get(i);
+            Vector2Di newpos = c.getFinalAnimationPos(1);
+            source_image.setColor(0, 0, 0, 0);
+            source_image.setBounds(newpos.getX(), newpos.getY(), card_w, card_h);
+        }
+        cardsAutoHidden = true;
+    }
+
+    public void returnFromAutoHideCards(){
+        Vector2Di mov = new Vector2Di(40, 120);
+        ArrayList<Image> src_images = new ArrayList<>();
+        for (Card c : inactive_cards) {
+            Image src = card_drag_source_images.get(c);
+            if (src == null)
+                return;
+            src_images.add(src);
+        }
+        for (int i = 0; i < inactive_cards.size(); i++) {
+            Card c = inactive_cards.get(i);
+            if(i > 0){mov.add(new Vector2Di(140, 0));}
+
+            c.addAnimation(new Animation(mov.tof(), -360, 0.65f, 1f));
+
+            Image source_image = src_images.get(i);
+            Vector2Di newpos = c.getFinalAnimationPos(1);
+            source_image.setColor(0, 0, 0, 0);
+            source_image.setBounds(newpos.getX(), newpos.getY(), card_w, card_h);
+        }
+        cardsAutoHidden = false;
+    }
+
+
 
     @Override
     public boolean scrolled(int i) {

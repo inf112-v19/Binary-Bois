@@ -49,7 +49,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         try {
             addSounds();
 
-            map = new Map(180, 0, 320, 320, "map.tmx");
+            map = new Map(180, 0, 300, 200, "map.tmx");
 
             ArrayList<Robot> robots = new ArrayList<>();
             for (int[] pos : robot_start_positions) {
@@ -77,6 +77,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             InputMultiplexer input_multi = new InputMultiplexer();
             for (InputProcessor p : card_queue.getInputProcessors())
                 input_multi.addProcessor(p);
+            input_multi.addProcessor(map);
             input_multi.addProcessor(this);
             input_multi.addProcessor(map);
             Gdx.input.setInputProcessor(input_multi);
@@ -85,8 +86,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             font = new BitmapFont();
             font.setColor(Color.BLACK);
 
-            game.appendToLogBuilder("Press h to hide all cards");
-            game.appendToLogBuilder("Press q to show all cards");
+            game.appendToLogBuilder("Click on the deck to show all cards");
             game.appendToLogBuilder("Press e to run selected cards");
             game.appendToLogBuilder("Use scrollwheel to scroll cards");
         } catch (NoSuchResource e) {
@@ -106,6 +106,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         soundNametoFile.put("Flag", Resources.getSound("Flag.ogg"));
         soundNametoFile.put("Wrench", Resources.getSound( "Wrench.ogg"));
         soundNametoFile.put("Oof", Resources.getSound( "Oof.ogg"));
+        soundNametoFile.put("showCards", Resources.getSound("showCards.ogg"));
+        soundNametoFile.put("snapCard", Resources.getSound("snapCard.ogg"));
+        soundNametoFile.put("hideCards", Resources.getSound("hideCards.ogg"));
         musicPlayer = Resources.getMusic("iRobot.ogg");
         musicPlayer.setVolume(0.5f);
         musicPlayer.setLooping(true);
