@@ -1,14 +1,8 @@
 package inf112.skeleton.app;
 
 import com.badlogic.gdx.graphics.Texture;
-import jdk.nashorn.internal.runtime.arrays.ArrayLikeIterator;
-
-import java.util.ArrayList;
-
-
 
 public class Robot extends Renderable implements IItem {
-
     private Vector2Di pos;
     private Vector2Di dir;
     private Texture texture;
@@ -39,8 +33,6 @@ public class Robot extends Renderable implements IItem {
         this.pos = new Vector2Di(0, 0);
         this.dir = new Vector2Di(1, 0);
     }
-
-
 
     /**
      * Move the robot d units along it's direction vector.
@@ -84,13 +76,10 @@ public class Robot extends Renderable implements IItem {
         this.pos = archiveMarker.copy();
     }
 
-
-
     /**
      * Handles health and deaths for robot based on which damage type it recieves.
      *
      */
-
     public void handleDamage(DamageType dtype) {
         int dmg = DamageType.getDamage(dtype);
         if ((health -= dmg) <= 0) {
@@ -149,5 +138,4 @@ public class Robot extends Renderable implements IItem {
     public int getDeaths() {
         return deaths;
     }
-
 }
