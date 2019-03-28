@@ -156,7 +156,6 @@ public class Map implements InputProcessor {
         if(button == Input.Buttons.LEFT) {
             int offset_x = (pw - map_pw) / 2,
                 offset_y = ph - map_ph;
-
             Vector2Di pos = pixToTile(new Vector2Df(screenX - offset_x, offset_y - screenY));
             //if (pos.getX() > dim.getX() || pos.getX() < 0 || pos.getY() > dim.getY() || pos.getY() < 0)
             //    return false;
