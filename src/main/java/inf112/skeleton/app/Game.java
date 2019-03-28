@@ -72,6 +72,39 @@ public class Game {
         return tmp;
     }
 
+    public void shootLazer(Vector2Di pos, Vector2Di dir) {
+        Vector2Di current_pos = pos.copy();
+        int x = current_pos.getX();
+        int y = current_pos.getY();
+        ArrayList<IItem> item_list = board.get(x, y);
+        for (IItem item : item_list) {
+            if (item instanceof Wall && ((Wall) item).hasEdge(dir)) {
+                System.out.println("Lazer hit wall on tile it is on");
+                return;
+            }
+        }
+        x += dir.getX();
+        y += dir.getY();
+        while (x < width && 0 < x && y < height && 0 < y) {
+            item_list = board.get(x, y);
+            for (IItem item : item_list) {
+                Vector2Di dir_opposite = dir.copy();
+                dir_opposite.mul(-1);
+                if (item instanceof Wall && ((Wall) item).hasEdge(dir_opposite)) {
+                    System.out.println("Lazer hit wall on the way to the tile it is now on");
+                    return;
+                }
+                if (item instanceof Robot) {
+                    ((Robot) item).handleDamage(DamageType.LASER);
+                    return;
+                }
+
+                x += dir.getX();
+                y += dir.getY();
+            }
+        }
+    }
+
     public Robot getRobot(int playerNumber) throws IndexOutOfBoundsException {
         return robots.get(playerNumber);
     }
