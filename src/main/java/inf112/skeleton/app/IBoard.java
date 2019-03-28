@@ -24,6 +24,13 @@ public interface IBoard {
         return get(pos.getX(), pos.getY());
     }
 
+    /**
+     *
+     * Checks that the item is on the board.
+     */
+    default boolean isOnBoard(Vector2Di v) {
+        return !(v.getY() < 0 || v.getY() >= getHeight() || v.getX() < 0 || v.getX() >= getWidth());
+    }
 
     /**
      * Adds item to the list of items at specified location
