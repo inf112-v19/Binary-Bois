@@ -104,7 +104,9 @@ public class Robot extends Renderable implements IItem {
     }
      */
 
-    public int handleDamage()
+    public int handleDamage() {
+        return 0;
+    }
 
     public void setPos(Vector2Di pos) {
         this.pos = pos;
@@ -142,6 +144,7 @@ public class Robot extends Renderable implements IItem {
     public int getCurrentLives(){
         return maxLives;
     }
+     */
 
 
 }
