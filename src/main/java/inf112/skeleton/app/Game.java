@@ -57,6 +57,14 @@ public class Game {
         return players.get(active_player_num);
     }
 
+    public int getActivePlayerNum() {
+        return active_player_num;
+    }
+
+    public void setActivePlayerNum(int num) {
+        active_player_num = num;
+    }
+
     public void nextPlayer() {
         active_player_num = (active_player_num+1) % players.size();
     }
@@ -72,38 +80,33 @@ public class Game {
         return tmp;
     }
 
-    public void shootLazer(Vector2Di pos, Vector2Di dir) {
+    public Vector2Di shootLaser(Vector2Di pos, Vector2Di dir) {
+        soundFx.add("Laser");
         Vector2Di current_pos = pos.copy();
-        int x = current_pos.getX();
-        int y = current_pos.getY();
-        ArrayList<IItem> item_list = board.get(x, y);
-        for (IItem item : item_list) {
-            if (item instanceof Wall && ((Wall) item).hasEdge(dir)) {
-                System.out.println("Lazer hit wall on tile it is on");
-                return;
-            }
-        }
-        x += dir.getX();
-        y += dir.getY();
-        while (x < width && 0 < x && y < height && 0 < y) {
-            item_list = board.get(x, y);
+        ArrayList<IItem> item_list = board.get(current_pos);
+        for (IItem item : item_list)
+            if (item instanceof Wall && ((Wall) item).hasEdge(dir))
+                return current_pos;
+
+        current_pos.add(dir);
+        for (; board.isOnBoard(current_pos); current_pos.add(dir)) {
+            item_list = board.get(current_pos);
             for (IItem item : item_list) {
                 Vector2Di dir_opposite = dir.copy();
                 dir_opposite.mul(-1);
-                if (item instanceof Wall && ((Wall) item).hasEdge(dir_opposite)) {
-                    System.out.println("Lazer hit wall on the way to the tile it is now on");
-                    return;
-                }
-                if (item instanceof Robot) {
-                    ((Robot) item).handleDamage(DamageType.LASER);
-                    return;
-                }
+                if (item instanceof Wall && ((Wall) item).hasEdge(dir_opposite))
+                    return current_pos;
 
-                x += dir.getX();
-                y += dir.getY();
+                if (item instanceof Robot) {
+                    soundFx.add("Oof");
+                    ((Robot) item).handleDamage(DamageType.LASER, board);
+                    return current_pos;
+                }
             }
         }
+        return current_pos;
     }
+
 
     public Robot getRobot(int playerNumber) throws IndexOutOfBoundsException {
         return robots.get(playerNumber);
@@ -145,12 +148,7 @@ public class Game {
     }
 
     public void killRobot(Robot robot) {
-        Vector2Di currentPos = robot.getPos();
-        Vector2Di backupPos = robot.getArchiveMarkerPos();
-        board.get(currentPos).remove(robot);
-        board.set(robot, backupPos);
-        robot.death();
-        robot.setArchiveMarker(backupPos);
+        robot.handleDamage(DamageType.FALL, board);
     }
     
     public void appendToLogBuilder(String string){
@@ -169,9 +167,9 @@ public class Game {
         board.set(robot, newpos);
         registerFlagUpdateBackup(pos, dir, robot);
     }
+
     public static void addSoundFX (String soundName){
         soundFx.add(soundName);
-
     }
 
     public void isOnHole(Robot robot) {
@@ -180,7 +178,7 @@ public class Game {
         for (IItem item : itemsOnPos) {
             if (item instanceof Hole) {
                 soundFx.add("Death");
-                killRobot(robot);
+                robot.handleDamage(DamageType.FALL, board);
                 return;
             }
         }

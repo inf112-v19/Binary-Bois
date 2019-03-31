@@ -2,6 +2,8 @@ package inf112.skeleton.app;
 
 import com.badlogic.gdx.graphics.Texture;
 
+import java.util.Random;
+
 public class Robot extends Renderable implements IItem {
     private Vector2Di pos;
     private Vector2Di dir;
@@ -15,6 +17,8 @@ public class Robot extends Renderable implements IItem {
     private int health = MAX_HEALTH;
     private int deaths = 0;
     private boolean powered_on = true;
+    private boolean game_over = false;
+    private Random rnd = new Random();
 
     Robot(int x, int y) throws NoSuchResource {
         super();
@@ -69,38 +73,53 @@ public class Robot extends Renderable implements IItem {
     /**
      * Robo RIP
      */
-    public void death() {
-        addAnimation(new Animation(new Vector2Df(0, 0), 360*2, -1, 1f));
-        addAnimation(Animation.moveTo(this, archiveMarker, 0.1f));
-        addAnimation(new Animation(new Vector2Df(0, 0), 0, 1, 0.5f));
-        this.pos = archiveMarker.copy();
+    public void death(IBoard board) {
+        Vector2Di currentPos = getPos();
+        Vector2Di backupPos = getArchiveMarkerPos();
+        board.get(currentPos).remove(this);
+        board.set(this, backupPos);
+        pos = archiveMarker.copy();
+        setArchiveMarker(backupPos);
     }
 
     /**
      * Handles health and deaths for robot based on which damage type it recieves.
-     *
      */
-    public void handleDamage(DamageType dtype) {
+    public void handleDamage(DamageType dtype, IBoard board) {
         int dmg = DamageType.getDamage(dtype);
+        System.out.println(name + " took " + dmg + " damage and now has " + (health-dmg) + " hp");
         if ((health -= dmg) <= 0) {
+            death(board);
+
             if (++deaths >= MAX_DEATHS) {
-                switch (dtype) {
-                    case LASER:
-                        // Show laser animation
-                        break;
-                    case FALL:
-                        // Show fall animation
-                        break;
-                    default:
-                        throw new UnsupportedOperationException();
-                }
-            } else {
-                health = MAX_HEALTH;
                 powered_on = false;
+                game_over = true;
+            } else {
+                powered_on = false;
+            }
+            switch (dtype) {
+                case LASER:
+                    Vector2Di vec = new Vector2Di(25, 0);
+                    vec.rotate(rnd.nextInt(360));
+                    int rot = (180-rnd.nextInt(360))*5;
+                    addAnimation(new Animation(new Vector2Df(vec.getX(), vec.getY()), rot, 3, 2f));
+                    addAnimation(new Animation(new Vector2Df(0, 0), -rot, -3, 0.01f));
+                    addAnimation(Animation.moveTo(this, archiveMarker, 0.01f));
+                    break;
+                case FALL:
+                    addAnimation(new Animation(new Vector2Df(0, 0), 360*2, -1, 1f));
+                    addAnimation(Animation.moveTo(this, archiveMarker, 0.1f));
+                    break;
+                default:
+                    throw new UnsupportedOperationException();
             }
         }
     }
 
+    /** You are out of the game if this is true */
+    public boolean isGame_over(){
+        return game_over;
+    }
 
     public boolean isPoweredDown() {
         return !powered_on;
@@ -108,7 +127,12 @@ public class Robot extends Renderable implements IItem {
 
     public void powerOn() {
         assert isPoweredDown();
-        powered_on = true;
+        if (!game_over && !powered_on) {
+            System.out.println("Powers up");
+            powered_on = true;
+            health = MAX_HEALTH;
+            addAnimation(new Animation(new Vector2Df(0, 0), 0, 1, 1f));
+        }
     }
 
     public void setPos(Vector2Di pos) {

@@ -41,6 +41,8 @@ public class Resources {
     @SuppressWarnings("unchecked")
     private static <T> T get(String rel_path, Function<String, T> fn) throws NoSuchResource {
         String path = realPath(rel_path);
+        if (path == null)
+            throw new NoSuchResource(rel_path);
         T obj = (T) cache.get(path);
         if (obj != null)
             return obj;
@@ -73,7 +75,7 @@ public class Resources {
             try {
                 return new CSV(p);
             } catch (Exception e) {
-                // Function<A, B> lambdas can't throw checked exceptions. Java is dumb.
+                // Function<A, B> lambdas can't throw checked exceptions. Java is dumb. :O
                 return null;
             }
         });

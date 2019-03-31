@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Timer;
-import org.lwjgl.Sys;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +35,8 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private Color bgcolor;
     private CardManager card_queue;
     private HashMap<String, Sound> soundNametoFile = new HashMap<>();
+    private Card[][] player_active_cards;
+    private  final int NUM_ACTIVE_CARDS = 5;
 
     public GameLoop(int map_px_w, int map_px_h) {
         super();
@@ -57,12 +58,13 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 robots.add(robut);
                 map.addDrawJob(robut);
             }
-            current_robot = robots.get(robots.size() - 1);
-            current_robot.rot(-90);
+
 
             Vector2Di map_dim = map.getDimensions();
             System.out.println("Map Dimensions: " + map_dim);
             this.game = new Game(map_dim.getX(), map_dim.getY(), robots);
+            current_robot = game.getRobot(game.getActivePlayer());
+            current_robot.rot(-90);
 
             try {
                 this.game.handOutCards();
@@ -71,7 +73,8 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 //       exception will never happen directly after the Game is instantiated.
             }
 
-            card_queue = new CardManager(5);
+            player_active_cards = new Card[robots.size()][NUM_ACTIVE_CARDS];
+            card_queue = new CardManager(NUM_ACTIVE_CARDS);
             card_queue.setCards(game.getActivePlayer().getHand());
 
             InputMultiplexer input_multi = new InputMultiplexer();
@@ -109,6 +112,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         soundNametoFile.put("showCards", Resources.getSound("showCards.ogg"));
         soundNametoFile.put("snapCard", Resources.getSound("snapCard.ogg"));
         soundNametoFile.put("hideCards", Resources.getSound("hideCards.ogg"));
+        soundNametoFile.put("Laser", Resources.getSound("Laser.mp3"));
         musicPlayer = Resources.getMusic("iRobot.ogg");
         musicPlayer.setVolume(0.5f);
         musicPlayer.setLooping(true);
@@ -144,7 +148,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             font.draw(batch, game.getPrintLog(), 0, 750);
             batch.end();
         }
-
         map.render();
 
         card_queue.render(batch);
@@ -156,11 +159,24 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     public boolean keyDown(int keycode) {
         final int KEY_NUM_END = 16;
         final int KEY_NUM_BEGIN = 8;
-        int move_amount = 1;
         if (keycode <= KEY_NUM_END && keycode >= KEY_NUM_BEGIN) {
             int number = keycode - KEY_NUM_BEGIN;
             try {
+                System.out.println("Input  " + number);
+                player_active_cards[game.getActivePlayerNum()] = card_queue.getActive_cards();
+                System.out.println("Saving:");
+                for (Card c :  player_active_cards[game.getActivePlayerNum()])
+                    System.out.println(c);
+
                 current_robot = game.getRobot(number);
+                game.setActivePlayerNum(number);
+                card_queue.setCards(game.getActivePlayer().getHand());
+                System.out.println("Cards gotten from player_active_cards  " + game.getActivePlayerNum());
+                for (Card c :  player_active_cards[game.getActivePlayerNum()])
+                    System.out.println(c);
+
+                card_queue.setActive_cards(player_active_cards[game.getActivePlayerNum()]);
+
             } catch (IndexOutOfBoundsException e) {
                 game.appendToLogBuilder("No such robot");
             }
@@ -168,9 +184,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         }
         switch (keycode) {
             case Input.Keys.DOWN:
-                move_amount = -1;
+                Commands.moveCommand.exec(-1, current_robot, game);
+                break;
             case Input.Keys.UP:
-                Commands.moveCommand.exec(move_amount, current_robot, game);
+                Commands.moveCommand.exec(1, current_robot, game);
                 break;
             case Input.Keys.RIGHT:
                 Commands.rotateCommand.exec(-90, current_robot, game);
@@ -205,7 +222,11 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             case Input.Keys.H:
                 card_queue.hideCards();
                 break;
-
+            case Input.Keys.L:
+                game.shootLaser(current_robot.getPos(), current_robot.getDir());
+                break;
+            case Input.Keys.R:
+                current_robot.powerOn();
             default:
                 return false;
         }

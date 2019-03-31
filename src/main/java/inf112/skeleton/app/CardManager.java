@@ -32,6 +32,7 @@ public class CardManager implements InputProcessor {
 
     private ArrayList<Card> inactive_cards = new ArrayList<>();
     private Card active_cards[];
+    private Card[] total_active_cards;
     private Texture slot_back;
     private Texture slot_front;
     private Texture slot_sep;
@@ -90,6 +91,7 @@ public class CardManager implements InputProcessor {
     }
 
     public void setCards(ArrayList<Card> cards) {
+        numberofcards = 0;
         inactive_cards.clear();
         inactive_cards.addAll(cards);
         for (Card c : cards){
@@ -102,6 +104,14 @@ public class CardManager implements InputProcessor {
         //       when the cards have been moved after showCards() there should
         //       be a dotted line around where the card deck was, clicking on that
         //       area should return the cards.
+    }
+
+    public Card[] getActive_cards() {
+        return active_cards;
+    }
+
+    public void setActive_cards(Card[] active_cards) {
+        this.active_cards = active_cards;
     }
 
     public void showCards() {
@@ -154,6 +164,7 @@ public class CardManager implements InputProcessor {
         stage.act(Gdx.graphics.getDeltaTime());
     }
 
+
     public ArrayList<Card> getSequence() {
         ArrayList<Card> cards = new ArrayList<>();
         for (int i = 0; i < num_slots; i++) {
@@ -162,6 +173,11 @@ public class CardManager implements InputProcessor {
                 cards.add(c);
         }
         return cards;
+    }
+
+    //TODO: This should make commands out of the active cards of all players
+    public void runAllActive() {
+
     }
 
     /**
