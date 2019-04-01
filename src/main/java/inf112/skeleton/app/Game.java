@@ -57,6 +57,27 @@ public class Game {
             throw new InitError("Not enough cards for " + players.size() + " players, have " + deck.size() + " cards");
     }
 
+    //Made for testing
+    public Game(int height, int width, ArrayList<Robot> robots, String empty_string) {
+        this.height = height;
+        this.width = width;
+        this.robots = robots;
+        this.players = new ArrayList<>();
+        robotsToPlayers = new HashMap<>();
+        board = new Board(height, width);
+        game_log = new GameLog(5);
+
+        int player_num = 0;
+        for (Robot r : robots) {
+            Player p = new Player("Player-" + player_num++);
+            robotsToPlayers.put(r, p);
+            players.add(p);
+        }
+        for (Robot robot : robots) {
+            board.set(robot, robot.getPos());
+        }
+    }
+
     public Player getActivePlayer() {
         return players.get(active_player_num);
     }
@@ -196,6 +217,10 @@ public class Game {
 
     public static void addSoundFX (String soundName){
         soundFx.add(soundName);
+    }
+
+    public void setOnBoard(IItem item, int x, int y) {
+        board.set(item, x, y);
     }
 
     public void isOnHole(Robot robot) {
