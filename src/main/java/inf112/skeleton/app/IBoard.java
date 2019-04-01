@@ -1,6 +1,7 @@
 package inf112.skeleton.app;
 
 import java.util.ArrayList;
+
 /**
  * The board itself. Knows what is on the board and where
  */
@@ -51,8 +52,12 @@ public interface IBoard {
      */
     int getHeight();
 
+
+
     /**
      * @return width of board
      */
     int getWidth();
+
+    ArrayList<IItem> getAllItemsOnBoard();
 }

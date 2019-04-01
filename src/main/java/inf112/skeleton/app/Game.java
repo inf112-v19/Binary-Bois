@@ -18,11 +18,15 @@ public class Game {
     private HashMap<Robot, Player> robotsToPlayers;
     private ArrayList<Robot> robots;
     private ArrayList<Player> players;
+    private ArrayList<IItem> flags;
     private GameLog game_log;
     private CardDeck deck;
     private int active_player_num = 0;
     public static ArrayList<String> soundFx = new ArrayList<>();
     private Random rnd = new Random();
+    private int numberOfFlags;
+    private static boolean winCondition = false;
+
 
     public class InitError extends Exception {
         public InitError(String msg) {
@@ -134,11 +138,29 @@ public class Game {
             return;
         for (IItem item : itemlist) {
             if (item instanceof Flag) {
+
                 soundFx.add("Flag");
                 robot.setArchiveMarker(newpos);
                 Player robotOwner = robotsToPlayers.get(robot);
-                robotOwner.register(((Flag) item).getNumber());
-                return;
+
+                //Keeping tack of which flags the player has visited so far
+                robotOwner.registerFlag((Flag)item);
+
+                //ArrayList of all Flag IItems that are on the map
+                ArrayList<IItem> flagArrayList = new ArrayList<>();
+                for(int i = 0; i < board.getAllItemsOnBoard().size(); i++){
+                    if(board.getAllItemsOnBoard().get(i) instanceof Flag){
+                        flagArrayList.add(board.getAllItemsOnBoard().get(i));
+                    }
+                }
+
+                //Win condition
+                if(robotOwner.getFlags().containsAll(flagArrayList)){
+                    System.out.println(robotOwner.getName() + " registered all flags. Winner!");
+                    winCondition = true;
+                }
+
+
             } else if (item instanceof Wrench) {
                 robot.setArchiveMarker(newpos);
                 soundFx.add("Wrench");
@@ -149,6 +171,10 @@ public class Game {
 
     public void killRobot(Robot robot) {
         robot.handleDamage(DamageType.FALL, board);
+    }
+
+    public static boolean getWinCondition(){
+        return winCondition;
     }
     
     public void appendToLogBuilder(String string){
@@ -183,7 +209,6 @@ public class Game {
             }
         }
     }
-
 
     public boolean canMoveTo(Vector2Di pos, Vector2Di dir, Robot my_robot){
         Vector2Di orig_pos = pos.copy();
@@ -232,7 +257,6 @@ public class Game {
     private void boardSetup() {
 
         TiledMap tiledMap = Map.getTiledMap();
-        int flagCounter = 1;
         for(int k = 0; k < tiledMap.getLayers().size(); k++){
             TiledMapTileLayer layer = (TiledMapTileLayer)tiledMap.getLayers().get(k);
             for(int i = 0; i < width; i++) {
@@ -263,8 +287,10 @@ public class Game {
 
                     }
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("flag")) {
-                        board.set(new Flag(flagCounter, new Vector2Di(i, j)), i, j);
-                        flagCounter += 1;
+                        numberOfFlags += 1;
+                        Flag flag = new Flag(numberOfFlags, new Vector2Di(i, j));
+                        board.set(flag, i, j);
+
                     }
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("hole")) {
                         board.set(new Hole(), i, j);

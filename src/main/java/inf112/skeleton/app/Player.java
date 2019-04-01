@@ -9,11 +9,11 @@ import java.util.Arrays;
  */
 public class Player {
 
-    private String name;
+    static String name;
     private int robotLives = 3;
     private int memoryHealth = 10;
     private ArrayList<Card> hand = new ArrayList<>();
-    private ArrayList<Integer> flags;
+    private ArrayList<Flag> flags;
 
     public Player(String name) {
         if (name.length() < 1)
@@ -22,14 +22,14 @@ public class Player {
         this.flags = new ArrayList<>();
     }
 
-    public void register(Integer flag) {
+    public void registerFlag(Flag flag) {
         if (!flags.contains(flag)) {
             flags.add(flag);
-            System.out.println("Flag " + flag + " registered by " + name);
+            System.out.println("Flag " + flag.getNumber() + " registered by " + name);
         }
     }
 
-    public ArrayList<Integer> getFlags() {
+    public ArrayList<Flag> getFlags() {
         return flags;
     }
 

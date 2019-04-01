@@ -19,12 +19,10 @@ public class Board implements IBoard {
         this.itemList = new HashMap<>();
     }
 
-
     @Override
     public ArrayList<IItem> get(int x, int y) {
         if (x < 0 || y < 0)
             throw new IllegalArgumentException("x and y must be greater than 0");
-
         return grid[x + y*width];
     }
 
@@ -45,5 +43,17 @@ public class Board implements IBoard {
     @Override
     public int getWidth() {
         return width;
+    }
+
+    @Override
+    public ArrayList<IItem> getAllItemsOnBoard() {
+        ArrayList<IItem> gridArrayList = new ArrayList<>();
+        for(int i = 0; i < grid.length; i++){
+            for(int j = 0; j < grid[i].size(); j++){
+                gridArrayList.add(grid[i].get(j));
+            }
+
+        }
+        return gridArrayList;
     }
 }

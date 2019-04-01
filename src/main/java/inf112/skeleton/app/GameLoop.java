@@ -145,9 +145,19 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
         if (game.getPrintLog() != null) {
             batch.begin();
+
             font.draw(batch, game.getPrintLog(), 0, 750);
             batch.end();
         }
+
+        if (Game.getWinCondition()) {
+            batch.begin();
+            font.getData().setScale(5.0f);
+            font.draw(batch, "WINNER", 400, 750);
+            font.getData().setScale(1);
+            batch.end();
+        }
+
         map.render();
 
         card_queue.render(batch);
