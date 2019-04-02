@@ -172,16 +172,13 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         if (keycode <= KEY_NUM_END && keycode >= KEY_NUM_BEGIN) {
             int number = keycode - KEY_NUM_BEGIN;
             try {
-                System.out.println("Input  " + number);
                 player_active_cards[game.getActivePlayerNum()] = card_queue.getActive_cards();
-                System.out.println("Saving:");
                 for (Card c :  player_active_cards[game.getActivePlayerNum()])
                     System.out.println(c);
 
                 current_robot = game.getRobot(number);
                 game.setActivePlayerNum(number);
                 card_queue.setCards(game.getActivePlayer().getHand());
-                System.out.println("Cards gotten from player_active_cards  " + game.getActivePlayerNum());
                 for (Card c :  player_active_cards[game.getActivePlayerNum()])
                     System.out.println(c);
 

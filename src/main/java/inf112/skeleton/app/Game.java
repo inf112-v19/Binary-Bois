@@ -95,8 +95,11 @@ public class Game {
     }
 
     public void handOutCards() throws CardDeck.NoMoreCards {
-        for (Player p : players)
-            p.giveDeck(deck.get(NUM_CARDS_PER_PLAYER));
+        for (int i = 0; i < players.size(); i++) {
+            Player p = players.get(i);
+            int robo_health = robots.get(i).getHealth();
+            p.giveDeck(deck.get(robo_health-1));
+        }
     }
 
     public ArrayList<String> checkPlaySound() {
@@ -109,9 +112,12 @@ public class Game {
         soundFx.add("Laser");
         Vector2Di current_pos = pos.copy();
         ArrayList<IItem> item_list = board.get(current_pos);
-        for (IItem item : item_list)
+        for (IItem item : item_list) {
             if (item instanceof Wall && ((Wall) item).hasEdge(dir))
                 return current_pos;
+            if (item instanceof LaserShooter)
+                return current_pos;
+        }
 
         current_pos.add(dir);
         for (; board.isOnBoard(current_pos); current_pos.add(dir)) {

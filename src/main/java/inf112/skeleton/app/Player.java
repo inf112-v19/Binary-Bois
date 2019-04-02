@@ -10,8 +10,6 @@ import java.util.Arrays;
 public class Player {
 
     static String name;
-    private int robotLives = 3;
-    private int memoryHealth = 10;
     private ArrayList<Card> hand = new ArrayList<>();
     private ArrayList<Flag> flags;
 
@@ -53,13 +51,5 @@ public class Player {
 
     public ArrayList<Card> getHand() {
         return hand;
-    }
-
-    public int getMemoryHealth() {
-        return memoryHealth;
-    }
-
-    public int getRobotLives() {
-        return robotLives;
     }
 }
