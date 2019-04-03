@@ -61,6 +61,27 @@ public class Game {
             throw new InitError("Not enough cards for " + players.size() + " players, have " + deck.size() + " cards");
     }
 
+    //Made for testing
+    public Game(int height, int width, ArrayList<Robot> robots, String empty_string) {
+        this.height = height;
+        this.width = width;
+        this.robots = robots;
+        this.players = new ArrayList<>();
+        robotsToPlayers = new HashMap<>();
+        board = new Board(height, width);
+        game_log = new GameLog(5);
+
+        int player_num = 0;
+        for (Robot r : robots) {
+            Player p = new Player("Player-" + player_num++);
+            robotsToPlayers.put(r, p);
+            players.add(p);
+        }
+        for (Robot robot : robots) {
+            board.set(robot, robot.getPos());
+        }
+    }
+
     public Player getActivePlayer() {
         return players.get(active_player_num);
     }
@@ -78,8 +99,11 @@ public class Game {
     }
 
     public void handOutCards() throws CardDeck.NoMoreCards {
-        for (Player p : players)
-            p.giveDeck(deck.get(NUM_CARDS_PER_PLAYER));
+        for (int i = 0; i < players.size(); i++) {
+            Player p = players.get(i);
+            int robo_health = robots.get(i).getHealth();
+            p.giveDeck(deck.get(robo_health-1));
+        }
     }
 
     public ArrayList<String> checkPlaySound() {
@@ -92,9 +116,12 @@ public class Game {
         soundFx.add("Laser");
         Vector2Di current_pos = pos.copy();
         ArrayList<IItem> item_list = board.get(current_pos);
-        for (IItem item : item_list)
+        for (IItem item : item_list) {
             if (item instanceof Wall && ((Wall) item).hasEdge(dir))
                 return current_pos;
+            if (item instanceof LaserShooter)
+                return current_pos;
+        }
 
         current_pos.add(dir);
         for (; board.isOnBoard(current_pos); current_pos.add(dir)) {
@@ -200,6 +227,10 @@ public class Game {
 
     public static void addSoundFX (String soundName){
         soundFx.add(soundName);
+    }
+
+    public void setOnBoard(IItem item, int x, int y) {
+        board.set(item, x, y);
     }
 
     public void isOnHole(Robot robot) {
