@@ -54,7 +54,8 @@ public class Map implements InputProcessor {
         ph = Gdx.graphics.getHeight();
         cam = new OrthographicCamera();
         cam.setToOrtho(false, map_pw, map_ph * (((float) ph) / ((float)pw)));
-        float z = 1.50f;
+        cam.position.add(-300f, -50f, 0f);
+        float z = 1.5f;
         cam.zoom += z;
 
         cam.update();

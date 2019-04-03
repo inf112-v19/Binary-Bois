@@ -16,6 +16,10 @@ public class Wall extends TilePiece {
         return false;
     }
 
+    public Vector2Di[] getEdges() {
+        return edges;
+    }
+
     public static Wall getFullWall() {
         return new Wall(new Vector2Di(1, 0),
                         new Vector2Di(-1, 0),
