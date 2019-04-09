@@ -16,10 +16,10 @@ import java.util.HashMap;
 
 public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private static int[][] robot_start_positions = {
-            {6, 5},
             {6, 6},
             {6, 7},
-            {6, 8}
+            {6, 8},
+            {6, 9}
     };
     // All positions are in board dimensions, not in pixel dimensions.
     private Music musicPlayer;
@@ -50,7 +50,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         try {
             addSounds();
 
-            map = new Map(180, 0, 300, 200, "map.tmx");
+            map = new Map(180, 0, 300, 200, "map2.tmx");
 
             ArrayList<Robot> robots = new ArrayList<>();
             for (int[] pos : robot_start_positions) {

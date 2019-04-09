@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="right-down" width="14" height="14" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="1">
+ <tileset firstgid="1" name="texturesheet" tilewidth="32" tileheight="32" tilecount="16" columns="4">
+  <image source="textures/texturesheet.png" width="128" height="128"/>
+  <tile id="0">
+   <properties>
+    <property name="E" type="bool" value="true"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="false"/>
+    <property name="S" type="bool" value="false"/>
+    <property name="W" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="E" type="bool" value="true"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="false"/>
+    <property name="S" type="bool" value="true"/>
+    <property name="W" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="E" type="bool" value="true"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="false"/>
+    <property name="S" type="bool" value="true"/>
+    <property name="W" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="E" type="bool" value="true"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="false"/>
+    <property name="S" type="bool" value="false"/>
+    <property name="W" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="MapObject" value="floor"/>
+   </properties>
+  </tile>
+  <tile id="5">
+   <properties>
+    <property name="E" type="bool" value="false"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="true"/>
+    <property name="S" type="bool" value="false"/>
+    <property name="W" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="6">
+   <properties>
+    <property name="E" type="bool" value="true"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="true"/>
+    <property name="S" type="bool" value="false"/>
+    <property name="W" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="7">
+   <properties>
+    <property name="E" type="bool" value="true"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="true"/>
+    <property name="S" type="bool" value="true"/>
+    <property name="W" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="8">
+   <properties>
+    <property name="E" type="bool" value="true"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="true"/>
+    <property name="S" type="bool" value="true"/>
+    <property name="W" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="9">
+   <properties>
+    <property name="E" type="bool" value="true"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="true"/>
+    <property name="S" type="bool" value="false"/>
+    <property name="W" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="10">
+   <properties>
+    <property name="E" type="bool" value="false"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="true"/>
+    <property name="S" type="bool" value="true"/>
+    <property name="W" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="11">
+   <properties>
+    <property name="E" type="bool" value="false"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="true"/>
+    <property name="S" type="bool" value="true"/>
+    <property name="W" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="12">
+   <properties>
+    <property name="E" type="bool" value="false"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="true"/>
+    <property name="S" type="bool" value="false"/>
+    <property name="W" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="13">
+   <properties>
+    <property name="E" type="bool" value="false"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="false"/>
+    <property name="S" type="bool" value="true"/>
+    <property name="W" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="14">
+   <properties>
+    <property name="E" type="bool" value="false"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="false"/>
+    <property name="S" type="bool" value="true"/>
+    <property name="W" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="15">
+   <properties>
+    <property name="E" type="bool" value="false"/>
+    <property name="MapObject" value="wall"/>
+    <property name="N" type="bool" value="false"/>
+    <property name="S" type="bool" value="false"/>
+    <property name="W" type="bool" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="17" name="flag" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="textures/flag.png" width="32" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="MapObject" value="flag"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="18" name="wrench" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <properties>
+   <property name="MapObject" value="wrench"/>
+  </properties>
+  <image source="textures/wrench.png" width="32" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="MapObject" value="wrench"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="19" name="holes" tilewidth="32" tileheight="32" tilecount="9" columns="3">
+  <image source="textures/holy_sheet.png" width="96" height="96"/>
+  <tile id="0">
+   <properties>
+    <property name="MapObject" value="hole"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="MapObject" value="hole"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="MapObject" value="hole"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="MapObject" value="hole"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="MapObject" value="hole"/>
+   </properties>
+  </tile>
+  <tile id="5">
+   <properties>
+    <property name="MapObject" value="hole"/>
+   </properties>
+  </tile>
+  <tile id="6">
+   <properties>
+    <property name="MapObject" value="hole"/>
+   </properties>
+  </tile>
+  <tile id="7">
+   <properties>
+    <property name="MapObject" value="hole"/>
+   </properties>
+  </tile>
+  <tile id="8">
+   <properties>
+    <property name="MapObject" value="hole"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer id="3" name="Rutelag 1" width="14" height="14">
+  <data encoding="base64" compression="zlib">
+   eJyVkN0KgDAIhUe1FgQtqNbf+79nXkyQg67t4kMUj0c9nXNvIxdxEJ4YIVq1QDxCp7FksM66NedDYYYXPejXqkO/TemflD21mSVP9GM6+I2l+7up1m8WyHow/KIxH/WWX+2efH8v/oAxgu4m9kYS8QH+aAhH
+  </data>
+ </layer>
+ <layer id="4" name="Rutelag 2" width="14" height="14">
+  <data encoding="base64" compression="zlib">
+   eJxjYBhYIEglc4SoZA4xgFpuHuoAVzgQGz70jDNiAQCcRABp
+  </data>
+ </layer>
+</map>

@@ -1,7 +1,7 @@
 # INF112 - Robo Rally - Gruppe 1 Team 5
 ![alt text](resources/binary_bois_awful_logo.png)
 
-![alt text](Deliverables/screenshot.JPG)
+![alt text](Deliverables/screenshot_04.04.JPG)
 
 
 ## Team staff

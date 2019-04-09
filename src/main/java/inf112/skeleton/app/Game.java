@@ -22,6 +22,10 @@ public class Game {
     private GameLog game_log;
     private CardDeck deck;
     private int active_player_num = 0;
+    private Vector2Di northVector = new Vector2Di(0,1);
+    private Vector2Di eastVector = new Vector2Di(1,0);
+    private Vector2Di southVector = new Vector2Di(0,-1);
+    private Vector2Di westVector = new Vector2Di(-1,0);
     public static ArrayList<String> soundFx = new ArrayList<>();
     private Random rnd = new Random();
     private int numberOfFlags;
@@ -298,24 +302,23 @@ public class Game {
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("wall")) {
                         ArrayList<Vector2Di> edgesArrayList = new ArrayList<>();
                         if(cell.getTile().getProperties().get("N", Boolean.class)){
-                            edgesArrayList.add(new Vector2Di(0,1));
+                            edgesArrayList.add(northVector);
                         }
                         if(cell.getTile().getProperties().get("E", Boolean.class)){
-                            edgesArrayList.add(new Vector2Di(1,0));
+                            edgesArrayList.add(eastVector);
                         }
                         if(cell.getTile().getProperties().get("S", Boolean.class)){
-                            edgesArrayList.add(new Vector2Di(0,-1));
+                            edgesArrayList.add(southVector);
                         }
 
                         if(cell.getTile().getProperties().get("W", Boolean.class)){
-                            edgesArrayList.add(new Vector2Di(-1,0));
+                            edgesArrayList.add(westVector);
                         }
                         Vector2Di[] edgesArray = new Vector2Di[edgesArrayList.size()];
                         for(int l = 0; l < edgesArrayList.size(); l++){
                             edgesArray[l] = edgesArrayList.get(l);
                         }
                         board.set(new Wall(edgesArray), i, j);
-
                     }
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("flag")) {
                         numberOfFlags += 1;
