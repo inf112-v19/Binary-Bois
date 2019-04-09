@@ -229,7 +229,7 @@ public class Game {
         board.set(item, x, y);
     }
 
-    public void isOnHole(Robot robot) {
+    public void handlePlunge(Robot robot) {
         Vector2Di currentPos = robot.getPos();
         ArrayList<IItem> itemsOnPos = board.get(currentPos);
         for (IItem item : itemsOnPos) {
@@ -274,7 +274,7 @@ public class Game {
                 if (canMoveTo(otherBotPos, dir, (Robot) itemInFront)) {
                     appendToLogBuilder("Pushed other robot");
                     ((Robot) itemInFront).move(dir, 1);
-                    isOnHole((Robot) itemInFront);
+                    handlePlunge((Robot) itemInFront);
                 } else {
                     appendToLogBuilder("Unable to push other robot!");
                     return false;

@@ -103,12 +103,12 @@ public class Robot extends Renderable implements IItem {
                     vec.rotate(rnd.nextInt(360));
                     int rot = (180-rnd.nextInt(360))*5;
                     addAnimation(new Animation(new Vector2Df(vec.getX(), vec.getY()), rot, 3, 2f));
-                    addAnimation(new Animation(new Vector2Df(0, 0), -rot, -3, 0.01f));
+                    addAnimation(new Animation(new Vector2Df(0, 0), -rot, 1-this.getFinalAnimationScale(), 0.01f));
                     addAnimation(Animation.moveTo(this, archiveMarker, 0.01f));
                     break;
                 case FALL:
                     addAnimation(new Animation(new Vector2Df(0, 0), 360*2, -1, 1f));
-                    addAnimation(Animation.moveTo(this, archiveMarker, 0.1f));
+                    addAnimation(Animation.moveTo(this, archiveMarker, 0.01f));
                     break;
                 default:
                     throw new UnsupportedOperationException();
@@ -131,7 +131,7 @@ public class Robot extends Renderable implements IItem {
             System.out.println("Powers up");
             powered_on = true;
             health = MAX_HEALTH;
-            addAnimation(new Animation(new Vector2Df(0, 0), 0, 1, 1f));
+            addAnimation(Animation.scaleTo(this, 1-getAnimatedScale(), 1f));
         }
     }
 
