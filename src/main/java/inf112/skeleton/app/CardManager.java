@@ -111,8 +111,14 @@ public class CardManager implements InputProcessor {
         return cards;
     }
 
-    public void setActiveCards(Card[] active_cards) {
-        this.active_cards = active_cards;
+    /** This is a test method, it does not bother to update the card positions,
+     *  do not use for non-testing purposes. */
+    public void setAllActiveCards() {
+        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
+            Card c = inactive_cards.get(i);
+            inactive_cards.remove(i);
+            active_cards[i] = c;
+        }
     }
 
     public void showCards() {
@@ -174,11 +180,6 @@ public class CardManager implements InputProcessor {
                 cards.add(c);
         }
         return cards;
-    }
-
-    //TODO: This should make commands out of the active cards of all players
-    public void runAllActive() {
-
     }
 
     /**

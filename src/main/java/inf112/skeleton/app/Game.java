@@ -77,9 +77,8 @@ public class Game {
             robotsToPlayers.put(r, p);
             players.add(p);
         }
-        for (Robot robot : robots) {
+        for (Robot robot : robots)
             board.set(robot, robot.getPos());
-        }
     }
 
     public Player getActivePlayer() {
@@ -104,6 +103,14 @@ public class Game {
             int robo_health = robots.get(i).getHealth();
             p.giveDeck(deck.get(robo_health-1));
         }
+    }
+
+    /**
+     * This is a testing method for automatically setting the active cards of players.
+     */
+    public void forceActiveCards() {
+        for (Player p : players)
+            p.getCardManager().setAllActiveCards();
     }
 
     public Player getPlayer(int num) {

@@ -27,21 +27,24 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private Robot current_robot;
     private ArrayList<Robot> robots;
     private Game game;
+    private Round round = null;
 
     private Map map;
 
-    int map_px_w, map_px_h;
     private BitmapFont font;
     private SpriteBatch batch;
-    private Color bgcolor;
+    private Color bgcolor = new Color(0.5f, 0.5f, 0.5f, 1);;
     private HashMap<String, Sound> soundNametoFile = new HashMap<>();
 
+    private boolean autofill_cards = false;
 
-    public GameLoop(int map_px_w, int map_px_h) {
+    public GameLoop() {
         super();
-        this.map_px_w = map_px_w;
-        this.map_px_h = map_px_h;
-        bgcolor = new Color(0.5f, 0.5f, 0.5f, 1);
+    }
+
+    public GameLoop(boolean autofill) {
+        super();
+        this.autofill_cards = autofill;
     }
 
     /**
@@ -105,6 +108,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             game.appendToLogBuilder("Click on the deck to show all cards");
             game.appendToLogBuilder("Press e to run selected cards");
             game.appendToLogBuilder("Use scrollwheel to scroll cards");
+
+            if (autofill_cards)
+                 game.forceActiveCards();
         } catch (NoSuchResource e) {
             System.out.println("Unable to load: " + e.getMessage());
             System.exit(1);
@@ -175,6 +181,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
         getCardManager().render(batch);
 
+        if (round != null && !round.doStep())
+            round = null;
+
         // TODO: The UI will be drawn here later.
     }
 
@@ -203,7 +212,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 for (int i = 0; i < num_players; i++) {
                     active_cards.add(game.getPlayer(i).getCardManager().getActiveCards());
                 }
-                Round round = new Round(robots, active_cards, game);
+                round = new Round(robots, active_cards, game);
                 break;
             case Input.Keys.DOWN:
                 Commands.moveCommand.exec(-1, current_robot, game);
