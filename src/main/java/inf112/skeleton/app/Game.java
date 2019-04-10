@@ -196,6 +196,9 @@ public class Game {
                 robot.setArchiveMarker(newpos);
                 soundFx.add("Wrench");
                 return;
+            } else if (item instanceof Laser){
+                robot.handleDamage(DamageType.LASER, board);
+                soundFx.add("Laser");
             }
         }
     }
@@ -331,6 +334,9 @@ public class Game {
                     }
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("wrench")) {
                         board.set(new Wrench(), i, j);
+                    }
+                    if (cell.getTile().getProperties().get("MapObject", String.class).equals("laser")) {
+                        board.set(new Laser(new Vector2Di(i, j)), i, j);
                     }
                 }
             }
