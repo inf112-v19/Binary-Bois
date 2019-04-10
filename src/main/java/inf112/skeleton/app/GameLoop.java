@@ -21,10 +21,11 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             {6, 8},
             {6, 9}
     };
-    // All positions are in board dimensions, not in pixel dimensions.
+    private static final int num_players = robot_start_positions.length;   //FIXME: Only for testing purposes
     private Music musicPlayer;
     private Sound fxPlayer;
     private Robot current_robot;
+    private ArrayList<Robot> robots;
     private Game game;
 
     private Map map;
@@ -33,10 +34,8 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private BitmapFont font;
     private SpriteBatch batch;
     private Color bgcolor;
-    private CardManager card_queue;
     private HashMap<String, Sound> soundNametoFile = new HashMap<>();
-    private Card[][] player_active_cards;
-    private  final int NUM_ACTIVE_CARDS = 5;
+
 
     public GameLoop(int map_px_w, int map_px_h) {
         super();
@@ -45,26 +44,50 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         bgcolor = new Color(0.5f, 0.5f, 0.5f, 1);
     }
 
+    /**
+     * Set up the input processors.
+     *
+     * @param extra Extra input processors that run *before* the default ones.
+     */
+    public void setInputs(ArrayList<InputProcessor> extra) {
+        InputMultiplexer mul = new InputMultiplexer();
+        for (InputProcessor inp : extra) {
+            mul.addProcessor(inp);
+        }
+        mul.addProcessor(map);
+        mul.addProcessor(this);
+        mul.addProcessor(map);
+        Gdx.input.setInputProcessor(mul);
+    }
+
+    private void updatePlayer(int player_idx) {
+        if (player_idx < 0 || player_idx >= num_players)
+            throw new IllegalArgumentException("Illegal player-index: " + player_idx);
+        current_robot = game.getRobot(player_idx);
+        game.setActivePlayerNum(player_idx);
+        Player p = game.getActivePlayer();
+        setInputs(p.getCardManager().getInputProcessors());
+    }
+
+
+
     @Override
     public void create () {
+        robots = new ArrayList<>();
         try {
             addSounds();
 
             map = new Map(180, 0, 300, 200, "map2.tmx");
 
-            ArrayList<Robot> robots = new ArrayList<>();
             for (int[] pos : robot_start_positions) {
                 Robot robut = new Robot(pos[0], pos[1]); //Robut
                 robots.add(robut);
                 map.addDrawJob(robut);
             }
 
-
             Vector2Di map_dim = map.getDimensions();
             System.out.println("Map Dimensions: " + map_dim);
             this.game = new Game(map_dim.getX(), map_dim.getY(), robots);
-            current_robot = game.getRobot(game.getActivePlayer());
-            current_robot.rot(-90);
 
             try {
                 this.game.handOutCards();
@@ -73,17 +96,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 //       exception will never happen directly after the Game is instantiated.
             }
 
-            player_active_cards = new Card[robots.size()][NUM_ACTIVE_CARDS];
-            card_queue = new CardManager(NUM_ACTIVE_CARDS);
-            card_queue.setCards(game.getActivePlayer().getHand());
-
-            InputMultiplexer input_multi = new InputMultiplexer();
-            for (InputProcessor p : card_queue.getInputProcessors())
-                input_multi.addProcessor(p);
-            input_multi.addProcessor(map);
-            input_multi.addProcessor(this);
-            input_multi.addProcessor(map);
-            Gdx.input.setInputProcessor(input_multi);
+            updatePlayer(0);
 
             batch = new SpriteBatch();
             font = new BitmapFont();
@@ -160,9 +173,13 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
         map.render();
 
-        card_queue.render(batch);
+        getCardManager().render(batch);
 
         // TODO: The UI will be drawn here later.
+    }
+
+    private CardManager getCardManager() {
+        return game.getActivePlayer().getCardManager();
     }
 
     @Override
@@ -172,17 +189,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         if (keycode <= KEY_NUM_END && keycode >= KEY_NUM_BEGIN) {
             int number = keycode - KEY_NUM_BEGIN;
             try {
-                player_active_cards[game.getActivePlayerNum()] = card_queue.getActive_cards();
-                for (Card c :  player_active_cards[game.getActivePlayerNum()])
-                    System.out.println(c);
-
-                current_robot = game.getRobot(number);
-                game.setActivePlayerNum(number);
-                card_queue.setCards(game.getActivePlayer().getHand());
-                for (Card c :  player_active_cards[game.getActivePlayerNum()])
-                    System.out.println(c);
-
-                card_queue.setActive_cards(player_active_cards[game.getActivePlayerNum()]);
+                updatePlayer(number);
 
             } catch (IndexOutOfBoundsException e) {
                 game.appendToLogBuilder("No such robot");
@@ -190,6 +197,14 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             return true;
         }
         switch (keycode) {
+            //Does a round with the active cards
+            case Input.Keys.D:
+                ArrayList<ArrayList<Card>> active_cards = new ArrayList<>();
+                for (int i = 0; i < num_players; i++) {
+                    active_cards.add(game.getPlayer(i).getCardManager().getActiveCards());
+                }
+                Round round = new Round(robots, active_cards, game);
+                break;
             case Input.Keys.DOWN:
                 Commands.moveCommand.exec(-1, current_robot, game);
                 break;
@@ -219,15 +234,15 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
             // Execute all cards that are queued
             case Input.Keys.E:
-                card_queue.getSequenceAsCommand().exec(1, current_robot, game);
+                getCardManager().getSequenceAsCommand().exec(1, current_robot, game);
                 break;
 
             case Input.Keys.Q:
-                card_queue.showCards();
+                getCardManager().showCards();
                 break;
 
             case Input.Keys.H:
-                card_queue.hideCards();
+                getCardManager().hideCards();
                 break;
             case Input.Keys.L:
                 game.shootLaser(current_robot.getPos(), current_robot.getDir());

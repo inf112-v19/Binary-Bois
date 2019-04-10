@@ -48,6 +48,7 @@ public class Game {
         game_log = new GameLog(5);
         try {
             deck = new CardDeck(cards_src);
+            setup();
         } catch (CSV.CSVError e) {
             throw new InitError("Card source CSV file was incorrectly formed: " + cards_src);
         } catch (IOException e) {
@@ -55,14 +56,13 @@ public class Game {
         } catch (NoSuchResource e) {
             throw new InitError("Unable to load resource: " + e.getMessage());
         }
-        setup();
 
         if (NUM_CARDS_PER_PLAYER * players.size() > deck.size())
             throw new InitError("Not enough cards for " + players.size() + " players, have " + deck.size() + " cards");
     }
 
     //Made for testing
-    public Game(int height, int width, ArrayList<Robot> robots, String empty_string) {
+    public Game(int height, int width, ArrayList<Robot> robots, String empty_string) throws NoSuchResource {
         this.height = height;
         this.width = width;
         this.robots = robots;
@@ -104,6 +104,10 @@ public class Game {
             int robo_health = robots.get(i).getHealth();
             p.giveDeck(deck.get(robo_health-1));
         }
+    }
+
+    public Player getPlayer(int num) {
+        return players.get(num);
     }
 
     public ArrayList<String> checkPlaySound() {
@@ -151,7 +155,7 @@ public class Game {
         return robots.get(players.indexOf(player));
     }
 
-    private void setup() {
+    private void setup() throws NoSuchResource {
         int player_num = 0;
         for (Robot r : robots) {
             Player p = new Player("Player-" + player_num++);
