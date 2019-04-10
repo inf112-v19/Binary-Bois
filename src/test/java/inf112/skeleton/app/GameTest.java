@@ -11,7 +11,7 @@ public class GameTest {
     private Game game;
 
     @Test
-    public void robotDoesNotGoThroughWall() {
+    public void robotDoesNotGoThroughWall() throws NoSuchResource{
         ArrayList<Robot> robots = new ArrayList<>();
         Robot robot = new Robot();
         robots.add(robot);

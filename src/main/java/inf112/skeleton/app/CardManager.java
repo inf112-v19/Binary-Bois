@@ -1,7 +1,6 @@
 package inf112.skeleton.app;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -14,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -38,7 +38,6 @@ public class CardManager implements InputProcessor {
     private Texture slot_sep;
     private Texture deck_bg;
     private Vector2Di deck_bg_pos;
-    private int num_slots;
     private ShapeRenderer shape_renderer;
     private final float bg_gray = 0.40f;
     private Color bgcolor = new Color(bg_gray, bg_gray, bg_gray, 1.0f);
@@ -53,6 +52,7 @@ public class CardManager implements InputProcessor {
     private int numberofcards = 0;
     int cardsScrolledBy;
     boolean cardsAutoHidden;
+    public static final int NUM_ACTIVE_SLOTS = 5;
 
     private Stage stage;
 
@@ -65,19 +65,18 @@ public class CardManager implements InputProcessor {
         }
     }
 
-    public CardManager(int num_slots) throws NoSuchResource {
-        start_pos = new Vector2Di(CARD_SPACING.getX() * num_slots + 20, 10);
+    public CardManager() throws NoSuchResource {
+        start_pos = new Vector2Di(CARD_SPACING.getX() * NUM_ACTIVE_SLOTS + 20, 10);
         stage = new Stage();
         slot_back = Resources.getTexture("cards/175x250/slot/slot_back.png");
         slot_front = Resources.getTexture("cards/175x250/slot/slot_front.png");
         slot_sep = Resources.getTexture("cards/175x250/slot/separator.png");
         deck_bg = Resources.getTexture("cards/175x250/deck/deck_background.png");
-        this.num_slots = num_slots;
         FIRST_SLOT_POS = new Vector2Di(0, 0);
         shape_renderer = new ShapeRenderer();
         deck_bg_pos = start_pos.copy();
         deck_bg_pos.add(DECK_BG_OFFSET);
-        active_cards = new Card[num_slots];
+        active_cards = new Card[NUM_ACTIVE_SLOTS];
         dragndrop = new DragAndDrop();
         ui_skin = new Skin();
         ui_skin.add("card", Resources.getTexture("cards/175x250/unknown.png"));
@@ -106,12 +105,20 @@ public class CardManager implements InputProcessor {
         //       area should return the cards.
     }
 
-    public Card[] getActive_cards() {
-        return active_cards;
+    public ArrayList<Card> getActiveCards() {
+        ArrayList<Card> cards = new ArrayList<>();
+        Collections.addAll(cards, active_cards);
+        return cards;
     }
 
-    public void setActive_cards(Card[] active_cards) {
-        this.active_cards = active_cards;
+    /** This is a test method, it does not bother to update the card positions,
+     *  do not use for non-testing purposes. */
+    public void setAllActiveCards() {
+        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
+            Card c = inactive_cards.get(i);
+            inactive_cards.remove(i);
+            active_cards[i] = c;
+        }
     }
 
     public void showCards() {
@@ -138,7 +145,7 @@ public class CardManager implements InputProcessor {
         if (last_card != null)
             last_card.addAnimationCallback(() -> {
                 setupDragTargets();
-                for (int j = 0; j < num_slots; j++) {
+                for (int j = 0; j < NUM_ACTIVE_SLOTS; j++) {
                     Card c = active_cards[j];
                     if (c != null)
                         makeDraggable(c);
@@ -167,17 +174,12 @@ public class CardManager implements InputProcessor {
 
     public ArrayList<Card> getSequence() {
         ArrayList<Card> cards = new ArrayList<>();
-        for (int i = 0; i < num_slots; i++) {
+        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
             Card c = active_cards[i];
             if (c != null)
                 cards.add(c);
         }
         return cards;
-    }
-
-    //TODO: This should make commands out of the active cards of all players
-    public void runAllActive() {
-
     }
 
     /**
@@ -212,7 +214,7 @@ public class CardManager implements InputProcessor {
     // TODO: Add the deck as a drag target so that cards can be put away.
     public void setupDragTargets() {
         Vector2Di slot_pos = FIRST_SLOT_POS.copy();
-        for (int i = 0; i < num_slots; i++) {
+        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
             Image target_img = new Image(ui_skin, "card");
             target_img.setColor(0, 0, 0, 0.0f);
             target_img.setBounds(slot_pos.getX(), slot_pos.getY(), card_w, card_h);
@@ -238,7 +240,7 @@ public class CardManager implements InputProcessor {
                             c.show();
                             int idx = inactive_cards.indexOf(c);
                             int active_idx = -1;
-                            for (int i = 0; i < num_slots; i++)
+                            for (int i = 0; i < NUM_ACTIVE_SLOTS; i++)
                                 if (active_cards[i] == c) {
                                     active_idx = i;
                                     break;
@@ -326,7 +328,7 @@ public class CardManager implements InputProcessor {
                         c.show();
                         int idx = inactive_cards.indexOf(c);
                         int active_idx = -1;
-                        for (int i = 0; i < num_slots; i++)
+                        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++)
                             if (active_cards[i] == c) {
                                 active_idx = i;
                                 break;
@@ -399,7 +401,7 @@ public class CardManager implements InputProcessor {
                 dragndrop.setDragActorPosition(x, y - img.getHeight());
                 source_image.setColor(0.00f, 0.00f, 0.00f, 0.00f);
 
-                for (int i = 0; i < num_slots; i++) {
+                for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
                     Card ac = active_cards[i];
                     if (ac != null && ac != c)
                         makeUnDraggable(ac);
@@ -431,7 +433,7 @@ public class CardManager implements InputProcessor {
                 source_image.setColor(1, 1, 1, 1);
                 c.show();
 
-                for (int i = 0; i < num_slots; i++) {
+                for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
                     Card ac = active_cards[i];
                     if (ac != null && ac != c)
                         resetDrag(ac);
@@ -440,7 +442,7 @@ public class CardManager implements InputProcessor {
                 mouse_start_drag_pos = null;
                 dragged_card = null;
                 Game.addSoundFX("snapCard");
-                if(inactive_cards.size() == numberofcards - num_slots && !cardsAutoHidden){
+                if(inactive_cards.size() == numberofcards - NUM_ACTIVE_SLOTS && !cardsAutoHidden){
                     autoHideCards();
                 }
             }
@@ -464,12 +466,12 @@ public class CardManager implements InputProcessor {
         batch.draw(deck_bg, deck_bg_pos.getX(), deck_bg_pos.getY());
 
         Vector2Di slot_bg_pos = FIRST_SLOT_POS.copy();
-        for (int i = 0; i < num_slots; i++) {
+        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
             batch.draw(slot_back, slot_bg_pos.getX(), slot_bg_pos.getY());
             slot_bg_pos.add(CARD_SPACING);
         }
 
-        for (int i = 0; i < num_slots; i++) {
+        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
             Card c = active_cards[i];
             if (c != null)
                 c.render(batch, 1);
@@ -491,7 +493,7 @@ public class CardManager implements InputProcessor {
         //       red flash: card execution aborted mid-way (ran into wall, hole etc.)
 
         Vector2Di slot_pos = FIRST_SLOT_POS.copy();
-        for (int i = 0; i < num_slots; i++) {
+        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
             batch.draw(slot_front, slot_pos.getX(), slot_pos.getY());
             slot_pos.add(CARD_SPACING);
         }

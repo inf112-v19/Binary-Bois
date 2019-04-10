@@ -12,12 +12,19 @@ public class Player {
     static String name;
     private ArrayList<Card> hand = new ArrayList<>();
     private ArrayList<Flag> flags;
+    private CardManager card_man;
 
-    public Player(String name) {
+    public Player(String name) throws NoSuchResource {
         if (name.length() < 1)
             throw new IllegalArgumentException("Names of players should be at least one");
         this.name = name;
         this.flags = new ArrayList<>();
+        this.card_man = new CardManager();
+
+    }
+
+    public CardManager getCardManager() {
+        return card_man;
     }
 
     public void registerFlag(Flag flag) {
@@ -39,6 +46,7 @@ public class Player {
         hand.clear();
         hand.addAll(newHand);
         System.out.println(name + " Cards: " + Arrays.toString(newHand.toArray()));
+        card_man.setCards(hand);
     }
 
     public Card popCard() {

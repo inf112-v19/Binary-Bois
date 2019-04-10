@@ -44,10 +44,10 @@ public class CardDeck {
             String type = row.get("Type");
             ICommand cmd = Commands.getComand(type);
             cards.add(new Card(cmd,
-                                  type,
-                                  row.getInt("Amount"),
-                                  row.getInt("TypeID"),
-                                  row.getInt("Priority")));
+                               type,
+                               row.getInt("Amount"),
+                               row.getInt("TypeID"),
+                               row.getInt("Priority")));
         }
         cards_orig.addAll(cards);
         shuffle();
