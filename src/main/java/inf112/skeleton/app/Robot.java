@@ -18,6 +18,7 @@ public class Robot extends Renderable implements IItem {
 
     Robot(int x, int y) throws NoSuchResource {
         super();
+        setPosScale(32);
         this.dir = new Vector2Di(1, 0);
         this.pos = new Vector2Di(x, y);
         this.texture = Resources.getTexture("robot1.png");

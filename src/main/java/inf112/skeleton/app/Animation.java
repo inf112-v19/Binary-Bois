@@ -67,7 +67,7 @@ public class Animation {
      */
     public static Animation moveTo(Renderable r, Vector2Di newpos, float t) {
         Vector2Df vec = newpos.copy().tof();
-        vec.sub(r.getFinalAnimationPos(1).tof());
+        vec.sub(r.getFinalAnimationPos().tof());
         return new Animation(vec, 0, 0, t);
     }
 

@@ -1,10 +1,15 @@
 package inf112.skeleton.app;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Matrix4;
+import org.lwjgl.opengl.Display;
 
+import javax.xml.soap.Text;
 import java.util.ArrayList;
 
 class AnimationCallback {
@@ -29,7 +34,7 @@ class AnimationCallback {
  * When you want to render a Renderable you should always use either
  * render(SpriteBatch, Vector2Di) or render(SpriteBatch).
  */
-public abstract class Renderable {//implements Comparable<Renderable> {
+public abstract class Renderable {
     public static final float ANIMATION_TIMESTEP = 1.0f/60.0f;
     private static float time_acc = 0.0f;
     private static int ticks = 0;
@@ -40,13 +45,29 @@ public abstract class Renderable {//implements Comparable<Renderable> {
     private Vector2Df pos = new Vector2Df(0, 0);
     private float angle = 0;
     private float scale = 1.0f;
+    private float pos_scale = 1;
 
     private ArrayList<Animation> animations = new ArrayList<>();
     private Animation current_animation = null;
 
     private boolean do_draw = true;
 
+    private static final int MAX_DRAW_JOBS = 1024;
     private static ArrayList<AnimationCallback> callbacks = new ArrayList<>();
+    private static final Vector2Di FBO_DIM = new Vector2Di(2048, 2048);
+    private static FrameBuffer fbo = null;
+    private static SpriteBatch batch = null;
+    private static Renderable draw_jobs[] = new Renderable[MAX_DRAW_JOBS];
+    private static int num_draw_jobs = 0;
+
+    public static void init() {
+        fbo = new FrameBuffer(Pixmap.Format.RGBA8888, FBO_DIM.getX(), FBO_DIM.getY(), false);
+        batch = new SpriteBatch();
+    }
+
+    public void setPosScale(int new_scale) {
+        pos_scale = new_scale;
+    }
 
     /**
      * @param new_anim Animation to add.
@@ -110,11 +131,11 @@ public abstract class Renderable {//implements Comparable<Renderable> {
         animations.clear();
     }
 
-    public Vector2Di getAnimatedDrawPos(float scale) {
+    public Vector2Di getAnimatedDrawPos() {
         Vector2Df pos = this.pos.copy();
         if (current_animation != null)
             pos.sub(current_animation.getPosOffset());
-        pos.mul(scale);
+        pos.mul(pos_scale);
         return pos.toi();
     }
 
@@ -130,11 +151,11 @@ public abstract class Renderable {//implements Comparable<Renderable> {
         return scale - current_animation.getScaleOffset();
     }
 
-    public Vector2Di getFinalAnimationPos(float scale) {
+    public Vector2Di getFinalAnimationPos() {
         Vector2Df pos = this.pos.copy();
         for (Animation a : animations)
             pos.add(a.getPosOffset());
-        pos.mul(scale);
+        pos.mul(pos_scale);
         return pos.toi();
     }
 
@@ -145,9 +166,9 @@ public abstract class Renderable {//implements Comparable<Renderable> {
         return scale;
     }
 
-    public Vector2Di getDrawPos(float scale) {
+    public Vector2Di getDrawPos() {
         Vector2Df pos = this.pos.copy();
-        pos.mul(scale);
+        pos.mul(pos_scale);
         return pos.toi();
     }
 
@@ -191,8 +212,48 @@ public abstract class Renderable {//implements Comparable<Renderable> {
         return 0;
     }
 
-    public void render(SpriteBatch batch, float scale) {
-        render(batch, getAnimatedDrawPos(scale));
+    /**
+     * Override this to use renderFBO.
+     *
+     * Always render to (0,0)
+     * See FBO_DIM for the maximum pixel size of things rendered to the FBO.
+     *
+     * @return The size of the rendered area on the FBO.
+     */
+    public Vector2Di render(SpriteBatch batch) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void render() {
+        if (num_draw_jobs == MAX_DRAW_JOBS)
+            throw new RuntimeException("Too many draw jobs");
+        if (!do_draw)
+            return;
+        draw_jobs[num_draw_jobs++] = this;
+    }
+
+    public void renderNow(SpriteBatch batch) {
+        if (!do_draw)
+            return;
+
+        Texture tx = getTexture();
+        if (tx == null)
+            return;
+
+        TextureRegion tx_reg = new TextureRegion(tx);
+
+        int rx = tx.getWidth() / 2,
+            ry = tx.getHeight() / 2;
+
+        Vector2Di dpos = getAnimatedDrawPos();
+        batch.draw(tx_reg,
+                   dpos.getX(), dpos.getY(),
+                   rx, ry,
+                   tx.getWidth(), tx.getHeight(),
+                   getAnimatedScale(), getAnimatedScale(),
+                   getAnimatedAngle());
+
+        update();
     }
 
     private void update() {
@@ -200,17 +261,95 @@ public abstract class Renderable {//implements Comparable<Renderable> {
             nextAnimation();
     }
 
-    public void render(SpriteBatch batch, Vector2Di pos) {
-        if (!do_draw)
-            return;
-        Texture tx = getTexture();
-        if (tx == null)
-            return;
-        int rx = tx.getWidth() / 2;
-        int ry = tx.getHeight() / 2;
-        TextureRegion rtx = new TextureRegion(tx);
-        batch.draw(rtx, pos.getX(), pos.getY(), rx, ry, tx.getWidth(), tx.getHeight(), getAnimatedScale(), getAnimatedScale(), getAnimatedAngle());
-        update();
+    private TextureRegion renderFBO(Vector2Di dim_ret) {
+        // make the FBO the current buffer
+        fbo.begin();
+
+        SpriteBatch batch = new SpriteBatch();
+
+        // Clear the FBO
+        Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
+        Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
+
+        batch.getProjectionMatrix().setToOrtho2D(0, 0, fbo.getWidth(), fbo.getHeight());
+
+        Vector2Di dim;
+        batch.begin();
+        try {
+            dim = render(batch);
+        } catch (Exception e) {
+            batch.end();
+            fbo.end();
+            throw e;
+        }
+        batch.end();
+
+        Texture tex = fbo.getColorBufferTexture();
+        TextureRegion tex_reg = new TextureRegion(tex, 0, 0, dim.getX(), dim.getY());
+        tex_reg.flip(false, true);
+
+        // now we can unbind the FBO, returning rendering back to the default back buffer (the Display)
+        fbo.end();
+
+        batch.getProjectionMatrix().setToOrtho2D(0, 0, Display.getWidth(), Display.getHeight());
+
+        dim_ret.set(dim.getX(), dim.getY());
+        return tex_reg;
+    }
+
+    public static void clearRenderQueue() {
+        num_draw_jobs = 0;
+    }
+
+    /**
+     * TODO: For FBO rendering a packing algorithm must be used.
+     *
+     * The algorithm:
+     *   1. Collect fbo renderables until the sum of their area exceeds
+     *      the area of the FBO (see FBO_DIM)
+     *   2. Sort the renderables from tallest to shortest.
+     *   3. Pack downwards until there is not fit, loop onwards until
+     *      a short enough renderable is found.
+     *   4. Increase x position with minimum width of renderables
+     *   5. Try to fit next renderable
+     *   6. If it does not fit, increase x by 10 until it does.
+     *   7. Loop
+     */
+    public static void flushRenderQueue() {
+        Vector2Di dim = new Vector2Di(0, 0);
+        batch.begin();
+        for (int i = 0; i < num_draw_jobs; i++) {
+            Renderable rend = draw_jobs[i];
+            Texture tx = rend.getTexture();
+            Vector2Di pos = rend.getAnimatedDrawPos();
+            TextureRegion tx_reg;
+            int rx, ry;
+            if (tx == null || rend.fboRenderEnabled()) {
+                batch.end();
+                tx_reg = rend.renderFBO(dim);
+                batch.begin();
+                rx = dim.getX() / 2;
+                ry = dim.getY() / 2;
+            } else {
+                rx = tx.getWidth() / 2;
+                ry = tx.getHeight() / 2;
+                tx_reg = new TextureRegion(tx);
+                dim.set(tx.getWidth(), tx.getHeight());
+            }
+            batch.draw(
+                    tx_reg,
+                    pos.getX(),
+                    pos.getY(),
+                    rx, ry,
+                    dim.getX(),
+                    dim.getY(),
+                    rend.getAnimatedScale(),
+                    rend.getAnimatedScale(),
+                    rend.getAnimatedAngle());
+            rend.update();
+        }
+        batch.end();
+        clearRenderQueue();
     }
 
     public void hide() {
@@ -221,10 +360,12 @@ public abstract class Renderable {//implements Comparable<Renderable> {
         do_draw = true;
     }
 
-    /*
-    @Override
-    public int compareTo(Renderable other) {
-        return other.getPriority() - getPriority();
+    /**
+     * Override this method to enable fbo rendering.
+     *
+     * @return Whether or not to render to FBO.
+     */
+    public boolean fboRenderEnabled() {
+        return false;
     }
-    */
 }

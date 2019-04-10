@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
 import java.util.ArrayList;
@@ -100,7 +101,7 @@ public class Map implements InputProcessor {
         for (Renderable r : render_queue) {
             //Vector2Di pos = r.getPos();
             //Vector2Di px_pos = toPixelCoordinate(pos);
-            r.render(batch, 32);
+            r.renderNow(batch);
         }
         batch.end();
 
@@ -156,6 +157,7 @@ public class Map implements InputProcessor {
         if(button == Input.Buttons.LEFT) {
             int offset_x = (pw - map_pw) / 2,
                 offset_y = ph - map_ph;
+
             Vector2Di pos = pixToTile(new Vector2Df(screenX - offset_x, offset_y - screenY));
             //if (pos.getX() > dim.getX() || pos.getX() < 0 || pos.getY() > dim.getY() || pos.getY() < 0)
             //    return false;

@@ -37,6 +37,8 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private CardManager card_queue;
     private HashMap<String, Sound> soundNametoFile = new HashMap<>();
 
+    private FBOTest fbo_test;
+
     public GameLoop(int map_px_w, int map_px_h) {
         super();
         this.map_px_w = map_px_w;
@@ -86,7 +88,11 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             font = new BitmapFont();
             font.setColor(Color.BLACK);
 
-            game.appendToLogBuilder("Click on the deck to show all cards");
+            fbo_test = new FBOTest();
+            Renderable.init();
+
+            game.appendToLogBuilder("Press h to hide all cards");
+            game.appendToLogBuilder("Press q to show all cards");
             game.appendToLogBuilder("Press e to run selected cards");
             game.appendToLogBuilder("Use scrollwheel to scroll cards");
         } catch (NoSuchResource e) {
@@ -149,7 +155,11 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
         card_queue.render(batch);
 
-        // TODO: The UI will be drawn here later.
+        //fbo_test.setDrawPos(new Vector2Df(100, 100));
+        //fbo_test.render(1);
+
+        //Renderable.flushRenderQueue();
+        Renderable.clearRenderQueue();
     }
 
     @Override
