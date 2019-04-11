@@ -190,18 +190,15 @@ public class Game {
 
                 //ArrayList of all Flag IItems that are on the map
                 ArrayList<IItem> flagArrayList = new ArrayList<>();
-                for(int i = 0; i < board.getAllItemsOnBoard().size(); i++){
-                    if(board.getAllItemsOnBoard().get(i) instanceof Flag){
+                for(int i = 0; i < board.getAllItemsOnBoard().size(); i++)
+                    if(board.getAllItemsOnBoard().get(i) instanceof Flag)
                         flagArrayList.add(board.getAllItemsOnBoard().get(i));
-                    }
-                }
 
                 //Win condition
                 if(robotOwner.getFlags().containsAll(flagArrayList)){
                     System.out.println(robotOwner.getName() + " registered all flags. Winner!");
                     winCondition = true;
                 }
-
 
             } else if (item instanceof Wrench) {
                 robot.setArchiveMarker(newpos);
