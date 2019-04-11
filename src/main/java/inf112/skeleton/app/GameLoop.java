@@ -13,6 +13,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+enum GameState {
+    GAME_START,
+    CHOOSING_CARDS,
+    RUNNING_ROUND,
+    RESPAWNING,
+    CHECKING_POWER_ON,
+}
 
 public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private static int[][] robot_start_positions = {
@@ -28,6 +35,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private ArrayList<Robot> robots;
     private Game game;
     private Round round = null;
+    private GameState state = GameState.GAME_START;
+    /**In seconds */
+    public static final int POWER_ON_TIMEOUT = 4;
+    private double state_start_t = 0.0;
 
     private Map map;
 
@@ -179,12 +190,57 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
         map.render();
 
-        getCardManager().render(batch);
+        switch (state) {
+            case GAME_START:
+                state = GameState.CHOOSING_CARDS;
+                break;
+            case CHOOSING_CARDS:
+                getCardManager().render(batch);
+                break;
+            case RUNNING_ROUND:
+                if (round != null && !round.doStep()) {
+                    round = null;
+                    state = GameState.RESPAWNING;
+                }
+                break;
+            case RESPAWNING:
+                Robot last_robot = null;
+                float wait = 0.0f;
+                for (Robot r : getDeadRobots()) {
+                    r.addAnimation(Animation.idle(wait += 0.5f));
+                    r.respawn(game);
+                    last_robot = r;
+                }
 
-        if (round != null && !round.doStep())
-            round = null;
+                Runnable run = () -> {
+                    System.out.println("CALLBACK");
+                    state = GameState.CHECKING_POWER_ON;
+                    state_start_t = System.currentTimeMillis() / 1000.0;
+                };
+                if (last_robot != null) {
+                    last_robot.addAnimationCallback(run);
+                } else {
+                    run.run();
+                }
+                break;
+
+            case CHECKING_POWER_ON:
+                System.out.println("Checking for power on");
+                double cur_time = System.currentTimeMillis() / 1000.0;
+                if (state_start_t + POWER_ON_TIMEOUT <= cur_time)
+                    state = GameState.CHOOSING_CARDS;
+                break;
+        }
 
         // TODO: The UI will be drawn here later.
+    }
+
+    private ArrayList<Robot> getDeadRobots() {
+        ArrayList<Robot> dead_robots = new ArrayList<>();
+        for (Robot r : robots)
+            if (r.hasDied())
+                dead_robots.add(r);
+        return dead_robots;
     }
 
     private CardManager getCardManager() {
@@ -213,6 +269,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                     active_cards.add(game.getPlayer(i).getCardManager().getActiveCards());
                 }
                 round = new Round(robots, active_cards, game);
+                state = GameState.RUNNING_ROUND;
                 break;
             case Input.Keys.DOWN:
                 Commands.moveCommand.exec(-1, current_robot, game);

@@ -19,6 +19,7 @@ public class Robot extends Renderable implements IItem {
     private boolean powered_on = true;
     private boolean game_over = false;
     private Random rnd = new Random();
+    private boolean died = false;
 
     Robot(int x, int y) throws NoSuchResource {
         super();
@@ -70,16 +71,31 @@ public class Robot extends Renderable implements IItem {
         return archiveMarker;
     }
 
+    public boolean hasDied() {
+        return died;
+    }
+
     /**
      * Robo RIP
      */
     public void death(IBoard board) {
+        died = true;
         Vector2Di currentPos = getPos();
-        Vector2Di backupPos = getArchiveMarkerPos();
         board.get(currentPos).remove(this);
-        board.set(this, backupPos);
+    }
+
+    /**
+     * Reset a player to it's archiveMarker, and animate respawning.
+     *
+     * @param game The board in which the robot exists.
+     */
+    public void respawn(Game game) {
+        Vector2Di backupPos = getArchiveMarkerPos();
+        game.setOnBoard(this, backupPos);
         pos = archiveMarker.copy();
         setArchiveMarker(backupPos);
+        addAnimation(Animation.scaleTo(this, 1-getAnimatedScale(), 1f));
+        died = false;
     }
 
     /**
@@ -91,12 +107,10 @@ public class Robot extends Renderable implements IItem {
         if ((health -= dmg) <= 0) {
             death(board);
 
-            if (++deaths >= MAX_DEATHS) {
-                powered_on = false;
+            powered_on = false;
+            if (++deaths >= MAX_DEATHS)
                 game_over = true;
-            } else {
-                powered_on = false;
-            }
+
             switch (dtype) {
                 case LASER:
                     Vector2Di vec = new Vector2Di(25, 0);
@@ -117,7 +131,7 @@ public class Robot extends Renderable implements IItem {
     }
 
     /** You are out of the game if this is true */
-    public boolean isGame_over(){
+    public boolean isGameOver(){
         return game_over;
     }
 
@@ -126,12 +140,11 @@ public class Robot extends Renderable implements IItem {
     }
 
     public void powerOn() {
-        assert isPoweredDown();
-        if (!game_over && !powered_on) {
-            System.out.println("Powers up");
+        assert !powered_on;
+
+        if (!game_over) {
             powered_on = true;
             health = MAX_HEALTH;
-            addAnimation(Animation.scaleTo(this, 1-getAnimatedScale(), 1f));
         }
     }
 

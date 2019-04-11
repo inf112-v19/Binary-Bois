@@ -244,6 +244,10 @@ public class Game {
         board.set(item, x, y);
     }
 
+    public void setOnBoard(IItem item, Vector2Di vec) {
+        board.set(item, vec);
+    }
+
     public void handlePlunge(Robot robot) {
         Vector2Di currentPos = robot.getPos();
         ArrayList<IItem> itemsOnPos = board.get(currentPos);
@@ -261,12 +265,17 @@ public class Game {
         Vector2Di newpos = pos.copy();
         newpos.move(dir, 1);
 
+        assert board.isOnBoard(orig_pos);
+
         for (IItem item : board.get(orig_pos))
             if (item instanceof Wall && ((Wall) item).hasEdge(dir)) {
                 appendToLogBuilder("Blocked by wall");
                 soundFx.add("Oof");
                 return false;
             }
+
+        if (!board.isOnBoard(newpos))
+            return false;
 
         ArrayList<IItem> itemlist = board.get(newpos);
         if (itemlist.isEmpty()) {

@@ -81,4 +81,12 @@ public class Card extends Renderable {
     public boolean exec(Robot robot, Game game) {
         return this.cmd.exec(this.amount, robot, game);
     }
+
+    public static Card getNoneCard() {
+        try {
+            return new Card(Commands.none, "none", 0, 0, Integer.MAX_VALUE);
+        } catch (NoSuchResource e) {
+            return null;
+        }
+    }
 }

@@ -11,8 +11,10 @@ class RoboCard implements Comparable<RoboCard> {
     public static ArrayList<RoboCard> createDemiRound(ArrayList<Robot> robots, ArrayList<Card> cards) {
         ArrayList<RoboCard> dr = new ArrayList<>();
 
-        for (int i = 0; i < cards.size(); i++)
-            dr.add(new RoboCard(robots.get(i), cards.get(i)));
+        for (int i = 0; i < cards.size(); i++) {
+            Card c = cards.get(i);
+            dr.add(new RoboCard(robots.get(i), c == null ? Card.getNoneCard() : c));
+        }
 
         Collections.sort(dr);
 
