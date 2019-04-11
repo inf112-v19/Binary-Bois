@@ -90,16 +90,17 @@ public class Robot extends Renderable implements IItem {
      * @param game The board in which the robot exists.
      */
     public void respawn(Game game) {
+        health = MAX_HEALTH;
         Vector2Di backupPos = getArchiveMarkerPos();
         game.setOnBoard(this, backupPos);
         pos = archiveMarker.copy();
         setArchiveMarker(backupPos);
-        addAnimation(Animation.scaleTo(this, 1-getAnimatedScale(), 1f));
+        addAnimation(Animation.scaleTo(this, 1, 1f));
         died = false;
     }
 
     /**
-     * Handles health and deaths for robot based on which damage type it recieves.
+     * Handles health and deaths for robot based on which damage type it receives.
      */
     public void handleDamage(DamageType dtype, IBoard board) {
         int dmg = DamageType.getDamage(dtype);
@@ -116,12 +117,12 @@ public class Robot extends Renderable implements IItem {
                     Vector2Di vec = new Vector2Di(25, 0);
                     vec.rotate(rnd.nextInt(360));
                     int rot = (180-rnd.nextInt(360))*5;
-                    addAnimation(new Animation(new Vector2Df(vec.getX(), vec.getY()), rot, 3, 2f));
+                    addAnimation(new Animation(new Vector2Df(vec.getX(), vec.getY()), rot, 3-this.getFinalAnimationScale(), 2f));
                     addAnimation(new Animation(new Vector2Df(0, 0), -rot, 1-this.getFinalAnimationScale(), 0.01f));
                     addAnimation(Animation.moveTo(this, archiveMarker, 0.01f));
                     break;
                 case FALL:
-                    addAnimation(new Animation(new Vector2Df(0, 0), 360*2, -1, 1f));
+                    addAnimation(new Animation(new Vector2Df(0, 0), 360*2, -this.getFinalAnimationScale(), 1f));
                     addAnimation(Animation.moveTo(this, archiveMarker, 0.01f));
                     break;
                 default:

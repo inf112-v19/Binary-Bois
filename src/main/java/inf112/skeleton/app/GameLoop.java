@@ -314,7 +314,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 game.shootLaser(current_robot.getPos(), current_robot.getDir());
                 break;
             case Input.Keys.R:
-                current_robot.powerOn();
+                current_robot.respawn(game);
             default:
                 return false;
         }

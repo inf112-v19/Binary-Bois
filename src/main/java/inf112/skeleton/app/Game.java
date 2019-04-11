@@ -2,6 +2,7 @@ package inf112.skeleton.app;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import org.lwjgl.Sys;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -153,7 +154,6 @@ public class Game {
         return current_pos;
     }
 
-
     public Robot getRobot(int playerNumber) throws IndexOutOfBoundsException {
         return robots.get(playerNumber);
     }
@@ -204,9 +204,6 @@ public class Game {
                 robot.setArchiveMarker(newpos);
                 soundFx.add("Wrench");
                 return;
-            } else if (item instanceof Laser){
-                robot.handleDamage(DamageType.LASER, board);
-                soundFx.add("Laser");
             }
         }
     }
@@ -248,13 +245,17 @@ public class Game {
         board.set(item, vec);
     }
 
-    public void handlePlunge(Robot robot) {
+    public void checkFloorHazard(Robot robot) {
         Vector2Di currentPos = robot.getPos();
         ArrayList<IItem> itemsOnPos = board.get(currentPos);
         for (IItem item : itemsOnPos) {
             if (item instanceof Hole) {
                 soundFx.add("Death");
                 robot.handleDamage(DamageType.FALL, board);
+                return;
+            } else if (item instanceof Laser){
+                soundFx.add("Laser");
+                robot.handleDamage(DamageType.LASER, board);
                 return;
             }
         }
@@ -264,6 +265,11 @@ public class Game {
         Vector2Di orig_pos = pos.copy();
         Vector2Di newpos = pos.copy();
         newpos.move(dir, 1);
+
+        System.out.println("Orig pos   " + orig_pos);
+        System.out.println("New pos   " + newpos);
+        System.out.println("Dir   " + dir);
+        System.out.println();
 
         assert board.isOnBoard(orig_pos);
 
@@ -294,11 +300,12 @@ public class Game {
         ArrayList<IItem> tmp_list = new ArrayList<>(itemlist);
         for (IItem itemInFront : tmp_list) {
             if (itemInFront instanceof Robot) {
+                assert itemInFront != my_robot;
                 Vector2Di otherBotPos = ((Robot) itemInFront).getPos();
                 if (canMoveTo(otherBotPos, dir, (Robot) itemInFront)) {
                     appendToLogBuilder("Pushed other robot");
                     ((Robot) itemInFront).move(dir, 1);
-                    handlePlunge((Robot) itemInFront);
+                    checkFloorHazard((Robot) itemInFront);
                 } else {
                     appendToLogBuilder("Unable to push other robot!");
                     return false;

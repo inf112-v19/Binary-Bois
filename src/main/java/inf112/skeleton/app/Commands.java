@@ -12,7 +12,7 @@ public class Commands {
             if (!game.canMoveTo(robot.getPos(), dir_v, robot))
                 return false;
             robot.move(sgn);
-            game.handlePlunge(robot);
+            game.checkFloorHazard(robot);
         }
         return true;
     };
