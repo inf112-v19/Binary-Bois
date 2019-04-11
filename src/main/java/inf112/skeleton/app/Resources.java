@@ -7,6 +7,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import org.lwjgl.opengl.EXTAbgr;
 
 import java.io.File;
@@ -53,7 +54,11 @@ public class Resources {
     }
 
     public static Texture getTexture(String p) throws NoSuchResource {
-        return get(p, Texture::new);
+        try {
+            return get(p, Texture::new);
+        } catch (GdxRuntimeException e) {
+            throw new NoSuchResource("No such file: " + p);
+        }
     }
 
     public static Music getMusic(String rp) throws NoSuchResource {
