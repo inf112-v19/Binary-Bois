@@ -5,6 +5,8 @@ import java.util.HashMap;
 public class Commands {
     /** Move a robot along its direction vector. */
     public static ICommand moveCommand = (int amount, Robot robot, Game game) -> {
+        if (robot.hasDied())
+            return false;
         int sgn = (int) Math.signum(amount);
         Vector2Di dir_v = robot.getDir().copy();
         dir_v.mul(sgn);
@@ -12,13 +14,16 @@ public class Commands {
             if (!game.canMoveTo(robot.getPos(), dir_v, robot))
                 return false;
             robot.move(sgn);
-            game.checkFloorHazard(robot);
+            game.handlePlunge(robot);
         }
+        game.handleLaserTile(robot);
         return true;
     };
 
     /** Rotate the direction vector of a robot. */
     public static ICommand rotateCommand = (int amount, Robot robot, Game game) -> {
+        if (robot.hasDied())
+            return false;
         robot.rot(amount);
         return true;
     };

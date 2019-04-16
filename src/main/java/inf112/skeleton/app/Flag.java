@@ -10,7 +10,7 @@ public class Flag implements IItem {
         this.pos = pos;
     }
 
-    int getNumber() {
+    public int getNumber() {
         return number;
     }
 

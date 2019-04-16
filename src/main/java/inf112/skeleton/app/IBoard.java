@@ -47,11 +47,16 @@ public interface IBoard {
         set(item, pos.getX(), pos.getY());
     }
 
+    /** Remove specified item from location */
+    void remove(IItem item, int x, int y);
+
+    /** See set(IItem, int, int) */
+    default void remove(IItem item, Vector2Di pos) {remove(item, pos.getX(), pos.getY());}
+
     /**
      * @return height of board
      */
     int getHeight();
-
 
 
     /**

@@ -2,7 +2,6 @@ package inf112.skeleton.app;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import org.lwjgl.Sys;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -245,7 +244,7 @@ public class Game {
         board.set(item, vec);
     }
 
-    public void checkFloorHazard(Robot robot) {
+    public void handlePlunge(Robot robot) {
         Vector2Di currentPos = robot.getPos();
         ArrayList<IItem> itemsOnPos = board.get(currentPos);
         for (IItem item : itemsOnPos) {
@@ -253,7 +252,15 @@ public class Game {
                 soundFx.add("Death");
                 robot.handleDamage(DamageType.FALL, board);
                 return;
-            } else if (item instanceof Laser){
+            }
+        }
+    }
+
+    public void handleLaserTile(Robot robot) {
+        Vector2Di currentPos = robot.getPos();
+        ArrayList<IItem> itemsOnPos = board.get(currentPos);
+        for (IItem item : itemsOnPos) {
+            if (item instanceof Laser){
                 soundFx.add("Laser");
                 robot.handleDamage(DamageType.LASER, board);
                 return;
@@ -305,7 +312,7 @@ public class Game {
                 if (canMoveTo(otherBotPos, dir, (Robot) itemInFront)) {
                     appendToLogBuilder("Pushed other robot");
                     ((Robot) itemInFront).move(dir, 1);
-                    checkFloorHazard((Robot) itemInFront);
+                    handlePlunge((Robot) itemInFront);
                 } else {
                     appendToLogBuilder("Unable to push other robot!");
                     return false;

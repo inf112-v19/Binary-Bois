@@ -81,7 +81,7 @@ public class Robot extends Renderable implements IItem {
     public void death(IBoard board) {
         died = true;
         Vector2Di currentPos = getPos();
-        board.get(currentPos).remove(this);
+        board.remove(this, currentPos);
     }
 
     /**

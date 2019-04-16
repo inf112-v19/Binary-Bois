@@ -35,6 +35,14 @@ public class Board implements IBoard {
         grid[index].add(item);
     }
 
+    public void remove(IItem item, int x, int y) {
+        get(x, y).remove(item);
+    }
+
+    public void remove(IItem item, Vector2Di pos) {
+        get(pos).remove(item);
+    }
+
     @Override
     public int getHeight() {
         return height;

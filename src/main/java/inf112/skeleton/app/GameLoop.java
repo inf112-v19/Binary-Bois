@@ -37,7 +37,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private Round round = null;
     private GameState state = GameState.GAME_START;
     /**In seconds */
-    public static final int POWER_ON_TIMEOUT = 4;
+    public static final int POWER_ON_TIMEOUT = 2;
     private double state_start_t = 0.0;
 
     private Map map;
