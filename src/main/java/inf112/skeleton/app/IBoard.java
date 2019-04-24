@@ -14,8 +14,8 @@ public interface IBoard {
      * lower left corner so (1,2) = ( . x . )
      *                              ( . . . )
      *                              ( . . . )
-     * @param x row number, starting at 0
-     * @param y column number, starting at 0
+     * @param x value, starting at 0
+     * @param y value, starting at 0
      * @return ArrayList of all items in grid position
      */
     ArrayList<IItem> get(int x, int y);

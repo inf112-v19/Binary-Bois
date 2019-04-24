@@ -354,6 +354,18 @@ public class Game {
                         }
                         board.set(new Wall(edgesArray), i, j);
                     }
+                    if (cell.getTile().getProperties().get("MapObject", String.class).equals("conveyor_belt")) {
+                        if(cell.getTile().getProperties().get("N", Boolean.class)){
+                            board.set(new ConveyorBelt(northVector, false), i, j);
+                        } else if(cell.getTile().getProperties().get("E", Boolean.class)){
+                            board.set(new ConveyorBelt(eastVector, false), i, j);
+                        } else if(cell.getTile().getProperties().get("S", Boolean.class)){
+                            board.set(new ConveyorBelt(southVector, false), i, j);
+                        } else if(cell.getTile().getProperties().get("W", Boolean.class)){
+                            board.set(new ConveyorBelt(westVector, false), i, j);
+                        }
+
+                    }
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("flag")) {
                         numberOfFlags += 1;
                         Flag flag = new Flag(numberOfFlags, new Vector2Di(i, j));
@@ -369,6 +381,7 @@ public class Game {
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("laser")) {
                         board.set(new Laser(new Vector2Di(i, j)), i, j);
                     }
+
                 }
             }
         }
