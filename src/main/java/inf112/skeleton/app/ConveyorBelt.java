@@ -14,4 +14,8 @@ public class ConveyorBelt extends TilePiece {
     public String getName() {
         return "Conveyor belt";
     }
+
+    public Vector2Di getDir() {
+        return dir;
+    }
 }

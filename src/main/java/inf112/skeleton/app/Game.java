@@ -268,6 +268,21 @@ public class Game {
         }
     }
 
+    public boolean handleConveyorTile(Robot robot) {
+        Vector2Di currentPos = robot.getPos();
+        ArrayList<IItem> itemsOnPos = board.get(currentPos);
+        for (IItem item : itemsOnPos) {
+            if (item instanceof ConveyorBelt){
+                if (canMoveTo(robot.getPos(), ((ConveyorBelt) item).getDir(), robot)) {
+                    robot.move(((ConveyorBelt) item).getDir(), 1);
+                    return true;
+                }
+                return false;
+            }
+        }
+        return false;
+    }
+
     public boolean canMoveTo(Vector2Di pos, Vector2Di dir, Robot my_robot){
         Vector2Di orig_pos = pos.copy();
         Vector2Di newpos = pos.copy();

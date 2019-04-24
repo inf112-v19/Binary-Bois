@@ -17,6 +17,10 @@ public class Commands {
             game.handlePlunge(robot);
         }
         game.handleLaserTile(robot);
+        boolean get_conveyed = true;
+        while (get_conveyed)
+            get_conveyed = game.handleConveyorTile(robot);
+        game.handlePlunge(robot);
         return true;
     };
 
