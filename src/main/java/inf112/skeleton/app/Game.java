@@ -355,14 +355,20 @@ public class Game {
                         board.set(new Wall(edgesArray), i, j);
                     }
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("conveyor_belt")) {
+                        boolean is_express;
+                        if(cell.getTile().getProperties().get("is_express", Boolean.class)){
+                            is_express = true;
+                        } else {
+                            is_express = false;
+                        }
                         if(cell.getTile().getProperties().get("N", Boolean.class)){
-                            board.set(new ConveyorBelt(northVector, false), i, j);
+                            board.set(new ConveyorBelt(northVector, is_express), i, j);
                         } else if(cell.getTile().getProperties().get("E", Boolean.class)){
-                            board.set(new ConveyorBelt(eastVector, false), i, j);
+                            board.set(new ConveyorBelt(eastVector, is_express), i, j);
                         } else if(cell.getTile().getProperties().get("S", Boolean.class)){
-                            board.set(new ConveyorBelt(southVector, false), i, j);
+                            board.set(new ConveyorBelt(southVector, is_express), i, j);
                         } else if(cell.getTile().getProperties().get("W", Boolean.class)){
-                            board.set(new ConveyorBelt(westVector, false), i, j);
+                            board.set(new ConveyorBelt(westVector, is_express), i, j);
                         }
 
                     }
