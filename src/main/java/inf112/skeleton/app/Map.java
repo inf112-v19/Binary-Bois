@@ -22,6 +22,7 @@ import java.util.Vector;
 public class Map implements InputProcessor {
     /** Enable/disable fun */
     private final boolean FUN_ENABLED = false;
+    private final static int TILE_CLICKS_OVERFLOW = 8192;
 
     private OrthographicCamera cam;
     private static TiledMap tiledMap;
@@ -158,10 +159,16 @@ public class Map implements InputProcessor {
         return new Vector2Di((int) (vec.x / tile_dim), (int) (vec.y / tile_dim));
     }
 
+    private void addClickEvent(Vector2Di pos) {
+        if (tile_clicks.size() >= TILE_CLICKS_OVERFLOW)
+            tile_clicks.clear();
+        tile_clicks.add(pos);
+    }
+
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if(button == Input.Buttons.LEFT) {
-            System.out.println("Pos: " + screenToMapCoord(Gdx.input.getX(), Gdx.input.getY()));
+        if (button == Input.Buttons.LEFT) {
+            addClickEvent(screenToMapCoord(Gdx.input.getX(), Gdx.input.getY()));
             return true;
         }
         return false;
