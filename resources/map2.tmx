@@ -293,6 +293,49 @@
    </properties>
   </tile>
  </tileset>
+ <tileset firstgid="44" name="convoeyer_belt" tilewidth="32" tileheight="32" tilecount="4" columns="4">
+  <image source="textures/conveyer_belt.png" width="128" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="E" type="bool" value="false"/>
+    <property name="MapObject" value="conveyor_belt"/>
+    <property name="N" type="bool" value="false"/>
+    <property name="S" type="bool" value="false"/>
+    <property name="W" type="bool" value="true"/>
+    <property name="is_express" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="E" type="bool" value="false"/>
+    <property name="MapObject" value="conveyor_belt"/>
+    <property name="N" type="bool" value="true"/>
+    <property name="S" type="bool" value="false"/>
+    <property name="W" type="bool" value="false"/>
+    <property name="is_express" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="E" type="bool" value="true"/>
+    <property name="MapObject" value="conveyor_belt"/>
+    <property name="N" type="bool" value="false"/>
+    <property name="S" type="bool" value="false"/>
+    <property name="W" type="bool" value="false"/>
+    <property name="is_express" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="E" type="bool" value="false"/>
+    <property name="MapObject" value="conveyor_belt"/>
+    <property name="N" type="bool" value="false"/>
+    <property name="S" type="bool" value="true"/>
+    <property name="W" type="bool" value="false"/>
+    <property name="is_express" type="bool" value="false"/>
+   </properties>
+  </tile>
+ </tileset>
  <layer id="3" name="Rutelag 1" width="14" height="14">
   <data encoding="base64" compression="zlib">
    eJyVkN0KgCAMhaUygyCDyv7e/z3bhYNx2EwvPobDs7Oz0zn3NnIRB+GJEarVC8QjdBpLBvusW/N7KMzw4g/6terQb1MyTsqe2sySJ/oxHdzG0v1lqvWbBbIfDL9ozEe95Ve7J+fvxR2wRtDdxN5IIj4ATwhI
@@ -300,7 +343,7 @@
  </layer>
  <layer id="4" name="Rutelag 2" width="14" height="14">
   <data encoding="base64" compression="zlib">
-   eJxjYKA+UCVBrSASW4aAWlkgVsIhJ0SCnZQCkJsJuRUXIFefCpn6yLGDWLtwxZ0gukIcQIhh8IUHAOvSAek=
+   eJxjYKA+UCVBrSASW4aAWlkgVsIhJ0SCnZQCkJsJuRUXIFefCpTWg2JdJDkdKKYE6CPZoYJPIRLAFXeC6ApxACEGysMDBvTJNAcdAABVUAMo
   </data>
  </layer>
 </map>
