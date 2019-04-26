@@ -29,7 +29,7 @@ class AnimationCallback {
  * When you want to render a Renderable you should always use either
  * render(SpriteBatch, Vector2Di) or render(SpriteBatch).
  */
-public abstract class Renderable {//implements Comparable<Renderable> {
+public abstract class Renderable {
     public static final float ANIMATION_TIMESTEP = 1.0f/60.0f;
     private static float time_acc = 0.0f;
     private static int ticks = 0;
@@ -220,11 +220,4 @@ public abstract class Renderable {//implements Comparable<Renderable> {
     public void show() {
         do_draw = true;
     }
-
-    /*
-    @Override
-    public int compareTo(Renderable other) {
-        return other.getPriority() - getPriority();
-    }
-    */
 }

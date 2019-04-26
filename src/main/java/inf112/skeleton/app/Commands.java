@@ -34,7 +34,7 @@ public class Commands {
 
     public static ICommand none = (int amount, Robot robot, Game game) -> true;
 
-    /** Map strings to command functions. */
+    /** GameMap strings to command functions. */
     private static HashMap<String, ICommand> cmd_map;
     static {
         cmd_map = new HashMap<>();

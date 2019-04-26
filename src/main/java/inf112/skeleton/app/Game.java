@@ -340,7 +340,7 @@ public class Game {
 
     private void boardSetup() {
 
-        TiledMap tiledMap = Map.getTiledMap();
+        TiledMap tiledMap = GameMap.getTiledMap();
         for(int k = 0; k < tiledMap.getLayers().size(); k++){
             TiledMapTileLayer layer = (TiledMapTileLayer)tiledMap.getLayers().get(k);
             for(int i = 0; i < width; i++) {

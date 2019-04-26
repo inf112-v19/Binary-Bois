@@ -13,14 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-enum GameState {
-    GAME_START,
-    CHOOSING_CARDS,
-    RUNNING_ROUND,
-    RESPAWNING,
-    CHECKING_POWER_ON,
-}
-
 public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private static int[][] robot_start_positions = {
             {6, 6},
@@ -40,7 +32,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     public static final int POWER_ON_TIMEOUT = 2;
     private double state_start_t = 0.0;
 
-    private Map map;
+    private GameMap map;
 
     private BitmapFont font;
     private SpriteBatch batch;
@@ -91,7 +83,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         try {
             addSounds();
 
-            map = new Map(180, 0, 300, 200, "map2.tmx");
+            map = new GameMap(180, 0, 300, 200, "map2.tmx");
 
             for (int[] pos : robot_start_positions) {
                 Robot robut = new Robot(pos[0], pos[1]); //Robut
@@ -100,7 +92,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             }
 
             Vector2Di map_dim = map.getDimensions();
-            System.out.println("Map Dimensions: " + map_dim);
+            System.out.println("GameMap Dimensions: " + map_dim);
             this.game = new Game(map_dim.getX(), map_dim.getY(), robots);
 
             try {

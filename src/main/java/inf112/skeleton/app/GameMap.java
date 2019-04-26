@@ -19,7 +19,7 @@ import java.util.Vector;
  *
  * TODO: Make the positioning work properly, currently it just centers the map at the top.
  */
-public class Map implements InputProcessor {
+public class GameMap implements InputProcessor {
     /** Enable/disable fun */
     private final boolean FUN_ENABLED = false;
     private final static int TILE_CLICKS_OVERFLOW = 8192;
@@ -38,7 +38,7 @@ public class Map implements InputProcessor {
     // FIXME: This should be retrieved from the map later on.
     private final int tile_dim = 32;
 
-    public Map(int px, int py, int dim_pw, int dim_ph, String map_file) throws NoSuchResource {
+    public GameMap(int px, int py, int dim_pw, int dim_ph, String map_file) throws NoSuchResource {
         pos = new Vector2Di(px, py);
 
         tiledMap = Resources.getTiledMap(map_file);
