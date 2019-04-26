@@ -68,14 +68,20 @@ public class GameSocket {
         meta.put("id", "");
 
         // Perform handshake to retrieve new encryption key and ID
+        System.out.println("Starting handshake ...");
         JSONObject obj = new JSONObject();
         obj.put("cmd", "join");
+        System.out.println("Sending join command ...");
         send(obj);
+        System.out.println("Waiting for join reply ...");
         JSONObject info = recv();
         if (!JSONTools.checkSpec(info, JSONSpecs.join_game_reply))
             throw new GameSocketException("Illegally formatted JSON returned");
         meta.put("id", (String) info.get("id"));
         key = (String) info.get("key");
+
+        // Now the GameSocket connection is established.
+        System.out.println("Connected.");
     }
 
     /**
@@ -96,22 +102,29 @@ public class GameSocket {
         meta.put("id", "SERVER");
 
         // Perform handshake with client.
+        System.out.println("Starting handshake ...");
         JSONObject cmd = recv();
+        System.out.println("Received command.");
         if (!JSONTools.checkSpec(cmd, JSONSpecs.cmd_base))
             throw new GameSocketException("Illegally formatted JSON returned");
         if (!cmd.get("cmd").equals("join"))
             throw new GameSocketException("Illegally formatted JSON returned");
+        System.out.println("Command was OK.");
         JSONObject obj = new JSONObject();
         int this_id_count;
         synchronized (GameSocket.class) {
             this_id_count = id_count++;
         }
+        String key;
         obj.put("status", "OK");
         obj.put("id", String.format("PLAYER-%d", this_id_count));
         obj.put("key", key = genKey());
+        System.out.println("Sending reply ...");
         send(obj);
+        this.key = key;
 
         // Now the GameSocket connection is established.
+        System.out.println("Connected.");
     }
 
     /**
@@ -136,6 +149,7 @@ public class GameSocket {
         for (int i = 0; i < MAX_SEND_ATTEMPTS; i++) {
             try {
                 sock_out.write(json_msg);
+                sock_out.write("\n");
                 sock_out.flush();
                 CryptoMessage resp_enc = CryptoMessage.fromJSON(sock_in.readLine());
                 JSONObject resp = new JSONObject(resp_enc.decrypt(key));
@@ -149,6 +163,7 @@ public class GameSocket {
             } catch (IOException | DecryptionException e) {
                 if (i+1 == MAX_SEND_ATTEMPTS)
                     throw e;
+                System.out.println("ERROR: " + e);
             }
         }
     }
@@ -161,10 +176,13 @@ public class GameSocket {
                 resp = new JSONObject(msg_enc.decrypt(key));
                 CryptoMessage reply_enc = new CryptoMessage(key, "{\"status\": \"OK\"}");
                 sock_out.write(reply_enc.asJSON());
+                sock_out.write("\n");
                 sock_out.flush();
+                break;
             } catch (IOException | DecryptionException e) {
                 if (i + 1 == MAX_RECV_ATTEMPTS)
                     throw e;
+                System.out.println("ERROR: " + e);
             }
         }
 
