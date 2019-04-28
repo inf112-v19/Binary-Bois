@@ -81,6 +81,14 @@ public class Game {
             board.set(robot, robot.getPos());
     }
 
+    public int getHeight() {
+        return height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
     public Player getActivePlayer() {
         return players.get(active_player_num);
     }
@@ -287,11 +295,6 @@ public class Game {
         Vector2Di orig_pos = pos.copy();
         Vector2Di newpos = pos.copy();
         newpos.move(dir, 1);
-
-        System.out.println("Orig pos   " + orig_pos);
-        System.out.println("New pos   " + newpos);
-        System.out.println("Dir   " + dir);
-        System.out.println();
 
         assert board.isOnBoard(orig_pos);
 

@@ -1,8 +1,7 @@
 package inf112.skeleton.app;
 
-import com.badlogic.gdx.utils.compression.lzma.Base;
 import org.json.JSONObject;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+//import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -140,7 +139,7 @@ public class GameSocket {
     private void reconnect() throws IOException {
         if (!do_reconnect)
             return;
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
     }
 
     public void send(JSONObject obj) throws IOException, DecryptionException {

@@ -1,11 +1,9 @@
 package inf112.skeleton.app;
 
 import org.json.JSONObject;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+//import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
@@ -82,9 +80,12 @@ public class JSONTools {
      * @throws IOException
      * @throws FileNotFoundException
      */
-    public static Map<String, SpecTarget> loadSpec(String path) throws IOException, FileNotFoundException {
+
+    /**public static Map<String, SpecTarget> loadSpec(String path) throws IOException, FileNotFoundException {
         try (BufferedReader istream = new BufferedReader(new FileReader(path))) {
         }
         throw new NotImplementedException();
+
     }
+     */
 }
