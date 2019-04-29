@@ -1,7 +1,6 @@
 package inf112.skeleton.app;
 
 import org.json.JSONObject;
-//import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -76,7 +75,7 @@ public class GameSocket {
         JSONObject info = recv();
         if (!JSONTools.checkSpec(info, JSONSpecs.join_game_reply))
             throw new GameSocketException("Illegally formatted JSON returned");
-        meta.put("id", (String) info.get("id"));
+        meta.put("id", info.get("id"));
         key = (String) info.get("key");
 
         // Now the GameSocket connection is established.
@@ -139,7 +138,7 @@ public class GameSocket {
     private void reconnect() throws IOException {
         if (!do_reconnect)
             return;
-        //throw new NotImplementedException();
+        //ToDo
     }
 
     public void send(JSONObject obj) throws IOException, DecryptionException {

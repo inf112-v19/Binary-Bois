@@ -7,18 +7,19 @@ import java.util.Queue;
 /**
  * Used to help Ai find it's way
  */
-public class BFS {
+public class Dijkstra {
 
     IBoard board;
     ArrayList<Integer>[] edges;
 
-    public BFS(IBoard board) {
+    @SuppressWarnings("unchecked")
+    public Dijkstra(IBoard board) {
 
         this.board = board;
         int height = board.getHeight();
         int width = board.getWidth();
 
-        edges = new ArrayList[width*height];
+        edges = (ArrayList<Integer>[]) new ArrayList[width*height];
         for (ArrayList a : edges)
             a = new ArrayList();
 
