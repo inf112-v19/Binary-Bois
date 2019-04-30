@@ -20,7 +20,7 @@ public class Card extends Renderable {
         this.priority = priority;
         this.cmd = cmd;
         try {
-            tx = Resources.getTexture("cards/175x250/" + this.name + "_" + this.amount + ".png");
+            tx = Resources.getTexture("cards/175x250/" + this.name + "_" + this.amount + "_" + this.priority + ".png");
             // TODO: Draw priority
         } catch (NoSuchResource e) {
             tx = Resources.getTexture("cards/175x250/unknown.png");

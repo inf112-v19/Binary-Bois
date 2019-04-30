@@ -18,4 +18,6 @@ public class ConveyorBelt extends TilePiece {
     public Vector2Di getDir() {
         return dir;
     }
+
+    public boolean is_express(){ return is_express;}
 }
