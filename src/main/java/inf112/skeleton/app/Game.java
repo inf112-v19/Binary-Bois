@@ -176,6 +176,7 @@ public class Game {
                 if (item instanceof Robot) {
                     soundFx.add("Oof");
                     ((Robot) item).handleDamage(DamageType.LASER, board);
+
                     return current_pos;
                 }
             }
@@ -340,6 +341,11 @@ public class Game {
         for (IItem item : board.get(orig_pos))
             if (item instanceof Wall && ((Wall) item).hasEdge(dir)) {
                 appendToLogBuilder("Blocked by wall");
+                Vector2Df blockedByWallAnimationVector = dir.tof();
+                blockedByWallAnimationVector.mul(0.3f);
+                my_robot.addAnimation(new Animation(blockedByWallAnimationVector, 0, 0, 0.1f));
+                blockedByWallAnimationVector.mul(-1);
+                my_robot.addAnimation(new Animation(blockedByWallAnimationVector, 0, 0, 0.1f));
                 soundFx.add("Oof");
                 return false;
             }
@@ -357,6 +363,11 @@ public class Game {
         dir_opposite.mul(-1);
         for (IItem itemInFront : itemlist)
             if (itemInFront instanceof Wall && ((Wall) itemInFront).hasEdge(dir_opposite)) {
+                Vector2Df blockedByWallAnimationVector = dir.tof();
+                blockedByWallAnimationVector.mul(0.3f);
+                my_robot.addAnimation(new Animation(blockedByWallAnimationVector, 0, 0, 0.1f));
+                blockedByWallAnimationVector.mul(-1);
+                my_robot.addAnimation(new Animation(blockedByWallAnimationVector, 0, 0, 0.1f));
                 appendToLogBuilder("Blocked by wall");
                 soundFx.add("Oof");
                 return false;
