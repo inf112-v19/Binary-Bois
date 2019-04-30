@@ -27,6 +27,14 @@ public class Card extends Renderable {
         }
     }
 
+    public Card(ICommand cmd, String name, int amount) {
+        this.name = name;
+        this.cmd = cmd;
+        this.amount = amount;
+        this.priority = -1;
+        this.type_id = -1;
+    }
+
     /**
      * @return The visual representation of the command as a card.
      */

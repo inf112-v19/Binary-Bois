@@ -95,6 +95,14 @@ public class Game {
             board.set(robot, robot.getPos());
     }
 
+    public Dijkstra getDijkstraedOn() {
+        return new Dijkstra(board);
+    }
+
+    public ArrayList<Vector2Di> fromTo(Vector2Di from, Vector2Di to) {
+        return Dijkstra.fromTo(board, from, to);
+    }
+
     public int getHeight() {
         return height;
     }

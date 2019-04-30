@@ -82,8 +82,8 @@ public class Dijkstra {
 
     private IBoard board;
     private ArrayList<Node> nodes;
-    private int width;
-    private int height;
+    int width;
+    int height;
 
     @SuppressWarnings("unchecked")
     public Dijkstra(IBoard board) {
@@ -151,6 +151,19 @@ public class Dijkstra {
             settledNodes.add(currentNode);
         }
         return nodes;
+    }
+
+    public ArrayList<Vector2Di> pathToPoints(List<Node> path) {
+        ArrayList<Vector2Di> vecs = new ArrayList<>();
+        for (Node n : path)
+            vecs.add(new Vector2Di(n.getNum() % width, n.getNum() / width));
+        return vecs;
+    }
+
+    public static ArrayList<Vector2Di> fromTo(IBoard board, Vector2Di from, Vector2Di to) {
+        Dijkstra d = new Dijkstra(board);
+        d.calculateShortestPathFromSource(from);
+        return d.pathToPoints(d.nodes.get(to.getX() + to.getY() * d.width).getShortestPathHere());
     }
 
     private void calculateMinimumDistance(Node evaluationNode,
@@ -245,6 +258,6 @@ public class Dijkstra {
 
     private boolean accessible(IItem item, Vector2Di dir) {
         return !(item instanceof Wall && ((Wall) item).hasEdge(dir) ||
-                item instanceof Hole || item instanceof LaserShooter);
+                item instanceof Hole);
     }
 }

@@ -189,9 +189,7 @@ public class CardManager implements InputProcessor {
      *
      * @return ICommand that will execute all cards in order.
      */
-    public ICommand getSequenceAsCommand() {
-        ArrayList<Card> seq = getSequence();
-
+    public static ICommand getSequenceAsCommand(ArrayList<Card> seq) {
         if (seq.size() == 0)
             return (int amount, Robot r, Game g) -> true;
 
@@ -209,6 +207,10 @@ public class CardManager implements InputProcessor {
             return true;
         };
         return cmd[0];
+    }
+
+    public ICommand getSequenceAsCommand() {
+        return CardManager.getSequenceAsCommand(getSequence());
     }
 
     // TODO: Add the deck as a drag target so that cards can be put away.
