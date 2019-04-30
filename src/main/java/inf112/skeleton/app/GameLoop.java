@@ -298,7 +298,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             case Input.Keys.Q:
                 getCardManager().showCards();
                 break;
-
             case Input.Keys.H:
                 getCardManager().hideCards();
                 break;

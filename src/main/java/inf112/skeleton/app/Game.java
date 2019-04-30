@@ -57,6 +57,20 @@ public class Game {
             throw new InitError("Unable to load resource: " + e.getMessage());
         }
 
+        /**  Dijkstra path test
+        Dijkstra dijk = new Dijkstra(board);
+        ArrayList<Node> nodes = dijk.calculateShortestPathFromSource(new Vector2Di(7, 5));
+        for (Node n : nodes) {
+            int x = n.getNum() % width;
+            int y = (int) Math.floor(n.getNum()/width);
+            System.out.println("Shortest path to (" + x + ", " + y + ")");
+            for (Node s : n.getShortestPathHere()) {
+                x = s.getNum() % width;
+                y = (int) Math.floor(s.getNum()/width);
+                System.out.println("   (" + x + ", " + y + ")");
+            }
+        }*/
+
         if (NUM_CARDS_PER_PLAYER * players.size() > deck.size())
             throw new InitError("Not enough cards for " + players.size() + " players, have " + deck.size() + " cards");
     }
