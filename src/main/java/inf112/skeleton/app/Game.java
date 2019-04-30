@@ -282,8 +282,13 @@ public class Game {
         for (IItem item : itemsOnPos) {
             if (item instanceof ConveyorBelt){
                 if (canMoveTo(robot.getPos(), ((ConveyorBelt) item).getDir(), robot)) {
-                    robot.move(((ConveyorBelt) item).getDir(), 1);
-                    return true;
+                    if(((ConveyorBelt) item).is_express()){
+                        robot.moveFast(((ConveyorBelt) item).getDir(), 1);
+                        return true;
+                    } else {
+                        robot.move(((ConveyorBelt) item).getDir(), 1);
+                        return true;
+                    }
                 }
                 return false;
             }
@@ -292,7 +297,6 @@ public class Game {
     }
 
     public boolean handleGyroTile(Robot robot){
-        Vector2Di currentDir = robot.getDir();
         Vector2Di currentPos = robot.getPos();
         ArrayList<IItem> itemsOnPos = board.get(currentPos);
         for (IItem item : itemsOnPos) {

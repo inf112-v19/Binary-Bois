@@ -217,7 +217,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 break;
 
             case CHECKING_POWER_ON:
-                System.out.println("Checking for power on");
+                //System.out.println("Checking for power on");
                 double cur_time = System.currentTimeMillis() / 1000.0;
                 if (state_start_t + POWER_ON_TIMEOUT <= cur_time)
                     state = GameState.CHOOSING_CARDS;

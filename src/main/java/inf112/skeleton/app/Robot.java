@@ -54,6 +54,13 @@ public class Robot extends Renderable implements IItem {
         addAnimation(Animation.moveBy(anim_move.toi(), 0.15f));
     }
 
+    public void moveFast(Vector2Di dir, int d) {
+        this.pos.move(dir, d);
+        Vector2Df anim_move = dir.copy().tof();
+        anim_move.mul(d);
+        addAnimation(Animation.moveBy(anim_move.toi(), 0.07f));
+    }
+
     public void rot(int deg) {
         this.dir.rotate((double) deg);
         addAnimation(Animation.rotateBy(this, deg, 0.25f));
