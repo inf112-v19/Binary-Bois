@@ -336,6 +336,21 @@
    </properties>
   </tile>
  </tileset>
+ <tileset firstgid="48" name="gyro" tilewidth="32" tileheight="32" tilecount="2" columns="2">
+  <image source="textures/gyro.png" width="64" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="MapObject" value="gyro"/>
+    <property name="rotation" type="int" value="90"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="MapObject" value="gyro"/>
+    <property name="rotation" type="int" value="-90"/>
+   </properties>
+  </tile>
+ </tileset>
  <layer id="3" name="Rutelag 1" width="14" height="14">
   <data encoding="base64" compression="zlib">
    eJyVkN0KgCAMhaUygyCDyv7e/z3bhYNx2EwvPobDs7Oz0zn3NnIRB+GJEarVC8QjdBpLBvusW/N7KMzw4g/6terQb1MyTsqe2sySJ/oxHdzG0v1lqvWbBbIfDL9ozEe95Ve7J+fvxR2wRtDdxN5IIj4ATwhI
@@ -343,7 +358,7 @@
  </layer>
  <layer id="4" name="Rutelag 2" width="14" height="14">
   <data encoding="base64" compression="zlib">
-   eJxjYKA+UCVBrSASW4aAWlkgVsIhJ0SCnZQCkJsJuRUXIFefCpTWg2JdJDkdKKYE6CPZoYJPIRLAFXeC6ApxACEGysMDBvTJNAcdAABVUAMo
+   eJxjYKA+UCVBrSASW4aAWlkgVoKyDdDkhKC0IQl2kwtAbibkVlyAXH0qUFoPinWR5HSgmBKgj2SHCj6FSAAUDrB4kEETJyYehBgoDw8Y0CfTHHQAAH5XA+o=
   </data>
  </layer>
 </map>

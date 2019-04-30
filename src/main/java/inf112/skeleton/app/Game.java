@@ -291,6 +291,19 @@ public class Game {
         return false;
     }
 
+    public boolean handleGyroTile(Robot robot){
+        Vector2Di currentDir = robot.getDir();
+        Vector2Di currentPos = robot.getPos();
+        ArrayList<IItem> itemsOnPos = board.get(currentPos);
+        for (IItem item : itemsOnPos) {
+            if (item instanceof Gyro){
+                robot.rot(((Gyro) item).getRotation());
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean canMoveTo(Vector2Di pos, Vector2Di dir, Robot my_robot){
         Vector2Di orig_pos = pos.copy();
         Vector2Di newpos = pos.copy();
@@ -389,6 +402,10 @@ public class Game {
                             board.set(new ConveyorBelt(westVector, is_express), i, j);
                         }
 
+                    }
+                    if(cell.getTile().getProperties().get("MapObject", String.class).equals("gyro")){
+                        Gyro gyro = new Gyro(cell.getTile().getProperties().get("rotation", Integer.class));
+                        board.set(gyro,i ,j);
                     }
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("flag")) {
                         numberOfFlags += 1;
