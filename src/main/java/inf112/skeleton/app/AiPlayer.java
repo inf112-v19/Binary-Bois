@@ -1,7 +1,5 @@
 package inf112.skeleton.app;
 
-import org.lwjgl.Sys;
-
 import java.util.ArrayList;
 
 public class AiPlayer extends Player {
@@ -10,13 +8,14 @@ public class AiPlayer extends Player {
         super(name);
     }
 
-    public static ArrayList<Card> pointsToCards(Vector2Di dir, ArrayList<Vector2Di> path) {
+    public static ArrayList<Card> pointsToCards(Vector2Di orig_dir, ArrayList<Vector2Di> path) {
+        Vector2Di dir = orig_dir;
         Vector2Di pos = path.get(0);
         ArrayList<Card> cards = new ArrayList<>();
         int dir_cnt = 0;
 
         for (int i = 1; i < path.size(); i++) {
-            Vector2Di diff = path.get(i);
+            Vector2Di diff = path.get(i).copy();
             diff.sub(pos);
             if (!dir.equals(diff)) {
                 if (dir_cnt > 0)

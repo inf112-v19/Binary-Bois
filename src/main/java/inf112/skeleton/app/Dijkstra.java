@@ -1,7 +1,5 @@
 package inf112.skeleton.app;
 
-import org.lwjgl.Sys;
-
 import java.util.*;
 
 class Node {
@@ -77,6 +75,10 @@ class Node {
 
 /**
  * Used to help Ai find it's way
+ *
+ * Methods calculateShortestPathFromSource(), calculateMinimumDistance(),
+ * getLowestDistanceNode() and class Node, are slightly modified versions of baeldung.com's
+ * implementation of Dijkstra in Java:   https://www.baeldung.com/java-dijkstra
  */
 public class Dijkstra {
 
@@ -177,7 +179,7 @@ public class Dijkstra {
         }
     }
 
-    private Node getLowestDistanceNode(Set < Node > unsettledNodes) {
+    private Node getLowestDistanceNode(Set <Node> unsettledNodes) {
         Node lowestDistanceNode = null;
         int lowestDistance = Integer.MAX_VALUE;
         for (Node node: unsettledNodes) {
@@ -210,14 +212,13 @@ public class Dijkstra {
 
             if (item instanceof ConveyorBelt) {
                 if (((ConveyorBelt) item).getDir() == dir)
-                    return 1;
+                    return 500;
                 Vector2Di conveyDir = ((ConveyorBelt) item).getDir().copy();
                 conveyDir.add(dir);
                 if (conveyDir.magnitude() == 0)
                     return -1;
             }
         }
-
         if (!board.isOnBoard(newpos))
             return -1;
 
@@ -235,14 +236,10 @@ public class Dijkstra {
         for (IItem itemInFront : tmp_list) {
             if (itemInFront instanceof Robot) {
                 Vector2Di otherBotPos = ((Robot) itemInFront).getPos();
-                if (isConnected(otherBotPos, dir) < 0)
+                if (isConnected(otherBotPos, dir) == -1)
                     return -1;
             }
             if (itemInFront instanceof ConveyorBelt) {
-
-                if (((ConveyorBelt) itemInFront).getDir() == dir)
-                    return 200;
-
                 Vector2Di conveyDir = ((ConveyorBelt) itemInFront).getDir().copy();
                 conveyDir.add(dir);
                 if (conveyDir.magnitude() == 0)
