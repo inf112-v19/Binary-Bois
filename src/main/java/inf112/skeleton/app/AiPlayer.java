@@ -24,6 +24,7 @@ public class AiPlayer extends Player {
                         cards.add(new Card(Commands.moveCommand, "move", 1));
                         //cards.add(new Card(Commands.moveCommand, "move", dir_cnt));
                 dir_cnt = 0;
+
                 cards.add(new Card(Commands.rotateCommand, "rotate", (int) Math.round(diff.angle(dir))));
             }
             dir_cnt++;

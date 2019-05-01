@@ -70,6 +70,7 @@ public class Vector2Df {
          *       so for a few common "other" vectors like [1, 0] the result should probably be
          *       cached until x/y changes.
          */
+
         float angle = (float) Math.toDegrees(Math.acos(this.dot(other) / (this.magnitude() * other.magnitude())));
         if (crossProduct(other) > 0)
             angle = angle * -1;
