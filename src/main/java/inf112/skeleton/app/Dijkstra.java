@@ -248,6 +248,9 @@ public class Dijkstra {
             if (itemInFront instanceof Laser) {
                 return 5000;
             }
+            if (itemInFront instanceof Wrench) {
+                return 100;
+            }
         }
 
         return 1000;

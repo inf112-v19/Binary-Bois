@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Timer;
+import org.lwjgl.Sys;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -147,9 +148,12 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             ArrayList<Vector2Di> path = game.fromTo(from, to);
             path.add(to);
             ArrayList<Card> cards = AiPlayer.pointsToCards(current_robot.getDir(), path);
-            for (Card c : cards) {
+            System.out.println("Optimal route:");
+            for (Card c : cards)
                 System.out.println(c);
-            }
+            System.out.println("Cards chosen:");
+            for (Card c : AiPlayer.chooseCards(current_robot.getDir(), path, game.getActivePlayer().getHand()))
+                System.out.println(c);
             ICommand cmd = CardManager.getSequenceAsCommand(cards);
             cmd.exec(1, current_robot, game);
         }

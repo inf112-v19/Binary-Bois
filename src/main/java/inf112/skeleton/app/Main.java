@@ -10,6 +10,6 @@ public class Main {
         cfg.title = "Robo Rally";
         cfg.width = 1600;
         cfg.height = 900;
-        new LwjglApplication(new GameLoop(true), cfg);
+        new LwjglApplication(new GameLoop(false), cfg);
     }
 }
