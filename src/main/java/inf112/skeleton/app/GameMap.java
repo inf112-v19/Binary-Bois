@@ -162,7 +162,10 @@ public class GameMap implements InputProcessor {
     private void addClickEvent(Vector2Di pos) {
         if (tile_clicks.size() >= TILE_CLICKS_OVERFLOW)
             tile_clicks.clear();
-        tile_clicks.add(pos);
+        if((pos.getX() >= 0 && pos.getX() <= getDimensions().getX()) && (pos.getY() >= 0 && pos.getX() <= getDimensions().getY())){
+            tile_clicks.add(pos);
+        }
+
     }
 
     @Override
