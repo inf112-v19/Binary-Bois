@@ -33,6 +33,8 @@ class Zucc extends Thread {
     private ArrayList<ArrayList<Card>> round_cards = null;
     private boolean has_final_answer = false;
     private JSONObject game_init_cfg = null;
+    private final Object monitor = new Object();
+    private boolean up_state = true;
 
     public Zucc(GameSocket gsock) throws DecryptionException, IOException {
         this.gsock = gsock;
@@ -97,6 +99,18 @@ class Zucc extends Thread {
                         synchronized (this) {
                             this.round_cards = round_cards;
                         }
+
+                        synchronized (monitor) {
+                            try {
+                                monitor.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        obj = new JSONObject();
+                        obj.put("status", "OK");
+                        gsock.send(obj);
                     break;
 
                     default:
@@ -180,6 +194,18 @@ class Zucc extends Thread {
     }
 
     /**
+     * Set the power up/down state.
+     *
+     * @param up_state Big if true.
+     */
+    public void setUpState(boolean up_state) {
+        synchronized (monitor) {
+            this.up_state = up_state;
+            monitor.notify();
+        }
+    }
+
+    /**
      * Reset the Zucc to prepare for a new round.
      */
     public void reset() {
@@ -219,7 +245,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private int local_player_idx = 0;
 
     private Zucc zucc;
-    private boolean autofill_cards = false;
+    private boolean autofill_cards = true;
     private String host;
     private String init_key;
 
@@ -317,8 +343,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 zucc.setActiveCards(cards);
             });
 
-            if (StaticConfig.DEBUG && autofill_cards)
-                 game.forceActiveCards();
+            if (StaticConfig.DEBUG && autofill_cards) {
+                game.forceActiveCards();
+                zucc.setActiveCards(game.getActivePlayer().getCardManager().getActiveCards());
+            }
         } catch (NoSuchResource e) {
             System.out.println("Unable to load: " + e.getMessage());
             System.exit(1);
@@ -452,10 +480,11 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             break;
 
             case CHECKING_POWER_ON:
-                //System.out.println("Checking for power on");
                 double cur_time = System.currentTimeMillis() / 1000.0;
-                if (state_start_t + POWER_ON_TIMEOUT <= cur_time)
+                if (state_start_t + POWER_ON_TIMEOUT <= cur_time) {
                     state = GameState.CHOOSING_CARDS;
+                    zucc.setUpState(true);
+                }
             break;
         }
 
@@ -520,6 +549,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 if (!StaticConfig.DEBUG) break;
                 Commands.rotateCommand.exec(90, current_robot, game);
             break;
+
+            case Input.Keys.Y:
+                ;
 
             case Input.Keys.M:
                 if (!musicPlayer.isPlaying())

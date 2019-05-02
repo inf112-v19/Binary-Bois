@@ -130,8 +130,8 @@ public class CardManager implements InputProcessor {
      *  do not use for non-testing purposes. */
     public void setAllActiveCards() {
         for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
-            Card c = inactive_cards.get(i);
-            inactive_cards.remove(i);
+            Card c = inactive_cards.get(0);
+            inactive_cards.remove(0);
             active_cards[i] = c;
         }
     }

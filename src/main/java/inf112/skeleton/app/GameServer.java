@@ -33,13 +33,13 @@ class ClientHandler extends Thread {
      * Dumb polling loop to handle clients.
      */
     public void run() {
-        final int WAIT_TIME = 1024;
+        final int WAIT_TIME = 64;
 
         for (;;) {
             try {
                 synchronized (this) {
                     switch (state) {
-                        case CHOOSING_CARDS:
+                        case CHOOSING_CARDS: {
                             if (cards_are_final) break;
                             JSONObject rq = new JSONObject();
                             rq.put("cmd", "get_cards");
@@ -49,12 +49,18 @@ class ClientHandler extends Thread {
 
                             selected_cards = Card.fromJSON(ret.getJSONArray("cards"));
                             cards_are_final = ret.getBoolean("final");
-                        break;
+                        } break;
 
                         case STARTING_ROUND:
                             gsock.send(round_cmd);
                             state = GameState.RUNNING_ROUND;
                         break;
+
+                        case RUNNING_ROUND: {
+                            JSONObject ret = gsock.recv();
+                            System.out.println(ret);
+                            state = GameState.CHOOSING_CARDS;
+                        } break;
 
                         default:
                     }
@@ -139,6 +145,7 @@ public class GameServer extends Thread {
         System.out.println("Listening for connections ...");
         while (idx_count < num_players) {
             try {
+                System.out.println("Waiting for conneciton ...");
                 Socket con = ssock.accept();
                 System.out.println("Got connection!");
 
@@ -169,6 +176,8 @@ public class GameServer extends Thread {
             } catch (CardDeck.NoMoreCards e) {
                 System.out.println("ERROR: Unable to retrieve cards");
             }
+
+            System.out.println("Finished waiting for all players.");
         }
     }
 
@@ -178,7 +187,7 @@ public class GameServer extends Thread {
      * This is implemented as a dumb polling loop.
      */
     public void run() {
-        final long WAIT_TIME = 128;
+        final long WAIT_TIME = 64;
 
         // Wait for clients to connect.
         listen();

@@ -62,6 +62,7 @@ public class Round {
 
         this.game = game;
         demirounds = (ArrayList<RoboCard>[]) (new ArrayList[NUM_CARDS]);
+        System.out.println("Cards: " + Arrays.toString(hands.toArray()));
         for (int i = 0;  i < NUM_CARDS; i++) {
             ArrayList<Card> cards = new ArrayList<>();
             for (int j = 0; j < robots.size(); j++)

@@ -187,8 +187,7 @@ public class Game {
      * This is a testing method for automatically setting the active cards of players.
      */
     public void forceActiveCards() {
-        for (Player p : players)
-            p.getCardManager().setAllActiveCards();
+        getActivePlayer().getCardManager().setAllActiveCards();
     }
 
     public Player getPlayer(int num) {
