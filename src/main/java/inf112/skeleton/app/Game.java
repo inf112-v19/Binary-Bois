@@ -84,6 +84,20 @@ public class Game {
             throw new InitError("Unable to load resource: " + e.getMessage());
         }
 
+        /**  Dijkstra path test
+        Dijkstra dijk = new Dijkstra(board);
+        ArrayList<Node> nodes = dijk.calculateShortestPathFromSource(new Vector2Di(7, 5));
+        for (Node n : nodes) {
+            int x = n.getNum() % width;
+            int y = (int) Math.floor(n.getNum()/width);
+            System.out.println("Shortest path to (" + x + ", " + y + ")");
+            for (Node s : n.getShortestPathHere()) {
+                x = s.getNum() % width;
+                y = (int) Math.floor(s.getNum()/width);
+                System.out.println("   (" + x + ", " + y + ")");
+            }
+        }*/
+
         if (NUM_CARDS_PER_PLAYER * players.size() > deck.size())
             throw new InitError("Not enough cards for " + players.size() + " players, have " + deck.size() + " cards");
     }
@@ -110,6 +124,22 @@ public class Game {
         }
         for (Robot robot : robots)
             board.set(robot, robot.getPos());
+    }
+
+    public Dijkstra getDijkstraedOn() {
+        return new Dijkstra(board);
+    }
+
+    public ArrayList<Vector2Di> fromTo(Vector2Di from, Vector2Di to) {
+        return Dijkstra.fromTo(board, from, to);
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getWidth() {
+        return width;
     }
 
     public Player getActivePlayer() {
@@ -194,6 +224,7 @@ public class Game {
                 if (item instanceof Robot) {
                     soundFx.add("Oof");
                     ((Robot) item).handleDamage(DamageType.LASER, board);
+
                     return current_pos;
                 }
             }
@@ -322,10 +353,27 @@ public class Game {
         for (IItem item : itemsOnPos) {
             if (item instanceof ConveyorBelt){
                 if (canMoveTo(robot.getPos(), ((ConveyorBelt) item).getDir(), robot)) {
-                    robot.move(((ConveyorBelt) item).getDir(), 1);
-                    return true;
+                    if(((ConveyorBelt) item).is_express()){
+                        robot.moveFast(((ConveyorBelt) item).getDir(), 1);
+                        return true;
+                    } else {
+                        robot.move(((ConveyorBelt) item).getDir(), 1);
+                        return true;
+                    }
                 }
                 return false;
+            }
+        }
+        return false;
+    }
+
+    public boolean handleGyroTile(Robot robot){
+        Vector2Di currentPos = robot.getPos();
+        ArrayList<IItem> itemsOnPos = board.get(currentPos);
+        for (IItem item : itemsOnPos) {
+            if (item instanceof Gyro){
+                robot.rot(((Gyro) item).getRotation());
+                return true;
             }
         }
         return false;
@@ -336,16 +384,16 @@ public class Game {
         Vector2Di newpos = pos.copy();
         newpos.move(dir, 1);
 
-        System.out.println("Orig pos   " + orig_pos);
-        System.out.println("New pos   " + newpos);
-        System.out.println("Dir   " + dir);
-        System.out.println();
-
         assert board.isOnBoard(orig_pos);
 
         for (IItem item : board.get(orig_pos))
             if (item instanceof Wall && ((Wall) item).hasEdge(dir)) {
                 appendToLogBuilder("Blocked by wall");
+                Vector2Df blockedByWallAnimationVector = dir.tof();
+                blockedByWallAnimationVector.mul(0.3f);
+                my_robot.addAnimation(new Animation(blockedByWallAnimationVector, 0, 0, 0.1f));
+                blockedByWallAnimationVector.mul(-1);
+                my_robot.addAnimation(new Animation(blockedByWallAnimationVector, 0, 0, 0.1f));
                 soundFx.add("Oof");
                 return false;
             }
@@ -363,6 +411,11 @@ public class Game {
         dir_opposite.mul(-1);
         for (IItem itemInFront : itemlist)
             if (itemInFront instanceof Wall && ((Wall) itemInFront).hasEdge(dir_opposite)) {
+                Vector2Df blockedByWallAnimationVector = dir.tof();
+                blockedByWallAnimationVector.mul(0.3f);
+                my_robot.addAnimation(new Animation(blockedByWallAnimationVector, 0, 0, 0.1f));
+                blockedByWallAnimationVector.mul(-1);
+                my_robot.addAnimation(new Animation(blockedByWallAnimationVector, 0, 0, 0.1f));
                 appendToLogBuilder("Blocked by wall");
                 soundFx.add("Oof");
                 return false;
@@ -434,6 +487,10 @@ public class Game {
                             board.set(new ConveyorBelt(westVector, is_express), i, j);
                         }
 
+                    }
+                    if(cell.getTile().getProperties().get("MapObject", String.class).equals("gyro")){
+                        Gyro gyro = new Gyro(cell.getTile().getProperties().get("rotation", Integer.class));
+                        board.set(gyro,i ,j);
                     }
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("flag")) {
                         numberOfFlags += 1;

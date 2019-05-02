@@ -211,7 +211,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private double state_start_t = 0.0;
 
     private GameMap map;
-
     private BitmapFont font;
     private SpriteBatch batch;
     private Color bgcolor = new Color(0.5f, 0.5f, 0.5f, 1);
@@ -350,6 +349,20 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     }
 
     public void render () {
+        ArrayList<Vector2Di> vecs = map.getTileClicks();
+        if (!vecs.isEmpty()) {
+            Vector2Di to = vecs.get(0);
+            Vector2Di from = current_robot.getPos();
+            ArrayList<Vector2Di> path = game.fromTo(from, to);
+            path.add(to);
+            ArrayList<Card> cards = AiPlayer.chooseCards(current_robot.getDir(), path, game.getActivePlayer().getHand());
+            for (Card c : cards)
+                System.out.println("   " + c);
+            ICommand cmd = CardManager.getSequenceAsCommand(cards);
+            cmd.exec(1, current_robot, game);
+        }
+
+
         // Check for sounds to play
         for (String sound : game.checkPlaySound()) {
             fxPlayer = soundNametoFile.get(sound);
@@ -439,7 +452,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             break;
 
             case CHECKING_POWER_ON:
-                System.out.println("Checking for power on");
+                //System.out.println("Checking for power on");
                 double cur_time = System.currentTimeMillis() / 1000.0;
                 if (state_start_t + POWER_ON_TIMEOUT <= cur_time)
                     state = GameState.CHOOSING_CARDS;

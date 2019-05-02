@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public class Board implements IBoard {
 
-    private ArrayList<IItem>[] grid;  //TODO: Should this also be a HashMap perhaps?
+    private ArrayList<IItem>[] grid;
     private int width;
     private int height;
     private HashMap<IItem, Integer> itemList; //keeps track of the pos of every item
@@ -51,6 +51,11 @@ public class Board implements IBoard {
     @Override
     public int getWidth() {
         return width;
+    }
+
+    @Override
+    public ArrayList<IItem>[] getGrid() {
+        return grid;
     }
 
     @Override

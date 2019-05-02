@@ -27,11 +27,19 @@ public class Card extends Renderable {
 
     public void initTexture() throws NoSuchResource {
         try {
-            tx = Resources.getTexture("cards/175x250/" + this.name + "_" + this.amount + ".png");
+            tx = Resources.getTexture("cards/175x250/" + this.name + "_" + this.amount + "_" + this.priority + ".png");
             // TODO: Draw priority
         } catch (NoSuchResource e) {
             tx = Resources.getTexture("cards/175x250/unknown.png");
         }
+    }
+
+    public Card(ICommand cmd, String name, int amount) {
+        this.name = name;
+        this.cmd = cmd;
+        this.amount = amount;
+        this.priority = -1;
+        this.type_id = -1;
     }
 
     /**

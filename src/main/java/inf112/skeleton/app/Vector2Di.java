@@ -58,7 +58,7 @@ public class Vector2Di {
          *       so for a few common "other" vectors like [1, 0] the result should probably be
          *       cached until x/y changes.
          */
-        return Math.toDegrees(Math.acos(this.dot(other) / (this.magnitude() * other.magnitude())));
+        return this.tof().angle(other.tof());
     }
 
     /**

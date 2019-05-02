@@ -3,11 +3,8 @@ package inf112.skeleton.app;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 
@@ -139,20 +136,6 @@ public class JSONTools {
 
     public static boolean checkSpec(Object obj, SpecTarget spec) {
         return check(obj, spec, 0);
-    }
-
-    /**
-     * TODO: Implement this.
-     *
-     * @param path
-     * @return
-     * @throws IOException
-     * @throws FileNotFoundException
-     */
-    public static Map<String, SpecTarget> loadSpec(String path) throws IOException, FileNotFoundException {
-        try (BufferedReader istream = new BufferedReader(new FileReader(path))) {
-        }
-        throw new NotImplementedException();
     }
 
     // toIntArray and toIntMatrix should obviously be generic,

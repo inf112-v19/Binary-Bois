@@ -26,6 +26,7 @@ public class Commands {
         boolean get_conveyed = true;
         while (get_conveyed)
             get_conveyed = game.handleConveyorTile(robot);
+        game.handleGyroTile(robot);
         game.handlePlunge(robot);
         return true;
     };

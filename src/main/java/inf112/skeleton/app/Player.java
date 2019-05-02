@@ -5,7 +5,6 @@ import java.util.Arrays;
 
 /**
  * The players.
- * TODO: Either the player knows of their robot, vice versa or they they don't know of each other
  */
 public class Player {
 

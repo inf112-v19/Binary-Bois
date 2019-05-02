@@ -15,9 +15,7 @@ class RoboCard implements Comparable<RoboCard> {
             Card c = cards.get(i);
             dr.add(new RoboCard(robots.get(i), c == null ? Card.getNoneCard() : c));
         }
-
         Collections.sort(dr);
-
         return dr;
     }
 
