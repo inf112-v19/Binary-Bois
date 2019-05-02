@@ -1,7 +1,5 @@
 package inf112.skeleton.app;
 
-import org.lwjgl.Sys;
-
 /**
  * Mutable 2D float vector.
  *

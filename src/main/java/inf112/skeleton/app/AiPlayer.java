@@ -2,6 +2,7 @@ package inf112.skeleton.app;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class AiPlayer extends Player {
 
@@ -20,9 +21,7 @@ public class AiPlayer extends Player {
             diff.sub(pos);
             if (!dir.equals(diff)) {
                 if (dir_cnt > 0)
-                    for (int c = 0; c < dir_cnt; c++)
-                        cards.add(new Card(Commands.moveCommand, "move", 1));
-                        //cards.add(new Card(Commands.moveCommand, "move", dir_cnt));
+                    cards.add(new Card(Commands.moveCommand, "move", dir_cnt));
                 dir_cnt = 0;
 
                 cards.add(new Card(Commands.rotateCommand, "rotate", (int) Math.round(diff.angle(dir))));
@@ -33,9 +32,7 @@ public class AiPlayer extends Player {
         }
 
         if (dir_cnt > 0)
-            for (int c = 0; c < dir_cnt; c++)
-                cards.add(new Card(Commands.moveCommand, "move", 1));
-            //cards.add(new Card(Commands.moveCommand, "move", dir_cnt));
+            cards.add(new Card(Commands.moveCommand, "move", dir_cnt));
 
         return cards;
     }
@@ -46,47 +43,53 @@ public class AiPlayer extends Player {
      */
     public static ArrayList<Card> chooseCards(Vector2Di orig_dir, ArrayList<Vector2Di> path, ArrayList<Card> hand) {
         ArrayList<Card> optimal = pointsToCards(orig_dir, path);
+        System.out.println("Optimal route:");
+        for (Card c : optimal)
+            System.out.println(c);
         ArrayList<Card> chosen_cards = new ArrayList<>();
+        ArrayList<Card> left_in_hand = new ArrayList<>(hand);
+        System.out.println("Cards chosen:");
         for (Card c : optimal) {
             if (chosen_cards.size() >= 5)
                 return chosen_cards;
 
             if (c.getName().equals("rotate")) {
-                ArrayList<Card> rotates = new ArrayList<>(findRotate(c.getAmount(), hand));
-                chosen_cards.addAll(rotates);
-            } else if (c.getName().equals("move")) {
+                ArrayList<Card> found_rotation = findMatchingCards(c.getAmount(), left_in_hand, "rotate");
+                chosen_cards.addAll(found_rotation);
+                left_in_hand.removeAll(found_rotation);
 
-            } else {
-                throw new IllegalArgumentException("Not a move or rotate card");
+            } else if (c.getName().equals("move")) {
+                ArrayList<Card> found_move = findMatchingCards(c.getAmount(), left_in_hand, "move");
+                chosen_cards.addAll(found_move);
+                left_in_hand.removeAll(found_move);
             }
         }
         return chosen_cards;
     }
 
-    public static ArrayList<Card> findRotate(int rotation, ArrayList<Card> my_hand) {
-        ArrayList<Card> hand = my_hand;
-        ArrayList<Card> both_types = new ArrayList<>(hand);
-        ArrayList<Card> only_rotation = new ArrayList<>();
-        for (Card c : both_types)
-            if (!c.getName().equals("rotate"))
-                only_rotation.add(c);
-        ArrayList<Card> correct = new ArrayList<>();
-        for (int r = 0; r < only_rotation.size(); r++) {
-            ArrayList<Card[]> combinations = combinations(only_rotation, only_rotation.size(), r);
-            for (Card[] combo : combinations) {
-                int my_rotation = 0;
-                for (Card c : combo) {
-                    my_rotation += c.getAmount();
-                }
-                if (my_rotation == rotation) {
-                    System.out.println("Found matching rotation: " + my_rotation + "  = " + rotation);
+    public static ArrayList<Card> findMatchingCards(int amount, ArrayList<Card> left_in_hand, String type) {
+        ArrayList<Card> only_of_type = new ArrayList<>();
+        for (Card c : left_in_hand)
+            if (c.getName().equals(type))
+                only_of_type.add(c);
 
-                    for (Card c : combo)
-                        correct.add(c);
+        ArrayList<Card> correct = new ArrayList<>();
+        for (int r = 1; r < only_of_type.size(); r++) {
+
+            ArrayList<Card[]> combinations = combinations(only_of_type, only_of_type.size(), r);
+
+            for (Card[] combo : combinations) {
+                int current_amount = 0;
+                for (Card c : combo)
+                    current_amount += c.getAmount();
+
+                if (current_amount == amount) {
+                    Collections.addAll(correct, combo);
                     return correct;
                 }
             }
         }
+        correct.add(left_in_hand.get(0));
         return correct;
     }
 
