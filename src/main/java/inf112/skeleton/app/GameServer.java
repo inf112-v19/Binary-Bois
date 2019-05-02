@@ -3,12 +3,11 @@ package inf112.skeleton.app;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Array;
+import java.net.*;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -131,13 +130,6 @@ public class GameServer extends Thread {
         cons = new GameSocket[num_players];
         client_handlers = new ClientHandler[num_players];
         this.init_key = init_key;
-    }
-
-    /**
-     * UDP broadcast so that potential players can find this
-     * server.
-     */
-    public void broadcast() {
     }
 
     // TODO: FIXME: Handle reconnects.
