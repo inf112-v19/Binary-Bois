@@ -2,8 +2,6 @@ package inf112.skeleton.app;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.sun.org.apache.xml.internal.security.Init;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
