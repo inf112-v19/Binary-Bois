@@ -8,10 +8,187 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Timer;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+
+enum ZuckerState {
+    INSTIGATOR,
+    LISTENER
+}
+
+/**
+ * Zucc sucks in commands from the server and handles them.
+ */
+class Zucc extends Thread {
+
+    private GameSocket gsock;
+    private ArrayList<JSONArray> cards_json = new ArrayList<>();
+    private JSONArray cards_answer = new JSONArray();
+    private ArrayList<ArrayList<Card>> round_cards = null;
+    private boolean has_final_answer = false;
+    private JSONObject game_init_cfg = null;
+
+    public Zucc(GameSocket gsock) throws DecryptionException, IOException {
+        this.gsock = gsock;
+        try {
+            game_init_cfg = gsock.recv();
+            if (!JSONTools.checkSpec(game_init_cfg, JSONSpecs.game_init))
+                throw new JSONException("game_init did not match spec");
+            cards_json.add(game_init_cfg.getJSONArray("cards"));
+        } catch (GameSocketException e) {
+            SystemPanic.panic("fucc");
+        }
+    }
+
+    /**
+     * Get initial game configuration.
+     */
+    public JSONObject getConfig() {
+        return game_init_cfg;
+    }
+
+    /**
+     * Listen on the gamesocket and handle events.
+     */
+    public void run() {
+        System.out.println("Starting Zucc.run() ...");
+        for (;;) {
+            try {
+                System.out.println("Waiting for command ...");
+                JSONObject obj = gsock.recv();
+                System.out.println("Received command.");
+                if (!JSONTools.checkSpec(obj, JSONSpecs.cmd_base))
+                    throw new JSONException("Illegal JSON structure.");
+                String cmd = obj.getString("cmd");
+                switch (cmd) {
+                    case "new_cards":
+                        if (!JSONTools.checkSpec(obj, JSONSpecs.card_deal))
+                            throw new JSONException("new_cards command did not match spec");
+
+                        synchronized (this) {
+                            cards_json.add(obj.getJSONArray("cards"));
+                        }
+                    break;
+
+                    case "get_cards":
+                        JSONObject cards_obj = new JSONObject();
+                        synchronized (this) {
+                            cards_obj.put("cards", cards_answer);
+                            cards_obj.put("final", has_final_answer);
+                        }
+                        gsock.send(cards_obj);
+                    break;
+
+                    case "run_round":
+                        System.out.println("RUNNING THE ROUND");
+                        if (!JSONTools.checkSpec(obj, JSONSpecs.run_round_map))
+                            throw new JSONException("run_round command did not match spec");
+                        JSONArray player_cards_arr = obj.getJSONArray("player_cards");
+                        ArrayList<ArrayList<Card>> round_cards = new ArrayList<>();
+                        for (Object cards : player_cards_arr)
+                            round_cards.add(Card.fromJSON((JSONArray) cards));
+
+                        synchronized (this) {
+                            this.round_cards = round_cards;
+                        }
+                    break;
+
+                    default:
+                        throw new JSONException("Unrecognized command: " + cmd);
+                }
+            } catch (JSONException e) {
+                System.out.println("JSON decoding error: " + e);
+            } catch (DecryptionException | GameSocketException | IOException e) {
+                // TODO: Handle connection-dropping exceptions properly.
+                System.out.println("Exception: " + e);
+            } catch (NoSuchResource e) {
+                SystemPanic.panic("NoSuchResource");
+            }
+
+            try {
+                Thread.sleep(1024);
+            } catch (InterruptedException e) {
+                ;
+            }
+        }
+    }
+
+    /**
+     * Retrieve cards that have been received from the server.
+     *
+     * @return null if there are no new cards, otherwise an array
+     *         of the new cards
+     * @throws NoSuchResource Thrown by Cards::new.
+     */
+    public ArrayList<Card> getCards() throws NoSuchResource {
+        ArrayList<JSONArray> cards_json;
+        synchronized (this) {
+            if (this.cards_json.isEmpty())
+                return null;
+            cards_json = this.cards_json;
+            this.cards_json = new ArrayList<>();
+        }
+
+        ArrayList<Card> cards = new ArrayList<>();
+        for (JSONArray arr : cards_json)
+            for (Object jobj : arr)
+                cards.add(Card.fromJSON((JSONObject) jobj));
+
+        return cards;
+    }
+
+    /**
+     * Get the cards to be executed this round.
+     *
+     * @return Array indexed by player index, where arr[1] = player-1s cards.
+     *         Returns null if the round isn't ready yet.
+     */
+    public ArrayList<ArrayList<Card>> getRoundCards() {
+        synchronized (this) {
+            ArrayList<ArrayList<Card>> round_cards = this.round_cards;
+            this.round_cards = null;
+            return round_cards;
+        }
+    }
+
+    /**
+     * Set the cards that should be sent to the server.
+     *
+     * @param active_cards 5 cards.
+     */
+    public void setActiveCards(ArrayList<Card> active_cards) {
+        synchronized (this) {
+            cards_answer = new JSONArray();
+            for (Card c : active_cards)
+                cards_answer.put(c.asJSON());
+        }
+    }
+
+    /**
+     * Tell the server that the current answer is the final answer.
+     */
+    public void submitAnswer() {
+        synchronized (this) {
+            has_final_answer = true;
+        }
+    }
+
+    /**
+     * Reset the Zucc to prepare for a new round.
+     */
+    public void reset() {
+        has_final_answer = false;
+
+        // Empty the selected cards
+        cards_answer = new JSONArray();
+    }
+}
 
 public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private static int[][] robot_start_positions = {
@@ -20,6 +197,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             {6, 8},
             {6, 9}
     };
+
     private static final int num_players = robot_start_positions.length;   //FIXME: Only for testing purposes
     private Music musicPlayer;
     private Sound fxPlayer;
@@ -36,13 +214,26 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
 
     private BitmapFont font;
     private SpriteBatch batch;
-    private Color bgcolor = new Color(0.5f, 0.5f, 0.5f, 1);;
+    private Color bgcolor = new Color(0.5f, 0.5f, 0.5f, 1);
     private HashMap<String, Sound> soundNametoFile = new HashMap<>();
+    private GameSocket gsock;
+    private int local_player_idx = 0;
 
+    private Zucc zucc;
     private boolean autofill_cards = false;
+    private String host;
+    private String init_key;
 
-    public GameLoop() {
+    public GameLoop(String host, String init_key) throws DecryptionException, IOException, GameSocketException {
         super();
+        this.host = host;
+        this.init_key = init_key;
+        //gsock = new GameSocket(host, init_key);
+        //zucc = new Zucc(gsock);
+        ////gsock.send(new JSONObject("{\"hello\": \"world\"}"));
+        //// Start listening for events
+        //zucc.start();
+        //local_player_idx = zucc.getConfig().getInt("idx");
     }
 
     public GameLoop(boolean autofill) {
@@ -57,9 +248,8 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
      */
     public void setInputs(ArrayList<InputProcessor> extra) {
         InputMultiplexer mul = new InputMultiplexer();
-        for (InputProcessor inp : extra) {
+        for (InputProcessor inp : extra)
             mul.addProcessor(inp);
-        }
         mul.addProcessor(map);
         mul.addProcessor(this);
         mul.addProcessor(map);
@@ -75,18 +265,26 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         setInputs(p.getCardManager().getInputProcessors());
     }
 
-
-
     @Override
     public void create () {
         robots = new ArrayList<>();
         try {
+            gsock = new GameSocket(host, init_key);
+            zucc = new Zucc(gsock);
+            zucc.start();
+            local_player_idx = zucc.getConfig().getInt("idx");
+
             addSounds();
 
             map = new GameMap(180, 0, 300, 200, "map2.tmx");
 
+            int[][] robot_start_positions =
+                    JSONTools.toIntMatrix(zucc
+                                          .getConfig()
+                                          .getJSONArray("robots_pos"));
             for (int[] pos : robot_start_positions) {
-                Robot robut = new Robot(pos[0], pos[1]); //Robut
+                Robot robut = new Robot(pos[0], pos[1]);
+                robut.initTextures();
                 robots.add(robut);
                 map.addDrawJob(robut);
             }
@@ -94,15 +292,14 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             Vector2Di map_dim = map.getDimensions();
             System.out.println("GameMap Dimensions: " + map_dim);
             this.game = new Game(map_dim.getX(), map_dim.getY(), robots);
+            this.game.initTextures();
 
-            try {
-                this.game.handOutCards();
-            } catch (CardDeck.NoMoreCards e) {
-                // NOTE: There is a check for this in the Game() constructor, so this
-                //       exception will never happen directly after the Game is instantiated.
-            }
+            updatePlayer(local_player_idx);
 
-            updatePlayer(0);
+            ArrayList<Card> my_cards = zucc.getCards();
+            for (Card c : my_cards)
+                c.initTexture();
+            game.getActivePlayer().giveDeck(my_cards);
 
             batch = new SpriteBatch();
             font = new BitmapFont();
@@ -112,13 +309,25 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
             game.appendToLogBuilder("Press e to run selected cards");
             game.appendToLogBuilder("Use scrollwheel to scroll cards");
 
-            if (autofill_cards)
+            // Make sure the card manager passes the card order to zucc.
+            game.getActivePlayer().getCardManager().onChange((Card[] cards_arr) -> {
+                ArrayList<Card> cards = new ArrayList<>();
+                for (Card c : cards_arr)
+                    if (c != null)
+                        cards.add(c);
+                zucc.setActiveCards(cards);
+            });
+
+            if (StaticConfig.DEBUG && autofill_cards)
                  game.forceActiveCards();
         } catch (NoSuchResource e) {
             System.out.println("Unable to load: " + e.getMessage());
             System.exit(1);
         } catch (Game.InitError e) {
             System.out.println(e.getMessage());
+            System.exit(1);
+        } catch (DecryptionException | IOException | GameSocketException e) {
+            System.out.println("Failed to connect: " + e);
             System.exit(1);
         }
     }
@@ -185,16 +394,29 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         switch (state) {
             case GAME_START:
                 state = GameState.CHOOSING_CARDS;
-                break;
+                game.appendToLogBuilder("Press Enter to submit cards");
+            break;
+
             case CHOOSING_CARDS:
                 getCardManager().render(batch);
-                break;
+            break;
+
+            case WAITING_FOR_ROUND_START:
+                ArrayList<ArrayList<Card>> round_cards = zucc.getRoundCards();
+                if (round_cards != null) {
+                    round = new Round(robots, round_cards, game);
+                    state = GameState.RUNNING_ROUND;
+                    game.appendToLogBuilder("Round starting ...");
+                }
+            break;
+
             case RUNNING_ROUND:
                 if (round != null && !round.doStep()) {
                     round = null;
                     state = GameState.RESPAWNING;
                 }
-                break;
+            break;
+
             case RESPAWNING:
                 Robot last_robot = null;
                 float wait = 0.0f;
@@ -214,14 +436,14 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 } else {
                     run.run();
                 }
-                break;
+            break;
 
             case CHECKING_POWER_ON:
                 System.out.println("Checking for power on");
                 double cur_time = System.currentTimeMillis() / 1000.0;
                 if (state_start_t + POWER_ON_TIMEOUT <= cur_time)
                     state = GameState.CHOOSING_CARDS;
-                break;
+            break;
         }
 
         // TODO: The UI will be drawn here later.
@@ -243,70 +465,95 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     public boolean keyDown(int keycode) {
         final int KEY_NUM_END = 16;
         final int KEY_NUM_BEGIN = 8;
-        if (keycode <= KEY_NUM_END && keycode >= KEY_NUM_BEGIN) {
+
+        if (StaticConfig.DEBUG && keycode <= KEY_NUM_END && keycode >= KEY_NUM_BEGIN) {
             int number = keycode - KEY_NUM_BEGIN;
             try {
                 updatePlayer(number);
-
             } catch (IndexOutOfBoundsException e) {
                 game.appendToLogBuilder("No such robot");
             }
             return true;
         }
+
         switch (keycode) {
             //Does a round with the active cards
             case Input.Keys.D:
+                if (!StaticConfig.DEBUG) break;
+
                 ArrayList<ArrayList<Card>> active_cards = new ArrayList<>();
-                for (int i = 0; i < num_players; i++) {
+                for (int i = 0; i < num_players; i++)
                     active_cards.add(game.getPlayer(i).getCardManager().getActiveCards());
-                }
                 round = new Round(robots, active_cards, game);
                 state = GameState.RUNNING_ROUND;
-                break;
+            break;
+
             case Input.Keys.DOWN:
+                if (!StaticConfig.DEBUG) break;
                 Commands.moveCommand.exec(-1, current_robot, game);
-                break;
+            break;
+
             case Input.Keys.UP:
+                if (!StaticConfig.DEBUG) break;
                 Commands.moveCommand.exec(1, current_robot, game);
-                break;
+            break;
+
             case Input.Keys.RIGHT:
+                if (!StaticConfig.DEBUG) break;
                 Commands.rotateCommand.exec(-90, current_robot, game);
-                break;
+            break;
+
             case Input.Keys.LEFT:
+                if (!StaticConfig.DEBUG) break;
                 Commands.rotateCommand.exec(90, current_robot, game);
-                break;
+            break;
+
             case Input.Keys.M:
                 if (!musicPlayer.isPlaying())
                     musicPlayer.play();
                 else
                     musicPlayer.stop();
-                break;
+            break;
 
             case Input.Keys.S:
                 current_robot.addAnimation(Animation.scaleTo(current_robot, 3, 1f));
-                break;
+            break;
 
             case Input.Keys.K:
+                if (!StaticConfig.DEBUG) break;
                 game.killRobot(current_robot);
-                break;
+            break;
 
             // Execute all cards that are queued
             case Input.Keys.E:
+                if (!StaticConfig.DEBUG) break;
                 getCardManager().getSequenceAsCommand().exec(1, current_robot, game);
-                break;
+            break;
 
             case Input.Keys.Q:
                 getCardManager().showCards();
-                break;
+            break;
 
             case Input.Keys.H:
                 getCardManager().hideCards();
-                break;
+            break;
+
             case Input.Keys.L:
+                if (!StaticConfig.DEBUG) break;
                 game.shootLaser(current_robot.getPos(), current_robot.getDir());
-                break;
+            break;
+
             case Input.Keys.R:
+                if (!StaticConfig.DEBUG) break;
                 current_robot.respawn(game);
+            break;
+
+            case Input.Keys.ENTER:
+                game.appendToLogBuilder("Waiting for round start ...");
+                state = GameState.WAITING_FOR_ROUND_START;
+                zucc.submitAnswer();
+            break;
+
             default:
                 return false;
         }

@@ -2,6 +2,12 @@ package inf112.skeleton.app;
 
 import java.util.HashMap;
 
+/**
+ * WARNING: Command names are sent across the network, the server
+ *          sending the command is able to set both the command name,
+ *          the priority, and the amount. Keep this in mind when you
+ *          write commands.
+ */
 public class Commands {
     /** Move a robot along its direction vector. */
     public static ICommand moveCommand = (int amount, Robot robot, Game game) -> {

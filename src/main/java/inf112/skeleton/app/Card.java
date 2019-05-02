@@ -1,6 +1,10 @@
 package inf112.skeleton.app;
 
 import com.badlogic.gdx.graphics.Texture;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * An action that can be executed on a game/robot.
@@ -13,12 +17,15 @@ public class Card extends Renderable {
     private ICommand cmd;
     private Texture tx;
 
-    public Card(ICommand cmd, String name, int amount, int type_id, int priority) throws NoSuchResource {
+    public Card(ICommand cmd, String name, int amount, int type_id, int priority) {
         this.name = name;
         this.amount = amount;
         this.type_id = type_id;
         this.priority = priority;
         this.cmd = cmd;
+    }
+
+    public void initTexture() throws NoSuchResource {
         try {
             tx = Resources.getTexture("cards/175x250/" + this.name + "_" + this.amount + ".png");
             // TODO: Draw priority
@@ -83,10 +90,46 @@ public class Card extends Renderable {
     }
 
     public static Card getNoneCard() {
-        try {
-            return new Card(Commands.none, "none", 0, 0, Integer.MAX_VALUE);
-        } catch (NoSuchResource e) {
-            return null;
-        }
+        return new Card(Commands.none, "none", 0, 0, Integer.MAX_VALUE);
+    }
+
+    public JSONObject asJSON() {
+        JSONObject obj = new JSONObject();
+        obj.put("type", name);
+        obj.put("type_id", type_id);
+        obj.put("priority", priority);
+        obj.put("amount", amount);
+        return obj;
+    }
+
+    /**
+     * Convert a JSON representation of a card into a Card object.
+     *
+     * @param card_obj The JSON representation.
+     * @return The card being represented.
+     * @throws NoSuchResource Thrown from Card::new()
+     */
+    public static Card fromJSON(JSONObject card_obj) throws NoSuchResource {
+        return new Card(
+                Commands.getComand(card_obj.getString("type")),
+                card_obj.getString("type"),
+                card_obj.getInt("amount"),
+                card_obj.getInt("type_id"),
+                card_obj.getInt("priority"));
+    }
+
+    /**
+     * Call {@link #fromJSON(JSONArray)} to convert a JSON array of cards
+     * into card instances.
+     *
+     * @param cards_obj Array of card information.
+     * @return Card objects.
+     * @throws NoSuchResource Thrown from Card::new()
+     */
+    public static ArrayList<Card> fromJSON(JSONArray cards_obj) throws NoSuchResource {
+        ArrayList<Card> cards = new ArrayList<>();
+        for (Object obj : cards_obj)
+            cards.add(fromJSON((JSONObject) obj));
+        return cards;
     }
 }

@@ -2,6 +2,10 @@ package inf112.skeleton.app;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.sun.org.apache.xml.internal.security.Init;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,7 +13,6 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class Game {
-    public static final String cards_src = "resources/Programcards.csv";
     public static final int NUM_CARDS_PER_PLAYER = 9;
 
     private int height = 0;
@@ -38,27 +41,55 @@ public class Game {
         }
     }
 
-    public Game(int height, int width, ArrayList<Robot> robots) throws InitError {
-        this.height = height;
+    public Game(JSONObject settings) throws InitError, JSONException {
+        ArrayList<Robot> robos = new ArrayList<>();
+        JSONSpecs.game_options.check(settings);
+        int[][] robots_pos = JSONTools.toIntMatrix(settings.getJSONArray("robots_pos"));
+        for (int[] pos : robots_pos)
+            robos.add(new Robot(pos[0], pos[1]));
+        //Vector2Di dim;
+        //try {
+        //    TiledMap tmap = Resources.getTiledMap((String) settings.get("map"));
+        //    dim = new Vector2Di(
+        //            tmap.getProperties().get("width", Integer.class),
+        //            tmap.getProperties().get("height", Integer.class)
+        //    );
+        //} catch (NoSuchResource e) {
+        //    throw new InitError(e.toString());
+        //}
+        Vector2Di dim = new Vector2Di(16, 16);
+        init(dim.getX(), dim.getY(), robos);
+    }
+
+    public Game(int width, int height, ArrayList<Robot> robots) throws InitError {
+        init(width, height, robots);
+    }
+
+    private void init(int width, int height, ArrayList<Robot> robots) throws InitError {
         this.width = width;
+        this.height = height;
         this.robots = robots;
         this.players = new ArrayList<>();
         robotsToPlayers = new HashMap<>();
         board = new Board(height, width);
         game_log = new GameLog(5);
         try {
-            deck = new CardDeck(cards_src);
+            deck = new CardDeck(StaticConfig.GAME_CARDS_SRC);
             setup();
         } catch (CSV.CSVError e) {
-            throw new InitError("Card source CSV file was incorrectly formed: " + cards_src);
+            throw new InitError("Card source CSV file was incorrectly formed: " + StaticConfig.GAME_CARDS_SRC);
         } catch (IOException e) {
-            throw new InitError("Unable to read card source CSV file: " + cards_src);
+            throw new InitError("Unable to read card source CSV file: " + StaticConfig.GAME_CARDS_SRC);
         } catch (NoSuchResource e) {
             throw new InitError("Unable to load resource: " + e.getMessage());
         }
 
         if (NUM_CARDS_PER_PLAYER * players.size() > deck.size())
             throw new InitError("Not enough cards for " + players.size() + " players, have " + deck.size() + " cards");
+    }
+
+    public void initTextures() throws NoSuchResource {
+        deck.initTextures();
     }
 
     //Made for testing
@@ -97,12 +128,29 @@ public class Game {
         active_player_num = (active_player_num+1) % players.size();
     }
 
+    /**
+     * This method was used to hand out cards on local play, it has
+     * now been superseded by getCards and GameServer.
+     * @throws CardDeck.NoMoreCards
+     */
+    @Deprecated
     public void handOutCards() throws CardDeck.NoMoreCards {
         for (int i = 0; i < players.size(); i++) {
             Player p = players.get(i);
             int robo_health = robots.get(i).getHealth();
             p.giveDeck(deck.get(robo_health-1));
         }
+    }
+
+    /**
+     * Retrieve a number of cards from the deck, Wraps {@link CardDeck#get(int)}
+     *
+     * @param num_cards
+     * @return The cards.
+     * @throws CardDeck.NoMoreCards
+     */
+    public ArrayList<Card> getCards(int num_cards) throws CardDeck.NoMoreCards {
+        return deck.get(num_cards);
     }
 
     /**

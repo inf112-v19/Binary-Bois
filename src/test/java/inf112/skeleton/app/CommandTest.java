@@ -11,7 +11,7 @@ public class CommandTest {
     @Test
     public void rotateCommand() {
         ICommand cmd = Commands.getComand("rotate");
-        Robot robot = new Robot();
+        Robot robot = new Robot(0, 0);
         Vector2Di dir = robot.getDir();
         int rot_amount = 90;
         double orig_angle = dir.angle();

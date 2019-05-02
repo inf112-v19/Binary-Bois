@@ -61,8 +61,6 @@ public class Round {
     @SuppressWarnings("unchecked")
     public Round(ArrayList<Robot> robots, ArrayList<ArrayList<Card>> hands, Game game) {
         // Assertions
-        for (ArrayList<Card> hand : hands)
-            assert hand.size() == NUM_CARDS;
 
         this.game = game;
         demirounds = (ArrayList<RoboCard>[]) (new ArrayList[NUM_CARDS]);
