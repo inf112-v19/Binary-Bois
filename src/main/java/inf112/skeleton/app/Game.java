@@ -20,7 +20,7 @@ public class Game {
     private ArrayList<Robot> robots;
     private ArrayList<Player> players;
     private ArrayList<IItem> flags;
-    private GameLog game_log;
+    private Log game_log;
     private CardDeck deck;
     private int active_player_num = 0;
     private Vector2Di northVector = new Vector2Di(0,1);
@@ -70,7 +70,7 @@ public class Game {
         this.players = new ArrayList<>();
         robotsToPlayers = new HashMap<>();
         board = new Board(height, width);
-        game_log = new GameLog(5);
+        game_log = new Log(5);
         try {
             deck = new CardDeck(StaticConfig.GAME_CARDS_SRC);
             setup();
@@ -112,7 +112,7 @@ public class Game {
         this.players = new ArrayList<>();
         robotsToPlayers = new HashMap<>();
         board = new Board(height, width);
-        game_log = new GameLog(5);
+        game_log = new Log(5);
 
         int player_num = 0;
         for (Robot r : robots) {

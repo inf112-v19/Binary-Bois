@@ -28,7 +28,6 @@ enum ZuckerState {
  * Zucc sucks in commands from the server and handles them.
  */
 class Zucc extends Thread {
-
     private GameSocket gsock;
     private ArrayList<JSONArray> cards_json = new ArrayList<>();
     private JSONArray cards_answer = new JSONArray();

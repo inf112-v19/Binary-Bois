@@ -14,9 +14,11 @@ public class StaticConfig {
 
     public static final boolean DEBUG = true;
 
+    public static final int UDP_BRD_PORT = 31337;
+
     private static int[][] DEFAULT_ROBOTS_POS = {
             {6, 6},
-            //{6, 7},
+            {6, 7},
             //{6, 8},
             //{6, 9}
     };
