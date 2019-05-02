@@ -1,5 +1,6 @@
 package inf112.skeleton.app;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -71,5 +72,24 @@ public class TestJSONSpec {
         if (JSONTools.checkSpec(incorrect_obj, spec)) {
             fail("Incorrect example passed the spec test");
         }
+    }
+
+    @Test
+    public void testGameSettingSpec() {
+        JSONObject settings = new JSONObject();
+        settings.put("version", "1.123123");
+        settings.put("num_players", 4);
+        settings.put("choosing_cards_time", 45);
+        settings.put("num_starting_cards", 9);
+        settings.put("map", "map2.tmx");
+        JSONArray robots = new JSONArray();
+        robots.put(new JSONObject("{\"x\": 0, \"y\": 0}"));
+        robots.put(new JSONObject("{\"x\": 3, \"y\": 4}"));
+        robots.put(new JSONObject("{\"x\": 9, \"y\": 0}"));
+        robots.put(new JSONObject("{\"x\": 9, \"y\": 3}"));
+        settings.put("robots", robots);
+        System.out.println(settings);
+        if (!JSONTools.checkSpec(settings, JSONSpecs.game_options))
+            fail("Should have succeeded");
     }
 }

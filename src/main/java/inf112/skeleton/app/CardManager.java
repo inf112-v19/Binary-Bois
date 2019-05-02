@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.function.Consumer;
 
 /**
  * Handles everything related to drawing and interacting with cards using
@@ -50,6 +51,8 @@ public class CardManager implements InputProcessor {
     private HashMap<Object, Image> card_drag_source_images = new HashMap<>();
     private Vector2Di mouse_pos = new Vector2Di(0, 0);
     private int numberofcards = 0;
+    /** This callback gets executed when there is a change in the active_cards array. */
+    private Consumer<Card[]> on_change_cb;
     int cardsScrolledBy;
     boolean cardsAutoHidden;
     public static final int NUM_ACTIVE_SLOTS = 5;
@@ -87,6 +90,18 @@ public class CardManager implements InputProcessor {
         processors.add(this);
         processors.add(stage);
         return processors;
+    }
+
+    /**
+     * Set a callback to be executed when the card order is changed.
+     *
+     * Note: There can only be a single onChange callback, subsequent
+     * calls to this function will replace the existing callback.
+     *
+     * @param on_change_cb The consumer that gets executed.
+     */
+    public void onChange(Consumer<Card[]> on_change_cb) {
+        this.on_change_cb = on_change_cb;
     }
 
     public void setCards(ArrayList<Card> cards) {
@@ -299,6 +314,10 @@ public class CardManager implements InputProcessor {
                             }
 
                             source_image.setBounds(cur_slot_pos.getX(), cur_slot_pos.getY(), card_w, card_h);
+
+                            // Send new card order to the on_change callback.
+                            if (on_change_cb != null)
+                                on_change_cb.accept(active_cards);
                         }
                     });
             slot_pos.add(CARD_SPACING);
@@ -354,6 +373,10 @@ public class CardManager implements InputProcessor {
                         }
 
                         source_image.setBounds(pos.getX(), pos.getY(), card_w, card_h);
+
+                        // Send new card order to the on_change callback.
+                        if (on_change_cb != null)
+                            on_change_cb.accept(active_cards);
                     }
                 });
     }

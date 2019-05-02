@@ -84,6 +84,11 @@ public class CardDeck {
         return cards;
     }
 
+    public void initTextures() throws NoSuchResource {
+        for (Card c : cards)
+            c.initTexture();
+    }
+
     /**
      * Put a card on top of the deck.
      * @param c The card to place on top.

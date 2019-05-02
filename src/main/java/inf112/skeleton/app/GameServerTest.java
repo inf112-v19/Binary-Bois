@@ -1,15 +1,26 @@
 package inf112.skeleton.app;
 
+import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import org.json.JSONObject;
+
 import java.io.IOException;
 
+/**
+ * Starts a game server, then fires up a game that connects to it.
+ *
+ * NOTE: This is only a test, it provides no method for setting game
+ * options and has a static init_key
+ */
 public class GameServerTest {
-    public static void main(String args[]) {
-        try {
-            GameServer server = new GameServer("abc123");
-            server.listen();
-        } catch (IOException e) {
-            System.out.println("Unable to start server: " + e);
-            System.exit(1);
-        }
+    public static void main(String args[]) throws IOException, CSV.CSVError, DecryptionException, GameSocketException, NoSuchResource {
+        final String init_key = "abc123";
+        GameServer server = new GameServer(1, StaticConfig.DEFAULT_GAME_OPTIONS, init_key);
+        server.start();
+        LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
+        cfg.title = "Robo Rally";
+        cfg.width = 1600;
+        cfg.height = 900;
+        new LwjglApplication(new GameLoop("localhost", init_key), cfg);
     }
 }

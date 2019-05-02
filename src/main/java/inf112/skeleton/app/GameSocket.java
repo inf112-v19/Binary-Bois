@@ -22,9 +22,9 @@ class GameSocketException extends Exception {
 public class GameSocket {
     public static final int MAX_RECONNECTS = 512;
     public static final int RECONNECT_WAIT_TIME_MS = 128;
-    public static final int SOCK_TIMEOUT = 128;
-    public static final int MAX_RECV_ATTEMPTS = 16;
-    public static final int MAX_SEND_ATTEMPTS = 16;
+    public static final int SOCK_TIMEOUT = 16000;
+    public static final int MAX_RECV_ATTEMPTS = 1;
+    public static final int MAX_SEND_ATTEMPTS = 1;
     public static final int port = GameServer.port;
     private static Integer id_count = 1;
     Socket sock;
@@ -146,41 +146,46 @@ public class GameSocket {
         Exception exc = null;
         for (int i = 0; i < MAX_SEND_ATTEMPTS; i++) {
             try {
+                //System.out.println("send(): " + json_msg);
                 sock_out.write(json_msg);
                 sock_out.write("\n");
                 sock_out.flush();
-                CryptoMessage resp_enc = CryptoMessage.fromJSON(sock_in.readLine());
-                JSONObject resp = new JSONObject(resp_enc.decrypt(key));
-                Object status = resp.get("status");
-                if (!((status instanceof String) && status.equals("OK"))) {
-                    // Retry on soft error
-                    System.out.println("Soft error: " + resp.get("msg"));
-                    continue;
-                }
+                //CryptoMessage resp_enc = CryptoMessage.fromJSON(sock_in.readLine());
+                //JSONObject resp = new JSONObject(resp_enc.decrypt(key));
+                //Object status = resp.get("status");
+                //if (!((status instanceof String) && status.equals("OK"))) {
+                //    // Retry on soft error
+                //    System.out.println("Soft error: " + resp.get("msg"));
+                //    continue;
+                //}
                 break;
-            } catch (IOException | DecryptionException e) {
+            } catch (IOException e) {
+                System.out.println("GameSocket.send() ERROR: " + e);
                 if (i+1 == MAX_SEND_ATTEMPTS)
                     throw e;
-                System.out.println("ERROR: " + e);
             }
         }
     }
 
-    public JSONObject recv() throws IOException, DecryptionException {
+    public JSONObject recv() throws IOException, DecryptionException, GameSocketException {
         JSONObject resp = null;
         for (int i = 0; i < MAX_RECV_ATTEMPTS; i++) {
             try {
-                CryptoMessage msg_enc = CryptoMessage.fromJSON(sock_in.readLine());
+                String line = sock_in.readLine();
+                if (line == null)
+                    throw new GameSocketException("sock_in.readLine() returned null.");
+                CryptoMessage msg_enc = CryptoMessage.fromJSON(line);
                 resp = new JSONObject(msg_enc.decrypt(key));
-                CryptoMessage reply_enc = new CryptoMessage(key, "{\"status\": \"OK\"}");
-                sock_out.write(reply_enc.asJSON());
-                sock_out.write("\n");
-                sock_out.flush();
+                System.out.println("recv(): " + resp);
+                //CryptoMessage reply_enc = new CryptoMessage(key, "{\"status\": \"OK\"}");
+                //sock_out.write(reply_enc.asJSON());
+                //sock_out.write("\n");
+                //sock_out.flush();
                 break;
-            } catch (IOException | DecryptionException e) {
+            } catch (IOException | DecryptionException | GameSocketException e) {
+                System.out.println("GameSocket.recv() ERROR: " + e);
                 if (i + 1 == MAX_RECV_ATTEMPTS)
                     throw e;
-                System.out.println("ERROR: " + e);
             }
         }
 

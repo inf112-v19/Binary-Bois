@@ -2,6 +2,7 @@ package inf112.skeleton.app;
 
 import com.badlogic.gdx.graphics.Texture;
 
+import javax.crypto.NoSuchPaddingException;
 import java.util.Random;
 
 public class Robot extends Renderable implements IItem {
@@ -21,22 +22,17 @@ public class Robot extends Renderable implements IItem {
     private Random rnd = new Random();
     private boolean died = false;
 
-    Robot(int x, int y) throws NoSuchResource {
+    Robot(int x, int y)  {
         super();
         this.dir = new Vector2Di(1, 0);
         this.pos = new Vector2Di(x, y);
-        this.texture = Resources.getTexture("robot1.png");
         this.name = "Robot " + nameInt++;
         archiveMarker = this.pos.copy();
         setDrawPos(new Vector2Df(x, y));
     }
 
-    /**
-     * Constructor for testing, instantiating Texture will throw a NullPointerException.
-     */
-    Robot() {
-        this.pos = new Vector2Di(0, 0);
-        this.dir = new Vector2Di(1, 0);
+    public void initTextures() throws NoSuchResource {
+        this.texture = Resources.getTexture("robot1.png");
     }
 
     /**
