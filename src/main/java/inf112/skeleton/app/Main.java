@@ -1,11 +1,15 @@
 package inf112.skeleton.app;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.io.IOException;
 
 public class Main {
+
     public static void main(String[] args) {
         LwjglApplicationConfiguration cfg;
         cfg = new LwjglApplicationConfiguration();
@@ -13,14 +17,9 @@ public class Main {
         cfg.width = 1600;
         cfg.height = 900;
 
-        final String hostname = "10.111.23.226";
+        new LwjglApplication(new RoboRally(), cfg);
 
-        try {
-            new LwjglApplication(new GameLoop(hostname, "abc123"), cfg);
-        } catch (GameSocketException | IOException e) {
-            SystemPanic.panic("Unable to connect to server: " + hostname);
-        } catch (DecryptionException e) {
-            SystemPanic.panic("Wrong key");
-        }
     }
+
+
 }

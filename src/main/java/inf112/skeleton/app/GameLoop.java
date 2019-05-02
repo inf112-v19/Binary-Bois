@@ -120,7 +120,7 @@ class Zucc extends Thread {
                 }
             } catch (JSONException e) {
                 System.out.println("JSON decoding error: " + e);
-            } catch (DecryptionException | GameSocketException | IOException e) {
+            } catch (IOException e) {
                 // TODO: Handle connection-dropping exceptions properly.
                 System.out.println("Exception: " + e);
             } catch (NoSuchResource e) {
@@ -218,7 +218,7 @@ class Zucc extends Thread {
     }
 }
 
-public class GameLoop extends ApplicationAdapter implements InputProcessor {
+public class GameLoop extends ApplicationAdapter implements InputProcessor, Screen {
     private static int[][] robot_start_positions = {
             {6, 6},
             {6, 7},
@@ -251,10 +251,14 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     private String host;
     private String init_key;
 
-    public GameLoop(String host, String init_key) throws DecryptionException, IOException, GameSocketException {
+    public GameLoop(String host, String init_key, RoboRally robo_rally) throws IOException {
         super();
+        batch = robo_rally.batch;
+        font = robo_rally.font;
+        font.setColor(Color.BLACK);
         this.host = host;
         this.init_key = init_key;
+        create();
         //gsock = new GameSocket(host, init_key);
         //zucc = new Zucc(gsock);
         ////gsock.send(new JSONObject("{\"hello\": \"world\"}"));
@@ -292,7 +296,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         setInputs(p.getCardManager().getInputProcessors());
     }
 
-    @Override
     public void create () {
         robots = new ArrayList<>();
         try {
@@ -328,10 +331,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
                 c.initTexture();
             game.getActivePlayer().giveDeck(my_cards);
 
-            batch = new SpriteBatch();
-            font = new BitmapFont();
-            font.setColor(Color.BLACK);
-
             game.appendToLogBuilder("Click on the deck to show all cards");
             game.appendToLogBuilder("Press e to run selected cards");
             game.appendToLogBuilder("Use scrollwheel to scroll cards");
@@ -355,7 +354,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         } catch (Game.InitError e) {
             System.out.println(e.getMessage());
             System.exit(1);
-        } catch (DecryptionException | IOException | GameSocketException e) {
+        } catch (IOException e) {
             System.out.println("Failed to connect: " + e);
             System.exit(1);
         }
@@ -378,7 +377,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
         musicPlayer.setLooping(true);
     }
 
-    public void render () {
+    @Override
+    public void render (float dt) {
+        System.out.println(map);
         ArrayList<Vector2Di> vecs = map.getTileClicks();
         if (!vecs.isEmpty()) {
             Vector2Di to = vecs.get(0);
@@ -640,5 +641,15 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor {
     @Override
     public boolean scrolled(int i) {
         return false;
+    }
+
+    @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void hide() {
+
     }
 }
