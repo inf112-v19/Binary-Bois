@@ -13,7 +13,7 @@ public class Main {
         cfg.width = 1600;
         cfg.height = 900;
 
-        final String hostname = "localhost";
+        final String hostname = "10.111.23.226";
 
         try {
             new LwjglApplication(new GameLoop(hostname, "abc123"), cfg);
