@@ -37,7 +37,7 @@ class Zucc extends Thread {
     private final Object monitor = new Object();
     private boolean up_state = true;
 
-    public Zucc(GameSocket gsock) throws DecryptionException, IOException {
+    public Zucc(GameSocket gsock) throws IOException {
         this.gsock = gsock;
         try {
             game_init_cfg = gsock.recv();
@@ -246,7 +246,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private int local_player_idx = 0;
 
     private Zucc zucc;
-    private boolean autofill_cards = true;
+    private boolean autofill_cards = false;
     private String host;
     private String init_key;
 
@@ -258,17 +258,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         this.host = host;
         this.init_key = init_key;
         create();
-        //gsock = new GameSocket(host, init_key);
-        //zucc = new Zucc(gsock);
-        ////gsock.send(new JSONObject("{\"hello\": \"world\"}"));
-        //// Start listening for events
-        //zucc.start();
-        //local_player_idx = zucc.getConfig().getInt("idx");
-    }
-
-    public GameLoop(boolean autofill) {
-        super();
-        this.autofill_cards = autofill;
     }
 
     /**
@@ -378,7 +367,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
     @Override
     public void render (float dt) {
-        System.out.println(map);
         ArrayList<Vector2Di> vecs = map.getTileClicks();
         if (!vecs.isEmpty()) {
             Vector2Di to = vecs.get(0);
@@ -391,7 +379,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             ICommand cmd = CardManager.getSequenceAsCommand(cards);
             cmd.exec(1, current_robot, game);
         }
-
 
         // Check for sounds to play
         for (String sound : game.checkPlaySound()) {
@@ -454,6 +441,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             break;
 
             case RUNNING_ROUND:
+                game.emptyAllHands();
                 if (round != null && !round.doStep()) {
                     round = null;
                     state = GameState.RESPAWNING;

@@ -18,7 +18,7 @@ public class StaticConfig {
 
     private static int[][] DEFAULT_ROBOTS_POS = {
             {6, 6},
-            {6, 7},
+            //{6, 7},
             //{6, 8},
             //{6, 9}
     };
