@@ -104,10 +104,18 @@ public class CardManager implements InputProcessor {
         this.on_change_cb = on_change_cb;
     }
 
-    public void removeAllCards() {
-        numberofcards = 0;
+    public void removeAllCards(Robot robot) {
         inactive_cards.clear();
-        active_cards = new Card[NUM_ACTIVE_SLOTS];
+
+        numberofcards = 0;
+
+        if (robot.getHealth() < 6)
+            numberofcards = 6 - robot.getHealth(); //He has some cards locked in place
+
+        int top = robot.getHealth() - 6;
+        top = (top < 0) ? -top : NUM_ACTIVE_SLOTS;
+        for (int i = 0; i < top; i++)
+            active_cards[i] = null;
     }
 
     public void setCards(ArrayList<Card> cards) {

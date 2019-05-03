@@ -314,10 +314,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
             updatePlayer(local_player_idx);
 
-            ArrayList<Card> my_cards = zucc.getCards();
-            for (Card c : my_cards)
-                c.initTexture();
-            game.getActivePlayer().giveDeck(my_cards);
+            giveCards();
 
             game.appendToLogBuilder("Click on the deck to show all cards");
             game.appendToLogBuilder("Press e to run selected cards");
@@ -345,6 +342,15 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         } catch (IOException e) {
             System.out.println("Failed to connect: " + e);
             System.exit(1);
+        }
+    }
+
+    private void giveCards() throws NoSuchResource {
+        ArrayList<Card> my_cards = zucc.getCards();
+        if (my_cards != null) {
+            for (Card c : my_cards)
+                c.initTexture();
+            game.getActivePlayer().giveDeck(my_cards, current_robot);
         }
     }
 
@@ -405,7 +411,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
         if (game.getPrintLog() != null) {
             batch.begin();
-
             font.draw(batch, game.getPrintLog(), 0, 750);
             batch.end();
         }
@@ -432,6 +437,11 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
             case WAITING_FOR_ROUND_START:
                 ArrayList<ArrayList<Card>> round_cards = zucc.getRoundCards();
+                try {
+                    giveCards();
+                } catch (NoSuchResource e) {
+                    System.out.println(e + " in GameLoop render(), case WAITING_FOR_ROUND_START");
+                }
                 if (round_cards != null) {
                     round = new Round(robots, round_cards, game);
                     state = GameState.RUNNING_ROUND;
@@ -440,7 +450,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             break;
 
             case RUNNING_ROUND:
-                game.emptyAllHands();
+                game.emptyHand(current_robot);
                 if (round != null && !round.doStep()) {
                     round = null;
                     state = GameState.RESPAWNING;
