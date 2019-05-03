@@ -214,6 +214,7 @@ public class GameServer extends Thread {
                         if (handler.getCardSelection() == null)
                             break sw;
 
+                    System.out.println("Running game ...");
                     JSONArray pl_cards = new JSONArray();
                     for (ClientHandler handler : client_handlers) {
                         JSONArray cards = new JSONArray();
@@ -241,8 +242,6 @@ public class GameServer extends Thread {
                         }
                         handler.runRound(round_obj, cards);
                     }
-
-
                 break;
             }
 

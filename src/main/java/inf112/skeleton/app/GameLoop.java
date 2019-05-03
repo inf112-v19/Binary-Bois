@@ -25,6 +25,7 @@ abstract class AZucc extends Thread {
     public abstract void submitAnswer();
     public abstract void setUpState(boolean up_state);
     public abstract JSONObject getConfig();
+    public abstract void reset();
 }
 
 class AiZucc extends AZucc {
@@ -36,6 +37,9 @@ class AiZucc extends AZucc {
     private final int NUM_PLAYERS = 4;
     private JSONObject game_settings;
     private CardDeck deck;
+
+    public void reset() {
+    }
 
     public AiZucc(RoboRallyGame game) throws IOException, NoSuchResource, CSV.CSVError, CardDeck.NoMoreCards {
         deck = new CardDeck(StaticConfig.GAME_CARDS_SRC);
@@ -578,6 +582,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
                 game.emptyHand(current_robot);
                 if (round != null && !round.doStep()) {
                     round = null;
+                    zucc.reset();
                     state = GameState.RESPAWNING;
                 }
             break;
