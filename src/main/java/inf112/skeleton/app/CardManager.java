@@ -128,6 +128,8 @@ public class CardManager implements InputProcessor {
         //top = (top < 0) ? -top : num_active_slots;
         //for (int i = 0; i < top; i++)
         //    active_cards[i] = null;
+        for (int i = 0; i < num_active_slots; i++)
+            active_cards[i] = null;
 
         stage.clear();
     }

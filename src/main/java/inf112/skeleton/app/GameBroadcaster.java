@@ -101,6 +101,12 @@ public class GameBroadcaster extends Thread {
 
         do {
             try {
+                broadcastTo(settings, InetAddress.getByName("10.113.22.168"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
                 broadcastToAll(settings);
                 epicHighTechWorkaround(settings, htek_wait_time++);
             } catch (IOException e) {
@@ -110,11 +116,6 @@ public class GameBroadcaster extends Thread {
 
             if (htek_wait_time == 32)
                 htek_wait_time = 3;
-            try {
-                broadcastTo(settings, InetAddress.getByName("10.113.22.168"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
             try {
                 Thread.sleep(WAIT_TIME);
