@@ -24,10 +24,84 @@ enum ZuckerState {
     LISTENER
 }
 
+abstract class AZucc extends Thread {
+    public abstract ArrayList<Card> getCards() throws NoSuchResource;
+    public abstract ArrayList<ArrayList<Card>> getRoundCards();
+    public abstract void setActiveCards(ArrayList<Card> active_cards);
+    public abstract void submitAnswer();
+    public abstract void setUpState(boolean up_state);
+    public abstract JSONObject getConfig();
+}
+
+class AiZucc extends AZucc {
+
+    boolean do_return_cards = true;
+    JSONObject cfg;
+    private ArrayList<Card> active_cards;
+    private RoboRallyGame game;
+
+    public AiZucc(JSONObject cfg) {
+        this.cfg = cfg;
+    }
+
+    public ArrayList<Card> getCards() throws NoSuchResource {
+        if (!do_return_cards)
+            return null;
+
+        returner 9 kort 
+
+                do_return_cards = false;
+    }
+
+    public ArrayList<ArrayList<Card>> getRoundCards() {
+        ArrayList<ArrayList<Card>> round_cards = new ArrayList<>();
+        round_cards.add(active_cards);
+
+        for (int i = 1; i < NUM_PLAYERS; i++) {
+            ArrayList<Card> ai_cards =
+        }
+        Vector2Di to = vecs.get(0);
+        Vector2Di from = current_robot.getPos();
+        ArrayList<Vector2Di> path = game.fromTo(from, to);
+        ArrayList<Card> cards = AiPlayer.chooseCards(current_robot.getDir(), path, game.getActivePlayer().getHand(), 10);
+        for (Card c : cards)
+            System.out.println("   " + c);
+        ICommand cmd = CardManager.getSequenceAsCommand(cards);
+        cmd.exec(1, current_robot, game);
+    }
+
+    regner ut
+    ai og
+    sender det
+
+    public void setActiveCards(ArrayList<Card> active_cards) {
+        this.active_cards = active_cards;
+    }
+
+    tar inn
+    kort og
+    lagrer som
+    feltvariabel
+
+    public void submitAnswer() {
+        do_return_cards = true;
+    }
+
+    public void setUpState(boolean up_state) {
+        ;
+    }
+
+
+    public JSONObject getConfig() {
+        return cfg;
+    }
+
+}
+
 /**
  * Zucc sucks in commands from the server and handles them.
  */
-class Zucc extends Thread {
+class Zucc extends AZucc {
     private GameSocket gsock;
     private ArrayList<JSONArray> cards_json = new ArrayList<>();
     private JSONArray cards_answer = new JSONArray();
@@ -230,7 +304,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private Sound fxPlayer;
     private Robot current_robot;
     private ArrayList<Robot> robots;
-    private Game game;
+    private RoboRallyGame game;
     private Round round = null;
     private GameState state = GameState.GAME_START;
     /**In seconds */
@@ -244,10 +318,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private HashMap<String, Sound> soundNametoFile = new HashMap<>();
     private GameSocket gsock;
     private int local_player_idx = 0;
-
+    
     private boolean ai_game;
 
-    private Zucc zucc;
+    private AZucc zucc;
     private boolean autofill_cards = false;
     private String host;
     private String init_key;
@@ -322,7 +396,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
             Vector2Di map_dim = map.getDimensions();
             System.out.println("GameMap Dimensions: " + map_dim);
-            this.game = new Game(map_dim.getX(), map_dim.getY(), robots);
+            this.game = new RoboRallyGame(map_dim.getX(), map_dim.getY(), robots);
             this.game.initTextures();
 
             updatePlayer(local_player_idx);
@@ -349,7 +423,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         } catch (NoSuchResource e) {
             System.out.println("Unable to load: " + e.getMessage());
             System.exit(1);
-        } catch (Game.InitError e) {
+        } catch (RoboRallyGame.InitError e) {
             System.out.println(e.getMessage());
             System.exit(1);
         } catch (IOException e) {
@@ -432,7 +506,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             batch.end();
         }
 
-        if (Game.getWinCondition()) {
+        if (RoboRallyGame.getWinCondition()) {
             batch.begin();
             font.getData().setScale(5.0f);
             font.draw(batch, "WINNER", 400, 750);
