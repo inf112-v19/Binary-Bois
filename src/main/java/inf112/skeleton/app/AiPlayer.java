@@ -47,12 +47,8 @@ public class AiPlayer extends Player {
      */
     public static ArrayList<Card> chooseCards(Vector2Di orig_dir, ArrayList<Vector2Di> path, ArrayList<Card> hand, int difficulty) {
         ArrayList<Card> optimal = pointsToCards(orig_dir, path);
-        System.out.println("Optimal route:");
-        for (Card c : optimal)
-            System.out.println(c);
         ArrayList<Card> chosen_cards = new ArrayList<>();
         ArrayList<Card> left_in_hand = new ArrayList<>(hand);
-        System.out.println("Cards chosen:");
         int path_num = 0;
         Random rnd = new Random();
         for (Card c : optimal) {
@@ -68,7 +64,6 @@ public class AiPlayer extends Player {
                 }
                 ArrayList<Card> found_rotation = findMatchingCards(c.getAmount(), left_in_hand, "rotate");
                 if (found_rotation.isEmpty()) {
-                    System.out.println("Found no rotation cards");
                     Vector2Di dir = currentDir(orig_dir, chosen_cards);
                     Card filler = fillIn(left_in_hand, dir, path.get(path_num), path.get(path.size()-1));
                     chosen_cards.add(filler);
@@ -89,7 +84,6 @@ public class AiPlayer extends Player {
                 }
                 ArrayList<Card> found_move = findMatchingCards(c.getAmount(), left_in_hand, "move");
                 if (found_move.isEmpty()) {
-                    System.out.println("Found no move cards");
                     Vector2Di dir = currentDir(orig_dir, chosen_cards);
                     Card filler = fillIn(left_in_hand, dir, path.get(path_num), path.get(path.size()-1));
                     chosen_cards.add(filler);
