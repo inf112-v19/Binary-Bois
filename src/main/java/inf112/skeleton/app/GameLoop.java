@@ -35,26 +35,41 @@ abstract class AZucc extends Thread {
 
 class AiZucc extends AZucc {
 
-    boolean do_return_cards = true;
-    JSONObject cfg;
+    private boolean do_return_cards = true;
+    private JSONObject cfg;
     private ArrayList<Card> active_cards;
     private RoboRallyGame game;
+    private final int NUM_PLAYERS = 4;
 
-    public AiZucc(JSONObject cfg) {
+    public AiZucc(RoboRallyGame game) {
         this.cfg = cfg;
+        this.game = game;
     }
 
     public ArrayList<Card> getCards() throws NoSuchResource {
         if (!do_return_cards)
             return null;
-
         do_return_cards = false;
-
-        return null;
+        return active_cards;
     }
 
     public ArrayList<ArrayList<Card>> getRoundCards() {
-        return null;
+        ArrayList<ArrayList<Card>> round_cards = new ArrayList<>();
+        round_cards.add(active_cards);
+
+        for (int i = 1; i < NUM_PLAYERS; i++) {
+            Player p = game.getPlayer(i);
+            Robot robot = game.getRobot(p);
+            Vector2Di to = new Vector2Di(12, 12);      //TODO: DUMMY DUMMY
+            Vector2Di from = robot.getPos();
+            ArrayList<Vector2Di> path = game.fromTo(from, to);
+            ArrayList<Card> cards = AiPlayer.chooseCards(robot.getDir(), path, game.getActivePlayer().getHand(), 10);
+            for (Card c : cards)
+                System.out.println("   " + c);
+            round_cards.add(cards);
+        }
+        return round_cards;
+
     }
 
     public void setActiveCards(ArrayList<Card> active_cards) {
@@ -74,6 +89,9 @@ class AiZucc extends AZucc {
         return cfg;
     }
 
+    public void run() {
+        ;
+    }
 }
 
 /**
@@ -314,7 +332,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         create();
     }
 
-    public GameLoop(String host, String init_key, RoboRally robo_rally, boolean ai_game) {
+    public GameLoop(String host, String init_key, RoboRally robo_rally, boolean ai_game) throws IOException {
         super();
         batch = robo_rally.batch;
         font = robo_rally.font;
@@ -352,10 +370,14 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     public void create () {
         robots = new ArrayList<>();
         try {
-            gsock = new GameSocket(host, init_key);
-            zucc = new Zucc(gsock);
-            zucc.start();
-            local_player_idx = zucc.getConfig().getInt("idx");
+            if (ai_game) {
+                zucc = new AiZucc(game);
+            } else {
+                gsock = new GameSocket(host, init_key);
+                zucc = new Zucc(gsock);
+                zucc.start();
+                local_player_idx = zucc.getConfig().getInt("idx");
+            }
 
             addSounds();
 
@@ -376,6 +398,8 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             System.out.println("GameMap Dimensions: " + map_dim);
             this.game = new RoboRallyGame(map_dim.getX(), map_dim.getY(), robots);
             this.game.initTextures();
+
+
 
             updatePlayer(local_player_idx);
 

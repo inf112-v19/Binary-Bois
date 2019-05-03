@@ -68,6 +68,7 @@ class MainMenu implements Screen {
             Card c = card_arr[0];
             if (c == null)
                 return;
+
             switch_to = c.getName();
         });
     }
@@ -115,6 +116,11 @@ class MainMenu implements Screen {
 
                 case "ai_game":
                     System.out.println("AI GAME");
+                    try {
+                        game.setScreen(new GameLoop(hostname, init_key, game, true));
+                    } catch (IOException e) {
+                        System.out.println(e + "caught in MainMenu, case ai_game");
+                    }
                 break;
 
                 case "host_game":
