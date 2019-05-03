@@ -27,6 +27,7 @@ class MainMenu implements Screen {
     final RoboRally game;
     OrthographicCamera camera;
     final String hostname = "localhost";
+    String init_key = "abc123";
     CardManager cm;
     private Texture bg;
     private String switch_to = null;
