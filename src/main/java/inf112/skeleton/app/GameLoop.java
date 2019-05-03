@@ -365,6 +365,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private String host;
     private String init_key;
     private AnimatedTexture my_robot_texture;
+    private AnimatedTexture winner_robot_texture = null;
 
     public GameLoop(String host, String init_key, Music music_player) {
         super();
@@ -556,15 +557,23 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             batch.end();
         }
 
-        if (RoboRallyGame.getWinCondition()) {
+        map.render();
+
+        Winner winner;
+        if ((winner = RoboRallyGame.getWinCondition()) != null) {
             batch.begin();
             font.getData().setScale(5.0f);
-            font.draw(batch, "WINNER", 400, 750);
+            font.draw(batch, "WINNER: Player-" + winner.idx, 400, 750);
+            try {
+                winner_robot_texture = new AnimatedTexture("textures/thicc_robot0" + (winner.idx + 1) + ".png");
+                winner_robot_texture.setDrawPos(new Vector2Df(375, 200));
+                winner_robot_texture.addAnimation(new Animation(new Vector2Df(2000, 0), 360, 0, 3));
+            } catch (NoSuchResource e) {
+                ;
+            }
             font.getData().setScale(1);
             batch.end();
         }
-
-        map.render();
 
         try {
             if (!ai_game)
@@ -643,6 +652,8 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
         batch.begin();
         my_robot_texture.render(batch, 1);
+        if (winner_robot_texture != null)
+            winner_robot_texture.render(batch, 1);
         batch.end();
     }
 

@@ -10,6 +10,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+class Winner {
+    public Robot robot;
+    public Player player;
+    public int idx;
+
+    public Winner(Robot robot, Player player, int idx) {
+        this.robot = robot;
+        this.player = player;
+        this.idx = idx;
+    }
+}
+
 public class RoboRallyGame {
     public static final int NUM_CARDS_PER_PLAYER = 9;
 
@@ -31,6 +43,7 @@ public class RoboRallyGame {
     private Random rnd = new Random();
     private int numberOfFlags;
     private static boolean winCondition = false;
+    private static Winner winner = null;
 
 
     public class InitError extends Exception {
@@ -228,14 +241,19 @@ public class RoboRallyGame {
 
                 //ArrayList of all Flag IItems that are on the map
                 ArrayList<IItem> flagArrayList = new ArrayList<>();
-                for(int i = 0; i < board.getAllItemsOnBoard().size(); i++)
-                    if(board.getAllItemsOnBoard().get(i) instanceof Flag)
+                for (int i = 0; i < board.getAllItemsOnBoard().size(); i++)
+                    if (board.getAllItemsOnBoard().get(i) instanceof Flag)
                         flagArrayList.add(board.getAllItemsOnBoard().get(i));
 
                 //Win condition
-                if(robotOwner.getFlags().containsAll(flagArrayList)){
+                if (robotOwner.getFlags().containsAll(flagArrayList)){
                     System.out.println(robotOwner.getName() + " registered all flags. Winner!");
                     winCondition = true;
+                    int idx;
+                    for (idx = 0; idx < players.size(); idx++)
+                        if (players.get(idx) == robotOwner)
+                            break;
+                    winner = new Winner(robot, robotOwner, idx);
                 }
 
             } else if (item instanceof Wrench) {
@@ -250,8 +268,8 @@ public class RoboRallyGame {
         robot.handleDamage(DamageType.FALL, board);
     }
 
-    public static boolean getWinCondition(){
-        return winCondition;
+    public static Winner getWinCondition() {
+        return winner;
     }
     
     public void appendToLogBuilder(String string){
