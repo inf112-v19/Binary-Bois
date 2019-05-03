@@ -604,6 +604,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
                     r.respawn(game);
                     last_robot = r;
                 }
+                for (Robot robot : robots) {
+                    game.shootLaser(robot.getPos(), robot.getDir());
+                }
 
                 Runnable run = () -> {
                     System.out.println("CALLBACK");
