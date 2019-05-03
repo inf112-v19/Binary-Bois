@@ -15,8 +15,8 @@ public class GameServerTest {
     public static void main(String args[]) throws IOException, CSV.CSVError, NoSuchResource {
         final String init_key = "abc123";
 
-        GameServer server = new GameServer(4, StaticConfig.DEFAULT_GAME_OPTIONS, init_key);
-        server.start();
+        //GameServer server = new GameServer(4, StaticConfig.DEFAULT_GAME_OPTIONS, init_key);
+        //server.start();
         //GameServer server = new GameServer(1, StaticConfig.DEFAULT_GAME_OPTIONS, init_key);
         //server.start();
 

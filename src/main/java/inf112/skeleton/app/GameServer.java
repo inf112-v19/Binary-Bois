@@ -9,6 +9,7 @@ import java.lang.reflect.Array;
 import java.net.*;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -119,6 +120,7 @@ public class GameServer extends Thread {
     private ClientHandler[] client_handlers;
     private int idx_count = 0;
     private int num_players;
+    private GameBroadcaster broadcaster;
 
     public GameServer(int num_players, JSONObject game_settings, String init_key) throws IOException, CSV.CSVError, NoSuchResource {
         ssock = new ServerSocket(port);
@@ -131,6 +133,7 @@ public class GameServer extends Thread {
         cons = new GameSocket[num_players];
         client_handlers = new ClientHandler[num_players];
         this.init_key = init_key;
+        broadcaster = new GameBroadcaster(game_settings);
     }
 
     // TODO: FIXME: Handle reconnects.
@@ -182,8 +185,12 @@ public class GameServer extends Thread {
     public void run() {
         final long WAIT_TIME = 64;
 
+        broadcaster.start();
+
         // Wait for clients to connect.
         listen();
+
+        broadcaster.done();
 
         for (;;) {
             sw: switch (state) {
