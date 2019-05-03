@@ -45,7 +45,7 @@ Dere må dokumentere hvordan prosjektet bygger, testes og kjøres, slik at det e
     - Generell dokumentasjon av metoder og klasser gjennom prosjekt mappen.
     
     - Spillet kjøres gjennom Main der man velger gamemode(Være host, joine en annen host eller spille mot AI).
-    
+      !Kan også kjøres gjennom gameServerTest dersom det skulle oppstå problemer med main.
     - Gjennom prosjektet har vi brukt ulike måter å teste produktet på,
       dette innebærer både Junit tester og manuell testing. 
       Manuell testing har blitt brukt for å sjekke etter eventuelle bugs som oppstår ved fremtvunget adferd av spiller. Ved hjelp av dette har vi funnet bugs som ikke oppstod ved normal spilling. Dette var i hovedsak ting som oppstod ved “spamming” av enkelte kommandoer og hyppige gjentakelser av enkelte handlinger.
