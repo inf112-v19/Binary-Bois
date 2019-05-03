@@ -9,13 +9,16 @@ import java.util.Enumeration;
 
 public class GameBroadcaster extends Thread {
     private int port;
+    private boolean running = true;
+    private JSONObject settings;
 
-    public GameBroadcaster(int port) {
+    public GameBroadcaster(JSONObject settings, int port) {
         this.port = port;
+        this.settings = settings;
     }
 
-    public GameBroadcaster() {
-        this(StaticConfig.UDP_BRD_PORT);
+    public GameBroadcaster(JSONObject settings) {
+        this(settings, StaticConfig.UDP_BRD_PORT);
     }
 
     /**
@@ -27,10 +30,10 @@ public class GameBroadcaster extends Thread {
         DatagramSocket dsock = new DatagramSocket();
         dsock.setBroadcast(true);
         byte[] strbuf = obj.toString().getBytes();
-        byte[] buf = new byte[header.length + strbuf.length + 1];
+        byte[] buf = new byte[header.length + strbuf.length];
         System.arraycopy(header, 0, buf, 0, header.length);
         System.arraycopy(strbuf, 0, buf, header.length, strbuf.length);
-        buf[buf.length-1] = "\n".getBytes()[0];
+        //buf[buf.length-1] = "\n".getBytes()[0];
         DatagramPacket pck = new DatagramPacket(buf, buf.length, brd_addr, port);
         dsock.send(pck);
         dsock.close();
@@ -64,11 +67,14 @@ public class GameBroadcaster extends Thread {
 
     public void run() {
         final int WAIT_TIME = 1024;
-        JSONObject obj = new JSONObject();
-        obj.put("msg", "Hello World!");
-        for (;;) {
+        boolean running;
+        synchronized (this) {
+            running = this.running;
+        }
+
+        do {
             try {
-                broadcastToAll(obj);
+                broadcastToAll(settings);
             } catch (IOException e) {
                 System.out.println("Unable to broadcast:");
                 e.printStackTrace();
@@ -79,11 +85,21 @@ public class GameBroadcaster extends Thread {
             } catch (InterruptedException e) {
                 ;
             }
+
+            synchronized (this) {
+                running = this.running;
+            }
+        } while (running);
+    }
+
+    public void done() {
+        synchronized (this) {
+            running = false;
         }
     }
 
     public static void main(String[] args) {
-        GameBroadcaster gbcast = new GameBroadcaster();
+        GameBroadcaster gbcast = new GameBroadcaster(StaticConfig.DEFAULT_GAME_OPTIONS);
         gbcast.start();
         try {
             gbcast.join();
