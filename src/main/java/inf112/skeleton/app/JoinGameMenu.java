@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 enum JoinState {
@@ -44,8 +45,14 @@ public class JoinGameMenu implements Screen, InputProcessor {
 
             case WAITING_FOR_GAME: {
                 ArrayList<GameSettings> games = game_finder.getGames();
-                for (GameSettings game : games) {
-                    ;
+                for (GameSettings game_set : games) {
+                    System.out.println("Found game: " + game_set);
+                    try {
+                        GameLoop gameloop = new GameLoop(game_set.getHost(), init_key, game.batch, game.font);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        System.out.println("Unable to connect to: " + game_set);
+                    }
                 }
             } break;
         }

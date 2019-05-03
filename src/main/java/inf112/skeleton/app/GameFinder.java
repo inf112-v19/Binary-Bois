@@ -44,6 +44,13 @@ class GameSettings {
     public String toString() {
         return String.format("<GameSettings: %s>", from_addr);
     }
+
+    public String getHost() {
+        String addr_str = from_addr.toString();
+        if (addr_str.startsWith("/"))
+            addr_str = addr_str.substring(1, addr_str.length());
+        return addr_str;
+    }
 }
 
 public class GameFinder extends Thread {

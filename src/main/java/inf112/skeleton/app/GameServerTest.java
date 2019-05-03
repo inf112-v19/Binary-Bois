@@ -13,7 +13,6 @@ import java.io.IOException;
  */
 public class GameServerTest {
     public static void main(String args[]) throws IOException, CSV.CSVError, NoSuchResource {
-
         LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
         cfg.title = "Robo Rally";
         cfg.width = 1600;
