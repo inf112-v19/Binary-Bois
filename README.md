@@ -5,13 +5,13 @@
 
 
 ## Team staff
-![alt text](resources/robot1.png)Tellev Sundt (Team Lead) 
+![alt text](resources/textures/robot01.png)Tellev Sundt (Team Lead) 
 
-![alt text](resources/robot1.png)Martin Strømme Særsten (Kundekontakt)
+![alt text](resources/textures/robot02.png)Martin Strømme Særsten (Kundekontakt)
 
-![alt text](resources/robot1.png)Lars-Eskild Jahnke
+![alt text](resources/textures/robot03.png)Lars-Eskild Jahnke
 
-![alt text](resources/robot1.png)Jonas Møller
+![alt text](resources/textures/robot04.png)Jonas Møller
 
-![alt text](resources/robot1.png)Eirik Torheim Lauritsen
+![alt text](resources/textures/robot05.png)Eirik Torheim Lauritsen
 
