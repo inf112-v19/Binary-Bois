@@ -30,7 +30,7 @@ class RoboCard implements Comparable<RoboCard> {
         this.c = c;
     }
 
-    public boolean exec(Game g, Runnable cb) {
+    public boolean exec(RoboRallyGame g, Runnable cb) {
         boolean ret = c.exec(robot, g);
         robot.addAnimationCallback(cb);
         return ret;
@@ -53,14 +53,14 @@ public class Round {
     private int dmr_idx = 0;
     private int idx = 0;
     private boolean is_done = false;
-    private Game game;
+    private RoboRallyGame roboRallyGame;
     private boolean is_animating = false;
 
     @SuppressWarnings("unchecked")
-    public Round(ArrayList<Robot> robots, ArrayList<ArrayList<Card>> hands, Game game) {
+    public Round(ArrayList<Robot> robots, ArrayList<ArrayList<Card>> hands, RoboRallyGame roboRallyGame) {
         // Assertions
 
-        this.game = game;
+        this.roboRallyGame = roboRallyGame;
         demirounds = (ArrayList<RoboCard>[]) (new ArrayList[NUM_CARDS]);
         System.out.println("Cards: " + Arrays.toString(hands.toArray()));
         for (int i = 0;  i < NUM_CARDS; i++) {
@@ -92,7 +92,7 @@ public class Round {
         }
 
         RoboCard rc = demirounds[dmr_idx].get(idx++);
-        rc.exec(game, () -> is_animating = false);
+        rc.exec(roboRallyGame, () -> is_animating = false);
 
         return true;
     }

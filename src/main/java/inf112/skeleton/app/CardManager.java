@@ -164,7 +164,7 @@ public class CardManager implements InputProcessor {
 
     public void showCards() {
         cardsScrolledBy = 0;
-        Game.addSoundFX("showCards");
+        RoboRallyGame.addSoundFX("showCards");
         Vector2Di card_pos = FIRST_CARD_POS.copy();
         float idle_t = 0.0f;
         int i = 0;
@@ -195,7 +195,7 @@ public class CardManager implements InputProcessor {
     }
 
     public void hideCards() {
-        Game.addSoundFX("hideCards");
+        RoboRallyGame.addSoundFX("hideCards");
         float idle_t = 0.0f;
         for (int i = inactive_cards.size()-1; i >= 0; i--) {
             Card c = inactive_cards.get(i);
@@ -232,13 +232,13 @@ public class CardManager implements InputProcessor {
      */
     public static ICommand getSequenceAsCommand(ArrayList<Card> seq) {
         if (seq.size() == 0)
-            return (int amount, Robot r, Game g) -> true;
+            return (int amount, Robot r, RoboRallyGame g) -> true;
 
         // Yes, this is weird, but I swear there's a good reason for using 1-length arrays here.
         ICommand cmd[] = new ICommand[1];
         int i[] = new int[1];
 
-        cmd[0] = (int amount, Robot r, Game g) -> {
+        cmd[0] = (int amount, Robot r, RoboRallyGame g) -> {
             seq.get(i[0]).exec(r, g);
             r.addAnimationCallback(() -> {
                 if (++i[0] >= seq.size())
@@ -492,7 +492,7 @@ public class CardManager implements InputProcessor {
 
                 mouse_start_drag_pos = null;
                 dragged_card = null;
-                Game.addSoundFX("snapCard");
+                RoboRallyGame.addSoundFX("snapCard");
                 if(inactive_cards.size() == numberofcards - num_active_slots && !cardsAutoHidden){
                     autoHideCards();
                 }

@@ -29,6 +29,7 @@ class MainMenu implements Screen {
     final String hostname = "localhost";
     CardManager cm;
     private Texture bg;
+    private String switch_to = null;
 
     public MainMenu(final RoboRally game) {
         this.game = game;
@@ -61,22 +62,12 @@ class MainMenu implements Screen {
         Gdx.input.setInputProcessor(mul);
 
         cm.onChange((Card[] card_arr) -> {
+            if (card_arr.length == 0)
+                return;
             Card c = card_arr[0];
             if (c == null)
                 return;
-            switch (c.getName()) {
-                case "join_game":
-                    System.out.println("JOIN GAME");
-                break;
-
-                case "ai_game":
-                    System.out.println("AI GAME");
-                break;
-
-                case "host_game":
-                    System.out.println("HOST GAME");
-                break;
-            }
+            switch_to = c.getName();
         });
     }
 
@@ -113,6 +104,25 @@ class MainMenu implements Screen {
         //    }
         //    dispose();
         //}
+
+        if (switch_to != null) {
+            switch (switch_to) {
+                case "join_game":
+                    game.setScreen(new JoinGameMenu(game));
+                    System.out.println("JOIN GAME");
+                break;
+
+                case "ai_game":
+                    System.out.println("AI GAME");
+                break;
+
+                case "host_game":
+                    game.setScreen(new HostGameSetupMenu(game));
+                    System.out.println("HOST GAME");
+                break;
+            }
+            dispose();
+        }
     }
 
     @Override

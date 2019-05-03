@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-public class Game {
+public class RoboRallyGame {
     public static final int NUM_CARDS_PER_PLAYER = 9;
 
     private int height = 0;
@@ -39,7 +39,7 @@ public class Game {
         }
     }
 
-    public Game(JSONObject settings) throws InitError, JSONException {
+    public RoboRallyGame(JSONObject settings) throws InitError, JSONException {
         ArrayList<Robot> robos = new ArrayList<>();
         JSONSpecs.game_options.check(settings);
         int[][] robots_pos = JSONTools.toIntMatrix(settings.getJSONArray("robots_pos"));
@@ -59,7 +59,7 @@ public class Game {
         init(dim.getX(), dim.getY(), robos);
     }
 
-    public Game(int width, int height, ArrayList<Robot> robots) throws InitError {
+    public RoboRallyGame(int width, int height, ArrayList<Robot> robots) throws InitError {
         init(width, height, robots);
     }
 
@@ -91,7 +91,7 @@ public class Game {
     }
 
     //Made for testing
-    public Game(int height, int width, ArrayList<Robot> robots, String empty_string) throws NoSuchResource {
+    public RoboRallyGame(int height, int width, ArrayList<Robot> robots, String empty_string) throws NoSuchResource {
         this.height = height;
         this.width = width;
         this.robots = robots;

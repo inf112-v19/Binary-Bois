@@ -59,7 +59,7 @@ class Zucc extends AZucc {
     }
 
     /**
-     * Get initial game configuration.
+     * Get initial roboRallyGame configuration.
      */
     public JSONObject getConfig() {
         return game_init_cfg;
@@ -239,7 +239,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private Sound fxPlayer;
     private Robot current_robot;
     private ArrayList<Robot> robots;
-    private Game game;
+    private RoboRallyGame roboRallyGame;
     private Round round = null;
     private GameState state = GameState.GAME_START;
     /**In seconds */
@@ -259,10 +259,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private String host;
     private String init_key;
 
-    public GameLoop(String host, String init_key, RoboRally robo_rally) throws IOException {
+    public GameLoop(String host, String init_key, SpriteBatch batch, BitmapFont font) throws IOException {
         super();
-        batch = robo_rally.batch;
-        font = robo_rally.font;
+        this.batch = batch;
+        this.font = font;
         font.setColor(Color.BLACK);
         this.host = host;
         this.init_key = init_key;
@@ -287,9 +287,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private void updatePlayer(int player_idx) {
         if (player_idx < 0 || player_idx >= num_players)
             throw new IllegalArgumentException("Illegal player-index: " + player_idx);
-        current_robot = game.getRobot(player_idx);
-        game.setActivePlayerNum(player_idx);
-        Player p = game.getActivePlayer();
+        current_robot = roboRallyGame.getRobot(player_idx);
+        roboRallyGame.setActivePlayerNum(player_idx);
+        Player p = roboRallyGame.getActivePlayer();
         setInputs(p.getCardManager().getInputProcessors());
     }
 
@@ -318,19 +318,19 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
             Vector2Di map_dim = map.getDimensions();
             System.out.println("GameMap Dimensions: " + map_dim);
-            this.game = new Game(map_dim.getX(), map_dim.getY(), robots);
-            this.game.initTextures();
+            this.roboRallyGame = new RoboRallyGame(map_dim.getX(), map_dim.getY(), robots);
+            this.roboRallyGame.initTextures();
 
             updatePlayer(local_player_idx);
 
             giveCards();
 
-            game.appendToLogBuilder("Click on the deck to show all cards");
-            game.appendToLogBuilder("Press e to run selected cards");
-            game.appendToLogBuilder("Use scrollwheel to scroll cards");
+            roboRallyGame.appendToLogBuilder("Click on the deck to show all cards");
+            roboRallyGame.appendToLogBuilder("Press e to run selected cards");
+            roboRallyGame.appendToLogBuilder("Use scrollwheel to scroll cards");
 
             // Make sure the card manager passes the card order to zucc.
-            game.getActivePlayer().getCardManager().onChange((Card[] cards_arr) -> {
+            roboRallyGame.getActivePlayer().getCardManager().onChange((Card[] cards_arr) -> {
                 ArrayList<Card> cards = new ArrayList<>();
                 for (Card c : cards_arr)
                     if (c != null)
@@ -339,13 +339,13 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             });
 
             if (StaticConfig.DEBUG && autofill_cards) {
-                game.forceActiveCards();
-                zucc.setActiveCards(game.getActivePlayer().getCardManager().getActiveCards());
+                roboRallyGame.forceActiveCards();
+                zucc.setActiveCards(roboRallyGame.getActivePlayer().getCardManager().getActiveCards());
             }
         } catch (NoSuchResource e) {
             System.out.println("Unable to load: " + e.getMessage());
             System.exit(1);
-        } catch (Game.InitError e) {
+        } catch (RoboRallyGame.InitError e) {
             System.out.println(e.getMessage());
             System.exit(1);
         } catch (IOException e) {
@@ -359,7 +359,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         if (my_cards != null) {
             for (Card c : my_cards)
                 c.initTexture();
-            game.getActivePlayer().giveDeck(my_cards, current_robot);
+            roboRallyGame.getActivePlayer().giveDeck(my_cards, current_robot);
         }
     }
 
@@ -386,16 +386,16 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         if (!vecs.isEmpty()) {
             Vector2Di to = vecs.get(0);
             Vector2Di from = current_robot.getPos();
-            ArrayList<Vector2Di> path = game.fromTo(from, to);
-            ArrayList<Card> cards = AiPlayer.chooseCards(current_robot.getDir(), path, game.getActivePlayer().getHand(), 10);
+            ArrayList<Vector2Di> path = roboRallyGame.fromTo(from, to);
+            ArrayList<Card> cards = AiPlayer.chooseCards(current_robot.getDir(), path, roboRallyGame.getActivePlayer().getHand(), 10);
             for (Card c : cards)
                 System.out.println("   " + c);
             ICommand cmd = CardManager.getSequenceAsCommand(cards);
-            cmd.exec(1, current_robot, game);
+            cmd.exec(1, current_robot, roboRallyGame);
         }
 
         // Check for sounds to play
-        for (String sound : game.checkPlaySound()) {
+        for (String sound : roboRallyGame.checkPlaySound()) {
             fxPlayer = soundNametoFile.get(sound);
             if (musicPlayer.isPlaying()) {
                 musicPlayer.setVolume(0.3f);
@@ -418,13 +418,13 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Renderable.updateAll();
 
-        if (game.getPrintLog() != null) {
+        if (roboRallyGame.getPrintLog() != null) {
             batch.begin();
-            font.draw(batch, game.getPrintLog(), 0, 750);
+            font.draw(batch, roboRallyGame.getPrintLog(), 0, 750);
             batch.end();
         }
 
-        if (Game.getWinCondition()) {
+        if (RoboRallyGame.getWinCondition()) {
             batch.begin();
             font.getData().setScale(5.0f);
             font.draw(batch, "WINNER", 400, 750);
@@ -437,7 +437,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         switch (state) {
             case GAME_START:
                 state = GameState.CHOOSING_CARDS;
-                game.appendToLogBuilder("Press Enter to submit cards");
+                roboRallyGame.appendToLogBuilder("Press Enter to submit cards");
             break;
 
             case CHOOSING_CARDS:
@@ -452,14 +452,14 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
                     System.out.println(e + " in GameLoop render(), case WAITING_FOR_ROUND_START");
                 }
                 if (round_cards != null) {
-                    round = new Round(robots, round_cards, game);
+                    round = new Round(robots, round_cards, roboRallyGame);
                     state = GameState.RUNNING_ROUND;
-                    game.appendToLogBuilder("Round starting ...");
+                    roboRallyGame.appendToLogBuilder("Round starting ...");
                 }
             break;
 
             case RUNNING_ROUND:
-                game.emptyHand(current_robot);
+                roboRallyGame.emptyHand(current_robot);
                 if (round != null && !round.doStep()) {
                     round = null;
                     state = GameState.RESPAWNING;
@@ -471,7 +471,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
                 float wait = 0.0f;
                 for (Robot r : getDeadRobots()) {
                     r.addAnimation(Animation.idle(wait += 0.5f));
-                    r.respawn(game);
+                    r.respawn(roboRallyGame);
                     last_robot = r;
                 }
 
@@ -508,7 +508,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     }
 
     private CardManager getCardManager() {
-        return game.getActivePlayer().getCardManager();
+        return roboRallyGame.getActivePlayer().getCardManager();
     }
 
     @Override
@@ -521,7 +521,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             try {
                 updatePlayer(number);
             } catch (IndexOutOfBoundsException e) {
-                game.appendToLogBuilder("No such robot");
+                roboRallyGame.appendToLogBuilder("No such robot");
             }
             return true;
         }
@@ -533,29 +533,29 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
                 ArrayList<ArrayList<Card>> active_cards = new ArrayList<>();
                 for (int i = 0; i < num_players; i++)
-                    active_cards.add(game.getPlayer(i).getCardManager().getActiveCards());
-                round = new Round(robots, active_cards, game);
+                    active_cards.add(roboRallyGame.getPlayer(i).getCardManager().getActiveCards());
+                round = new Round(robots, active_cards, roboRallyGame);
                 state = GameState.RUNNING_ROUND;
             break;
 
             case Input.Keys.DOWN:
                 if (!StaticConfig.DEBUG) break;
-                Commands.moveCommand.exec(-1, current_robot, game);
+                Commands.moveCommand.exec(-1, current_robot, roboRallyGame);
             break;
 
             case Input.Keys.UP:
                 if (!StaticConfig.DEBUG) break;
-                Commands.moveCommand.exec(1, current_robot, game);
+                Commands.moveCommand.exec(1, current_robot, roboRallyGame);
             break;
 
             case Input.Keys.RIGHT:
                 if (!StaticConfig.DEBUG) break;
-                Commands.rotateCommand.exec(-90, current_robot, game);
+                Commands.rotateCommand.exec(-90, current_robot, roboRallyGame);
             break;
 
             case Input.Keys.LEFT:
                 if (!StaticConfig.DEBUG) break;
-                Commands.rotateCommand.exec(90, current_robot, game);
+                Commands.rotateCommand.exec(90, current_robot, roboRallyGame);
             break;
 
             case Input.Keys.Y:
@@ -574,13 +574,13 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
             case Input.Keys.K:
                 if (!StaticConfig.DEBUG) break;
-                game.killRobot(current_robot);
+                roboRallyGame.killRobot(current_robot);
             break;
 
             // Execute all cards that are queued
             case Input.Keys.E:
                 if (!StaticConfig.DEBUG) break;
-                getCardManager().getSequenceAsCommand().exec(1, current_robot, game);
+                getCardManager().getSequenceAsCommand().exec(1, current_robot, roboRallyGame);
             break;
 
             case Input.Keys.Q:
@@ -593,16 +593,16 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
             case Input.Keys.L:
                 if (!StaticConfig.DEBUG) break;
-                game.shootLaser(current_robot.getPos(), current_robot.getDir());
+                roboRallyGame.shootLaser(current_robot.getPos(), current_robot.getDir());
             break;
 
             case Input.Keys.R:
                 if (!StaticConfig.DEBUG) break;
-                current_robot.respawn(game);
+                current_robot.respawn(roboRallyGame);
             break;
 
             case Input.Keys.ENTER:
-                game.appendToLogBuilder("Waiting for round start ...");
+                roboRallyGame.appendToLogBuilder("Waiting for round start ...");
                 state = GameState.WAITING_FOR_ROUND_START;
                 zucc.submitAnswer();
             break;
