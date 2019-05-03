@@ -63,9 +63,9 @@ class Zucc extends Thread {
         System.out.println("Starting Zucc.run() ...");
         for (;;) {
             try {
-                System.out.println("Waiting for command ...");
+                //System.out.println("Waiting for command ...");
                 JSONObject obj = gsock.recv();
-                System.out.println("Received command.");
+                //System.out.println("Received command.");
                 if (!JSONTools.checkSpec(obj, JSONSpecs.cmd_base))
                     throw new JSONException("Illegal JSON structure.");
                 String cmd = obj.getString("cmd");
@@ -372,7 +372,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             Vector2Di to = vecs.get(0);
             Vector2Di from = current_robot.getPos();
             ArrayList<Vector2Di> path = game.fromTo(from, to);
-            path.add(to);
             ArrayList<Card> cards = AiPlayer.chooseCards(current_robot.getDir(), path, game.getActivePlayer().getHand(), 10);
             for (Card c : cards)
                 System.out.println("   " + c);
