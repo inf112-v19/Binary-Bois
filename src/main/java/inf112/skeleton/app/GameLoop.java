@@ -429,8 +429,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             this.game = new RoboRallyGame(map_dim.getX(), map_dim.getY(), robots);
             this.game.initTextures();
 
-
-
             updatePlayer(local_player_idx);
 
             giveCards();
@@ -499,7 +497,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     }
 
     public void render (float dt) {
-        ArrayList<Vector2Di> vecs = map.getTileClicks();
+        /**ArrayList<Vector2Di> vecs = map.getTileClicks();
         if (!vecs.isEmpty()) {
             Vector2Di to = vecs.get(0);
             Vector2Di from = current_robot.getPos();
@@ -509,11 +507,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
                 System.out.println("   " + c);
             ICommand cmd = CardManager.getSequenceAsCommand(cards);
             cmd.exec(1, current_robot, game);
-        }
-
-        if (ai_game) {
-
-        }
+        }*/
 
         // Check for sounds to play
         for (String sound : game.checkPlaySound()) {

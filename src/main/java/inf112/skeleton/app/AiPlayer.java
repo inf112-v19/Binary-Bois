@@ -118,7 +118,7 @@ public class AiPlayer extends Player {
     public static Vector2Di currentDir(Vector2Di orig_dir, ArrayList<Card> chosen_cards) {
         int rotation = 0;
         for (Card c : chosen_cards) {
-            if (c.getName().equals("rotate")) {
+            if (c != null && c.getName().equals("rotate")) {
                 rotation += c.getAmount();
             }
         }
