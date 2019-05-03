@@ -41,9 +41,11 @@ public class Player {
         return name;
     }
 
-    public void giveDeck(ArrayList<Card> newHand) {
+    public void giveDeck(ArrayList<Card> newHand, Robot my_robot) {
         hand.clear();
-        hand.addAll(newHand);
+        for (int i = 0; i < my_robot.getHealth()-1; i++)
+            hand.add(newHand.get(i));
+
         System.out.println(name + " Cards: " + Arrays.toString(newHand.toArray()));
         card_man.setCards(hand);
     }

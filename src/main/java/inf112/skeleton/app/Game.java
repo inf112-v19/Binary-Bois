@@ -110,10 +110,9 @@ public class Game {
             board.set(robot, robot.getPos());
     }
 
-    public void emptyAllHands() {
-        for (Player p : players) {
-            p.getCardManager().removeAllCards();
-        }
+    public void emptyHand(Robot robot) {
+        getActivePlayer().getCardManager().removeAllCards(robot);
+        getActivePlayer().getHand().clear();
     }
 
     public ArrayList<Vector2Di> fromTo(Vector2Di from, Vector2Di to) {
@@ -132,20 +131,6 @@ public class Game {
 
     public void setActivePlayerNum(int num) {
         active_player_num = num;
-    }
-
-    /**
-     * This method was used to hand out cards on local play, it has
-     * now been superseded by getCards and GameServer.
-     * @throws CardDeck.NoMoreCards
-     */
-    @Deprecated
-    public void handOutCards() throws CardDeck.NoMoreCards {
-        for (int i = 0; i < players.size(); i++) {
-            Player p = players.get(i);
-            int robo_health = robots.get(i).getHealth();
-            p.giveDeck(deck.get(robo_health-1));
-        }
     }
 
     /**
