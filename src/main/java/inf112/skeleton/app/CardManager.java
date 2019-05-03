@@ -104,6 +104,12 @@ public class CardManager implements InputProcessor {
         this.on_change_cb = on_change_cb;
     }
 
+    public void removeAllCards() {
+        numberofcards = 0;
+        inactive_cards.clear();
+        active_cards = new Card[NUM_ACTIVE_SLOTS];
+    }
+
     public void setCards(ArrayList<Card> cards) {
         numberofcards = 0;
         inactive_cards.clear();

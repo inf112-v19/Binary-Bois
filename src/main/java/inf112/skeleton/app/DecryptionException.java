@@ -1,6 +1,6 @@
 package inf112.skeleton.app;
 
-class DecryptionException extends Exception {
+class DecryptionException extends GameSocketException {
     public DecryptionException(String msg) {
         super(msg);
     }
