@@ -348,7 +348,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     };
 
     private static final int num_players = robot_start_positions.length;   //FIXME: Only for testing purposes
-    private Music musicPlayer;
+    private Music music_player;
     private Sound fxPlayer;
     private Robot current_robot;
     private ArrayList<Robot> robots;
@@ -375,16 +375,20 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private String init_key;
     private AnimatedTexture my_robot_texture;
 
-    public GameLoop(String host, String init_key) {
+    public GameLoop(String host, String init_key, Music music_player) {
         super();
+        this.music_player = music_player;
+        music_player.setVolume(0.5f);
         this.batch = null;
         this.font = null;
         this.host = host;
         this.init_key = init_key;
     }
 
-    public GameLoop(String host, String init_key, SpriteBatch batch, BitmapFont font) {
+    public GameLoop(String host, String init_key, SpriteBatch batch, BitmapFont font, Music music_player) {
         super();
+        this.music_player = music_player;
+        music_player.setVolume(0.5f);
         this.batch = batch;
         this.font = font;
         if (font != null)
@@ -394,8 +398,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         create();
     }
 
-    public GameLoop(String host, String init_key, RoboRally robo_rally, boolean ai_game) {
+    public GameLoop(String host, String init_key, RoboRally robo_rally, Music music_player, boolean ai_game) {
         super();
+        this.music_player = music_player;
+        music_player.setVolume(0.5f);
         batch = robo_rally.batch;
         font = robo_rally.font;
         font.setColor(Color.BLACK);
@@ -528,9 +534,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         soundNametoFile.put("snapCard", Resources.getSound("snapCard.ogg"));
         soundNametoFile.put("hideCards", Resources.getSound("hideCards.ogg"));
         soundNametoFile.put("Laser", Resources.getSound("Laser.mp3"));
-        musicPlayer = Resources.getMusic("iRobot.ogg");
-        musicPlayer.setVolume(0.5f);
-        musicPlayer.setLooping(true);
     }
 
     public void render() {
@@ -553,12 +556,12 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         // Check for sounds to play
         for (String sound : game.checkPlaySound()) {
             fxPlayer = soundNametoFile.get(sound);
-            if (musicPlayer.isPlaying()) {
-                musicPlayer.setVolume(0.3f);
+            if (music_player.isPlaying()) {
+                music_player.setVolume(0.3f);
                 Timer.schedule(new Timer.Task() {
                     @Override
                     public void run() {
-                        musicPlayer.setVolume(0.5f);
+                        music_player.setVolume(0.5f);
                     }
                 }, 0.05f);
             }
@@ -631,6 +634,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
                     r.addAnimation(Animation.idle(wait += 0.5f));
                     r.respawn(game);
                     last_robot = r;
+                }
+                for (Robot robot : robots) {
+                    game.shootLaser(robot.getPos(), robot.getDir());
                 }
 
                 Runnable run = () -> {
@@ -722,13 +728,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
             case Input.Keys.Y:
                 ;
-
-            case Input.Keys.M:
-                if (!musicPlayer.isPlaying())
-                    musicPlayer.play();
-                else
-                    musicPlayer.stop();
-            break;
 
             case Input.Keys.S:
                 current_robot.addAnimation(Animation.scaleTo(current_robot, 3, 1f));

@@ -1,6 +1,7 @@
 package inf112.skeleton.app;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -21,8 +22,10 @@ public class HostGameSetupMenu implements Screen, InputProcessor {
     private final float header_text_scale = 6.0f;
     private String header_text;
     private float header_text_width;
+    Music music_player;
 
-    public HostGameSetupMenu(RoboRally game) {
+    public HostGameSetupMenu(RoboRally game, Music music_player) {
+        this.music_player = music_player;
         try {
             this.font = game.font;
             this.batch = game.batch;
@@ -108,7 +111,7 @@ public class HostGameSetupMenu implements Screen, InputProcessor {
                 GameServer server = new GameServer(player_robots.size(), config, init_key);
                 server.start();
 
-                game.setScreen(new GameLoop("localhost", init_key, batch, font));
+                game.setScreen(new GameLoop("localhost", init_key, batch, font, music_player));
                 dispose();
             } catch (IOException | NoSuchResource | CSV.CSVError e) {
                 e.printStackTrace();

@@ -1,6 +1,6 @@
 package inf112.skeleton.app;
 
-public class Flag implements IItem {
+public class Flag implements IItem, Comparable<Flag> {
 
     private int number;
     private Vector2Di pos;
@@ -17,5 +17,10 @@ public class Flag implements IItem {
     @Override
     public String getName() {
         return "Flag";
+    }
+
+    @Override
+    public int compareTo(Flag o) {
+        return this.getNumber()-o.getNumber();
     }
 }

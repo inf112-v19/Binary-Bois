@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 
 import java.io.IOException;
@@ -19,8 +20,10 @@ public class JoinGameMenu implements Screen, InputProcessor {
     private RoboRally game;
     private JoinState state = JoinState.WAITING_FOR_INPUT;
     private GameFinder game_finder;
+    Music music_player;
 
-    public JoinGameMenu(RoboRally game) {
+    public JoinGameMenu(RoboRally game, Music music_player) {
+        this.music_player = music_player;
         this.game = game;
         Gdx.input.setInputProcessor(this);
         game_finder = new GameFinder();
@@ -47,7 +50,7 @@ public class JoinGameMenu implements Screen, InputProcessor {
                 ArrayList<GameSettings> games = game_finder.getGames();
                 for (GameSettings game_set : games) {
                     System.out.println("Found game: " + game_set);
-                    game.setScreen(new GameLoop(game_set.getHost(), init_key, game.batch, game.font));
+                    game.setScreen(new GameLoop(game_set.getHost(), init_key, game.batch, game.font, music_player));
 
                 }
                 dispose();
