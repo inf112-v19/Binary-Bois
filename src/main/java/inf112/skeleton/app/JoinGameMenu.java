@@ -17,7 +17,6 @@ enum JoinState {
 public class JoinGameMenu implements Screen, InputProcessor {
     private String init_key = "";
     private RoboRally game;
-    private boolean is_done = false;
     private JoinState state = JoinState.WAITING_FOR_INPUT;
     private GameFinder game_finder;
 
@@ -48,12 +47,13 @@ public class JoinGameMenu implements Screen, InputProcessor {
                 for (GameSettings game_set : games) {
                     System.out.println("Found game: " + game_set);
                     try {
-                        GameLoop gameloop = new GameLoop(game_set.getHost(), init_key, game.batch, game.font);
+                        game.setScreen(new GameLoop(game_set.getHost(), init_key, game.batch, game.font));
                     } catch (IOException e) {
                         e.printStackTrace();
                         System.out.println("Unable to connect to: " + game_set);
                     }
                 }
+                dispose();
             } break;
         }
     }
@@ -94,8 +94,8 @@ public class JoinGameMenu implements Screen, InputProcessor {
             break;
 
             case Input.Keys.ENTER:
-                ;
-                is_done = true;
+                game_finder.start();
+                state = JoinState.WAITING_FOR_GAME;
             break;
 
             default:

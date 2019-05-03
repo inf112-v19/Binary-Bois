@@ -70,6 +70,7 @@ public class GameFinder extends Thread {
     public void run() {
         try {
             DatagramSocket ssock = new DatagramSocket(port);
+            ssock.setBroadcast(true);
             byte[] recv_data = new byte[2048];
 
             System.out.printf("Waiting for games on udp %s:%s",
