@@ -38,7 +38,9 @@ Som en del av denne leveransen skal dere legge ved en liste (og kort beskrivelse
    
     - Dersom man velger å låse inn kortene man vil bruke uten å velge noen den gitte runden krasjer spillet ved feilmelding "Krasj1"
     - Dersom man blir frakoblet fra spillet kobler man ikke til igjen.
-    - 
+    - Innimellom kan det oppstå bugs med kortene. Dett innebærer blant annet at de bruker
+      en del tid på å vises. 
+    - Kan kjøre kortene når man har lagt dem i "slots" med e, men kan ikke locke dem inn med enter for å kjøre en runde.
 
 Dere må dokumentere hvordan prosjektet bygger, testes og kjøres, slik at det er lett å teste koden. Under vurdering kommer koden også til å brukertestes. 
 
