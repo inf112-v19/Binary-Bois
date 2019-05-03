@@ -20,6 +20,8 @@ public class GameServerTest {
         cfg.title = "Robo Rally";
         cfg.width = 1600;
         cfg.height = 900;
+        cfg.resizable = false;
+        cfg.fullscreen = false;
         new LwjglApplication(new RoboRally(), cfg);
     }
 }
