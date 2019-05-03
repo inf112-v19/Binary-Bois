@@ -24,10 +24,19 @@ enum ZuckerState {
     LISTENER
 }
 
+abstract class AZucc extends Thread {
+    public abstract ArrayList<Card> getCards() throws NoSuchResource;
+    public abstract ArrayList<ArrayList<Card>> getRoundCards();
+    public abstract void setActiveCards(ArrayList<Card> active_cards);
+    public abstract void submitAnswer();
+    public abstract void setUpState(boolean up_state);
+    public abstract JSONObject getConfig();
+}
+
 /**
  * Zucc sucks in commands from the server and handles them.
  */
-class Zucc extends Thread {
+class Zucc extends AZucc {
     private GameSocket gsock;
     private ArrayList<JSONArray> cards_json = new ArrayList<>();
     private JSONArray cards_answer = new JSONArray();
@@ -245,7 +254,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private GameSocket gsock;
     private int local_player_idx = 0;
 
-    private Zucc zucc;
+    private AZucc zucc;
     private boolean autofill_cards = false;
     private String host;
     private String init_key;
