@@ -27,8 +27,10 @@ public class Player {
     }
 
     public void registerFlag(Flag flag) {
-        if (flags.isEmpty() && flag.getNumber() == 1) {
-            flags.add(flag);
+
+        if (flags.isEmpty()) {
+            if (flag.getNumber() == 1)
+                flags.add(flag);
             return;
         }
 

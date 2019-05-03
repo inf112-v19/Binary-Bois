@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.function.Consumer;
@@ -136,6 +137,7 @@ public class CardManager implements InputProcessor {
 
         inactive_cards.clear();
         inactive_cards.addAll(cards);
+        System.out.println("Set cards: " + Arrays.toString(cards.toArray()));
         for (Card c : cards)
             c.setDrawPos(start_pos.tof());
     }
@@ -499,10 +501,6 @@ public class CardManager implements InputProcessor {
 
     public void render(SpriteBatch batch) {
         Vector2Di bg_sz = new Vector2Di(Gdx.graphics.getWidth(), card_h + 20);
-        //shape_renderer.begin(ShapeRenderer.ShapeType.Filled);
-        //shape_renderer.setColor(bgcolor);
-        //shape_renderer.rect(0, 0, bg_sz.getX(), bg_sz.getY());
-        //shape_renderer.end();
 
         batch.begin();
         if (draw_deck)
@@ -520,20 +518,14 @@ public class CardManager implements InputProcessor {
                 c.render(batch, 1);
         }
 
-        for (int i = inactive_cards.size()-1; i >= 0; i--)
+        for (int i = inactive_cards.size()-1; i >= 0; i--) {
             inactive_cards.get(i).render(batch, 1);
+        }
         batch.end();
 
         stage.draw();
 
         batch.begin();
-        // Card slot rendering TODOs:
-        // TODO: Something should probably be drawn behind and between the slots.
-        // TODO: Draw different lights:
-        //       none: No card.
-        //       blue: executing card (light is blue for as long as the robot animation lasts)
-        //       green: card ready.
-        //       red flash: card execution aborted mid-way (ran into wall, hole etc.)
 
         Vector2Di slot_pos = FIRST_SLOT_POS.copy();
         for (int i = 0; i < num_active_slots; i++) {
