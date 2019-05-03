@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -31,9 +32,11 @@ class MainMenu implements Screen {
     CardManager cm;
     private Texture bg;
     private String switch_to = null;
+    Music music_player;
 
-    public MainMenu(final RoboRally game) {
+    public MainMenu(final RoboRally game, Music music_player) {
         this.game = game;
+        this.music_player = music_player;
         try {
             this.cm = new CardManager(card_sz, false, 1);
         } catch (NoSuchResource e) {
@@ -110,18 +113,18 @@ class MainMenu implements Screen {
         if (switch_to != null) {
             switch (switch_to) {
                 case "join_game":
-                    game.setScreen(new JoinGameMenu(game));
+                    game.setScreen(new JoinGameMenu(game, music_player));
                     System.out.println("JOIN GAME");
                 break;
 
                 case "ai_game":
                     System.out.println("AI GAME");
-                    game.setScreen(new GameLoop(hostname, init_key, game, true));
+                    game.setScreen(new GameLoop(hostname, init_key, game, music_player, true));
 
                 break;
 
                 case "host_game":
-                    game.setScreen(new HostGameSetupMenu(game));
+                    game.setScreen(new HostGameSetupMenu(game, music_player));
                     System.out.println("HOST GAME");
                 break;
             }
