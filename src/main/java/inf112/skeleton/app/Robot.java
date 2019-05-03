@@ -93,7 +93,7 @@ public class Robot extends Renderable implements IItem {
      *
      * @param game The board in which the robot exists.
      */
-    public void respawn(Game game) {
+    public void respawn(RoboRallyGame game) {
         health = MAX_HEALTH;
         Vector2Di backupPos = getArchiveMarkerPos();
         game.setOnBoard(this, backupPos);

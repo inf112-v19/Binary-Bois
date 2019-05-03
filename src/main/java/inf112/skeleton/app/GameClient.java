@@ -8,7 +8,7 @@ public class GameClient {
     GameSocket gsock;
     JSONObject game_conf;
 
-    public GameClient(String hostname, String init_key) throws DecryptionException, IOException, GameSocketException {
+    public GameClient(String hostname, String init_key) throws IOException {
         gsock = new GameSocket(hostname, init_key);
         game_conf = gsock.recv();
     }

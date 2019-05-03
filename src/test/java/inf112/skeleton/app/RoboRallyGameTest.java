@@ -6,16 +6,16 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class GameTest {
+public class RoboRallyGameTest {
 
-    private Game game;
+    private RoboRallyGame game;
 
     @Test
     public void robotDoesNotGoThroughWall() throws NoSuchResource{
         ArrayList<Robot> robots = new ArrayList<>();
         Robot robot = new Robot(0,0);
         robots.add(robot);
-        game = new Game(5, 5, robots, "TEST GAME");
+        game = new RoboRallyGame(5, 5, robots, "TEST GAME");
         Wall fullWall = new Wall(new Vector2Di(1, 0),
                 new Vector2Di(-1, 0),
                 new Vector2Di(0, 1),

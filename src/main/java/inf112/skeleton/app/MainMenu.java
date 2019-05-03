@@ -73,7 +73,7 @@ class MainMenu implements Screen {
                 case "ai_game":
                     System.out.println("AI GAME");
                     try {
-                        game.setScreen(new GameLoop(hostname, init_key, game));
+                        game.setScreen(new GameLoop(hostname, init_key, game, true));
                     } catch (IOException e) {
                         System.out.println(e + "caught in MainMenu, case ai_game");
                     }

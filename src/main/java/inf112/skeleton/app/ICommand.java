@@ -3,7 +3,7 @@ package inf112.skeleton.app;
 /**
  * Lambda function interface for actions that are performed on robots/games
  * Use like any other Lambda function interface:
- *   ICommand cmd = (int amount, Robot robot, Game game) -> robot.doThing(amount);
+ *   ICommand cmd = (int amount, Robot robot, RoboRallyGame game) -> robot.doThing(amount);
  */
 public interface ICommand {
     /**
@@ -14,5 +14,5 @@ public interface ICommand {
      * @param game The game to act upon.
      * @return Whether or not the command succeeded fully.
      */
-    boolean exec(int amount, Robot robot, Game game);
+    boolean exec(int amount, Robot robot, RoboRallyGame game);
 }
