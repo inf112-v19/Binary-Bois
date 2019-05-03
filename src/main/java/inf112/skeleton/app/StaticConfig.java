@@ -18,9 +18,9 @@ public class StaticConfig {
 
     private static int[][] DEFAULT_ROBOTS_POS = {
             {6, 6},
-            {6, 7},
-            {6, 8},
-            {6, 9}
+            //{6, 7},
+            //{6, 8},
+            //{6, 9}
     };
 
     private static int[][] DEFAULT_FLAGS_POS = {
@@ -51,7 +51,7 @@ public class StaticConfig {
     public static final JSONObject DEFAULT_GAME_OPTIONS = new JSONObject();
     static {
         DEFAULT_GAME_OPTIONS.put("version", StaticConfig.VERSION);
-        DEFAULT_GAME_OPTIONS.put("num_players", 3);
+        DEFAULT_GAME_OPTIONS.put("num_players", DEFAULT_ROBOTS_POS.length);
         DEFAULT_GAME_OPTIONS.put("choosing_cards_time", 45);
         DEFAULT_GAME_OPTIONS.put("num_starting_cards", 9);
         DEFAULT_GAME_OPTIONS.put("map", "map2.tmx");

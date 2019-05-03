@@ -24,6 +24,7 @@ class ClientHandler extends Thread {
     private GameServer gserv;
     private GameState state = GameState.CHOOSING_CARDS;
     private JSONObject round_cmd = null;
+    private ArrayList<Card> cards_to_give = null;
 
     public ClientHandler(GameServer gserv, GameSocket gsock) {
         this.gsock = gsock;
@@ -60,6 +61,14 @@ class ClientHandler extends Thread {
                         case RUNNING_ROUND: {
                             JSONObject ret = gsock.recv();
                             System.out.println(ret);
+                            JSONObject cmd = new JSONObject();
+                            cmd.put("cmd", "new_cards");
+                            cmd.put("reason", "new round");
+                            JSONArray cards_jarr = new JSONArray();
+                            for (Card c : cards_to_give)
+                                cards_jarr.put(c.asJSON());
+                            cmd.put("cards", cards_jarr);
+                            gsock.send(cmd);
                             state = GameState.CHOOSING_CARDS;
                         } break;
 
@@ -89,12 +98,13 @@ class ClientHandler extends Thread {
         return selected_cards;
     }
 
-    public void runRound(JSONObject round_cmd) {
+    public void runRound(JSONObject round_cmd, ArrayList<Card> cards) {
         synchronized (this) {
             cards_are_final = false;
             selected_cards = null;
             state = GameState.STARTING_ROUND;
             this.round_cmd = round_cmd;
+            cards_to_give = cards;
         }
     }
 }
@@ -216,8 +226,23 @@ public class GameServer extends Thread {
                     round_obj.put("cmd", "run_round");
                     round_obj.put("player_cards", pl_cards);
 
-                    for (ClientHandler handler : client_handlers)
-                        handler.runRound(round_obj);
+                    for (ClientHandler handler : client_handlers) {
+                        ArrayList<Card> cards = null;
+                        try {
+                            cards = deck.get(9);
+                        } catch (CardDeck.NoMoreCards e) {
+                            deck.restore();
+                            deck.shuffle();
+                            try {
+                                cards = deck.get(9);
+                            } catch (CardDeck.NoMoreCards e2) {
+                                SystemPanic.panic("Could not restore cards");
+                            }
+                        }
+                        handler.runRound(round_obj, cards);
+                    }
+
+
                 break;
             }
 

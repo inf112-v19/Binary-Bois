@@ -124,10 +124,12 @@ public class CardManager implements InputProcessor {
         if (robot.getHealth() < 6)
             numberofcards = 6 - robot.getHealth(); //He has some cards locked in place
 
-        int top = robot.getHealth() - 6;
-        top = (top < 0) ? -top : num_active_slots;
-        for (int i = 0; i < top; i++)
-            active_cards[i] = null;
+        //int top = robot.getHealth() - 6;
+        //top = (top < 0) ? -top : num_active_slots;
+        //for (int i = 0; i < top; i++)
+        //    active_cards[i] = null;
+
+        stage.clear();
     }
 
     public void setCards(ArrayList<Card> cards) {
@@ -493,9 +495,9 @@ public class CardManager implements InputProcessor {
                 mouse_start_drag_pos = null;
                 dragged_card = null;
                 RoboRallyGame.addSoundFX("snapCard");
-                if(inactive_cards.size() == numberofcards - num_active_slots && !cardsAutoHidden){
+                /*if (inactive_cards.size() == numberofcards - num_active_slots && !cardsAutoHidden){
                     autoHideCards();
-                }
+                }*/
             }
         };
 

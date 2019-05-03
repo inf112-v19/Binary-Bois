@@ -322,11 +322,20 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private String host;
     private String init_key;
 
+    public GameLoop(String host, String init_key) throws IOException {
+        super();
+        this.batch = null;
+        this.font = null;
+        this.host = host;
+        this.init_key = init_key;
+    }
+
     public GameLoop(String host, String init_key, SpriteBatch batch, BitmapFont font) throws IOException {
         super();
         this.batch = batch;
         this.font = font;
-        font.setColor(Color.BLACK);
+        if (font != null)
+            font.setColor(Color.BLACK);
         this.host = host;
         this.init_key = init_key;
         create();
@@ -370,6 +379,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     public void create () {
         robots = new ArrayList<>();
         try {
+            if (batch == null) batch = new SpriteBatch();
+            if (font == null)  font = new BitmapFont();
+
             if (ai_game) {
                 zucc = new AiZucc(game);
             } else {
@@ -439,6 +451,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         if (my_cards != null) {
             for (Card c : my_cards)
                 c.initTexture();
+            game.getActivePlayer().getCardManager().removeAllCards(current_robot);
             game.getActivePlayer().giveDeck(my_cards, current_robot);
         }
     }
@@ -460,7 +473,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         musicPlayer.setLooping(true);
     }
 
-    @Override
+    public void render() {
+        render(0.0f);
+    }
+
     public void render (float dt) {
         ArrayList<Vector2Di> vecs = map.getTileClicks();
         if (!vecs.isEmpty()) {
@@ -518,6 +534,12 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
         map.render();
 
+        try {
+            giveCards();
+        } catch (NoSuchResource e) {
+            System.out.println(e + " in GameLoop render(), case WAITING_FOR_ROUND_START");
+        }
+
         switch (state) {
             case GAME_START:
                 state = GameState.CHOOSING_CARDS;
@@ -530,11 +552,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
             case WAITING_FOR_ROUND_START:
                 ArrayList<ArrayList<Card>> round_cards = zucc.getRoundCards();
-                try {
-                    giveCards();
-                } catch (NoSuchResource e) {
-                    System.out.println(e + " in GameLoop render(), case WAITING_FOR_ROUND_START");
-                }
                 if (round_cards != null) {
                     round = new Round(robots, round_cards, game);
                     state = GameState.RUNNING_ROUND;
