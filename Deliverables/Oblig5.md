@@ -13,25 +13,20 @@ Gruppen har lært at god arbeidsflyt, løpende dialog og møte opp til avtaler e
 
 Liste over implementerte krav: 
 
-Man må kunne spille en komplett runde   JA
-Man må kunne vinne spillet spillet ved å besøke siste flagg (fullføre et spill)   JA
-Det skal være lasere på brettet   JA
-Det skal være hull på brettet  JA
-Skademekanismer (spilleren får færre kort ved skade) NEI  
-Spillmekanismer for å skyte andre spillere innen rekkevidde med laser som peker rett frem  JA
-Fungerende samlebånd på brettet som flytter robotene   JA
-Fungerende gyroer på brettet som flytter robotene   JA
-Game over etter 3 tapte liv   JA
-Multiplayer over LAN eller Internet   JA
-Feilhåndtering ved disconnect. (Spillet skal i hvertfall ikke kræsje)   NEI
-Power down NEI  
-Samlebånd som går i dobbelt tempo   JA
-Spille mot AI (single-player-mode), evt spill mot random-roboter  JA
-
-
-
-
-
+Man må kunne spille en komplett runde   JA  
+Man må kunne vinne spillet spillet ved å besøke siste flagg (fullføre et spill)   JA  
+Det skal være lasere på brettet   JA  
+Det skal være hull på brettet  JA  
+Skademekanismer (spilleren får færre kort ved skade) NEI    
+Spillmekanismer for å skyte andre spillere innen rekkevidde med laser som peker rett frem  JA  
+Fungerende samlebånd på brettet som flytter robotene   JA  
+Fungerende gyroer på brettet som flytter robotene   JA  
+Game over etter 3 tapte liv   JA  
+Multiplayer over LAN eller Internet   JA  
+Feilhåndtering ved disconnect. (Spillet skal i hvertfall ikke kræsje)   NEI  
+Power down NEI    
+Samlebånd som går i dobbelt tempo   JA  
+Spille mot AI (single-player-mode), evt spill mot random-roboter  JA  
 
 
 
