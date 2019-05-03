@@ -22,9 +22,15 @@ class MainMenu implements Screen {
     final RoboRally game;
     OrthographicCamera camera;
     final String hostname = "localhost";
+    CardManager cm;
 
     public MainMenu(final RoboRally game) {
         this.game = game;
+        try {
+            this.cm = new CardManager();
+        } catch (NoSuchResource e) {
+            System.out.println(e + "caught in MainMenu constructor");
+        }
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1600, 900);
@@ -44,9 +50,13 @@ class MainMenu implements Screen {
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-        game.font.draw(game.batch, "RoboRally!!! ", 100, 150);
+        game.font.getData().setScale(6.0f);
+        game.font.draw(game.batch, "RoboRally ", Gdx.graphics.getWidth()/2-200, Gdx.graphics.getHeight()/2+400);
+        game.font.getData().setScale(1);
         game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
         game.batch.end();
+
+        cm.menuRender(game.batch);
 
         if (Gdx.input.isTouched()) {
             try {
