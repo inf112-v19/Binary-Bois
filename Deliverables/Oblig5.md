@@ -35,11 +35,24 @@ Spille mot AI (single-player-mode), evt spill mot random-roboter
 
 
 Som en del av denne leveransen skal dere legge ved en liste (og kort beskrivelse?) over kjente feil og svakheter i produktet. 
+   
+    - Dersom man velger å låse inn kortene man vil bruke uten å velge noen den gitte runden krasjer spillet ved feilmelding "Krasj1"
 
 Dere må dokumentere hvordan prosjektet bygger, testes og kjøres, slik at det er lett å teste koden. Under vurdering kommer koden også til å brukertestes. 
 
+    - Gjennom prosjektet har vi brukt ulike måter å teste produktet på,
+      dette innebærer både Junit tester og manuell testing. 
+      
+      Manuell testing har blitt brukt for å sjekke etter eventuelle bugs som oppstår ved fremtvunget adferd av spiller. Ved hjelp av dette har vi funnet bugs som ikke oppstod ved normal spilling. Dette var i hovedsak ting som oppstod ved “spamming” av enkelte kommandoer og hyppige gjentakelser av enkelte handlinger.
+      
+      Junit testene våres går på mer “tekniske” løsninger, slik som multiplayer, at commands utfører de riktige handlingene og at vegger fungerer som de skal blant annet.
+
 Dokumentér også hvordan testene skal kjøres. 
+    
+    - Testene kjøres som Junit tester og kan kjøres individuelt. Resultatene fra kjøring av enkelte tester er dokumentert med screenshots i Deliverables mappen.
+
 
 Kodekvalitet og testdekning vektlegges. Merk at testene dere skriver skal brukes i produktet. 
 
-Legg også ved et klassediagram som viser de viktige delene av koden. Tilpass klassediagrammet slik at det gir leseren mest mulig informasjon (feks Intellij kan tilpasse klassediagram som genereres). Hvis dere
+Legg også ved et klassediagram som viser de viktige delene av koden. Tilpass klassediagrammet slik at det gir leseren mest mulig informasjon (feks Intellij kan tilpasse klassediagram som genereres).
+    - Klassediagrammet ligger ved i "Deliverables" folderen i prosjektet. 

@@ -343,6 +343,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private boolean autofill_cards = false;
     private String host;
     private String init_key;
+    private AnimatedTexture my_robot_texture;
 
     public GameLoop(String host, String init_key, Music music_player) {
         super();
@@ -412,12 +413,17 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
             if (ai_game) {
                 zucc = new AiZucc(game);
+                local_player_idx = 0;
             } else {
                 gsock = new GameSocket(host, init_key);
                 zucc = new Zucc(gsock);
                 zucc.start();
                 local_player_idx = zucc.getConfig().getInt("idx");
             }
+
+            my_robot_texture = new AnimatedTexture("textures/thicc_robot0" + (local_player_idx+1) + ".png");
+            my_robot_texture.setDrawPos(new Vector2Df(-400, 200));
+            my_robot_texture.addAnimation(new Animation(new Vector2Df(2000, 0), 360, 0, 3));
 
             addSounds();
 
@@ -621,6 +627,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         }
 
         // TODO: The UI will be drawn here later.
+
+        batch.begin();
+        my_robot_texture.render(batch, 1);
+        batch.end();
     }
 
     private ArrayList<Robot> getDeadRobots() {
