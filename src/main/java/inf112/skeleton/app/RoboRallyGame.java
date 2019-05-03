@@ -223,7 +223,7 @@ public class RoboRallyGame {
                 robot.setArchiveMarker(newpos);
                 Player robotOwner = robotsToPlayers.get(robot);
 
-                //Keeping tack of which flags the player has visited so far
+                //Keeping track of which flags the player has visited so far
                 robotOwner.registerFlag((Flag)item);
 
                 //ArrayList of all Flag IItems that are on the map

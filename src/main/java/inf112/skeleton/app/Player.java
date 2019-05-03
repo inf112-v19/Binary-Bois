@@ -27,10 +27,13 @@ public class Player {
     }
 
     public void registerFlag(Flag flag) {
-        if (!flags.contains(flag)) {
+        if (flags.isEmpty() && flag.getNumber() == 1)
             flags.add(flag);
-            System.out.println("Flag " + flag.getNumber() + " registered by " + name);
-        }
+
+        //Only add flags with one index higher
+        if (!flags.contains(flag) && flags.get(flags.size()-1).getNumber() == flag.getNumber()-1)
+            flags.add(flag);
+
     }
 
     public ArrayList<Flag> getFlags() {
