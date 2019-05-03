@@ -104,6 +104,12 @@ public class CardManager implements InputProcessor {
         this.on_change_cb = on_change_cb;
     }
 
+    public void removeAllCards() {
+        numberofcards = 0;
+        inactive_cards.clear();
+        active_cards = new Card[NUM_ACTIVE_SLOTS];
+    }
+
     public void setCards(ArrayList<Card> cards) {
         numberofcards = 0;
         inactive_cards.clear();
@@ -480,6 +486,16 @@ public class CardManager implements InputProcessor {
 
     }
 
+    public void menuRender(SpriteBatch batch) {
+        batch.begin();
+        Vector2Di slot_pos = FIRST_SLOT_POS.copy();
+        batch.draw(slot_back, (Gdx.graphics.getWidth()-slot_back.getWidth())/2, slot_pos.getY());
+        batch.draw(slot_front, (Gdx.graphics.getWidth()-slot_front.getWidth())/2, slot_pos.getY());
+        batch.end();
+
+        stage.draw();
+    }
+
     public void render(SpriteBatch batch) {
         Vector2Di bg_sz = new Vector2Di(Gdx.graphics.getWidth(), card_h + 20);
         shape_renderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -648,7 +664,6 @@ public class CardManager implements InputProcessor {
         }
         cardsAutoHidden = false;
     }
-
 
 
     @Override

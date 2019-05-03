@@ -2,12 +2,12 @@ package inf112.skeleton.app;
 
 import java.util.Vector;
 
-public class GameLog {
+public class Log {
     private long start_time;
     private Vector<LogItem> logs;
     private int max_len;
 
-    public GameLog(int max_len) {
+    public Log(int max_len) {
         this.max_len = max_len;
         start_time = System.currentTimeMillis();
         logs = new Vector<>();

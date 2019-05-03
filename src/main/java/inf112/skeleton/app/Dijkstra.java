@@ -97,12 +97,9 @@ public class Dijkstra {
         nodes = new ArrayList();
         for (int i = 0; i < height*width; i++)
             nodes.add(new Node(i));
-        //System.out.println("digraph {");
-        // Adds all edges between vertices
         outer: for (int y = 0; y < width; y++) {
             for (int x = 0; x < height; x++) {
                 int pos = x + y*width;
-                //System.out.println("a" + pos + "[label=\"(" + x + ", " + y + ")\"];");
                 int conn = isConnected(new Vector2Di(x, y), new Vector2Di(0, 1));
                 if (conn > -1)
                     nodes.get(pos).add(nodes.get(pos + width), conn);
@@ -118,15 +115,8 @@ public class Dijkstra {
                 conn = isConnected(new Vector2Di(x, y), new Vector2Di(-1, 0));
                 if (conn > -1)
                     nodes.get(pos).add(nodes.get(pos - 1), conn);
-
             }
         }
-
-
-        //for (Node n : nodes) {
-        //    n.printNeighbours();
-        //}
-        //System.out.println("}");
     }
 
     public ArrayList<Node> calculateShortestPathFromSource(Vector2Di sourceVec) {

@@ -3,12 +3,11 @@ package inf112.skeleton.app;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Array;
+import java.net.*;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -65,7 +64,7 @@ class ClientHandler extends Thread {
                         default:
                     }
                 }
-            } catch (IOException | GameSocketException | DecryptionException e) {
+            } catch (IOException e) {
                 // TODO: FIXME: Handle reconnect.
                 //System.out.println("Possibly lost connection to client: " + e);
             } catch (NoSuchResource e) {
@@ -133,13 +132,6 @@ public class GameServer extends Thread {
         this.init_key = init_key;
     }
 
-    /**
-     * UDP broadcast so that potential players can find this
-     * server.
-     */
-    public void broadcast() {
-    }
-
     // TODO: FIXME: Handle reconnects.
     public void listen() {
         System.out.println("Listening for connections ...");
@@ -167,13 +159,13 @@ public class GameServer extends Thread {
                 client_handlers[idx_count].start();
 
                 idx_count++;
-            } catch (IOException e) {
-                System.out.println("ERROR: Unable to accept socket connection: " + e);
             } catch (DecryptionException e) {
                 System.out.println("WARNING: Connected with wrong key");
             } catch (GameSocketException e) {
                 System.out.println("WARNING: Possible version mismatch between server and client.");
-            } catch (CardDeck.NoMoreCards e) {
+            } catch (IOException e) {
+                System.out.println("ERROR: Unable to accept socket connection: " + e);
+            }  catch (CardDeck.NoMoreCards e) {
                 System.out.println("ERROR: Unable to retrieve cards");
             }
 

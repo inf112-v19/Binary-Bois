@@ -2,7 +2,6 @@ package inf112.skeleton.app;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -13,7 +12,7 @@ import java.io.IOException;
  * options and has a static init_key
  */
 public class GameServerTest {
-    public static void main(String args[]) throws IOException, CSV.CSVError, DecryptionException, GameSocketException, NoSuchResource {
+    public static void main(String args[]) throws IOException, CSV.CSVError, NoSuchResource {
         final String init_key = "abc123";
         GameServer server = new GameServer(1, StaticConfig.DEFAULT_GAME_OPTIONS, init_key);
         server.start();
@@ -21,6 +20,6 @@ public class GameServerTest {
         cfg.title = "Robo Rally";
         cfg.width = 1600;
         cfg.height = 900;
-        new LwjglApplication(new GameLoop("localhost", init_key), cfg);
+        new LwjglApplication(new RoboRally(), cfg);
     }
 }

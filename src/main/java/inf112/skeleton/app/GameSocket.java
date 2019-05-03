@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-class GameSocketException extends Exception {
+class GameSocketException extends IOException {
     public GameSocketException(String msg) {
         super(msg);
     }
@@ -182,7 +182,7 @@ public class GameSocket {
                 //sock_out.write("\n");
                 //sock_out.flush();
                 break;
-            } catch (IOException | DecryptionException | GameSocketException e) {
+            } catch (IOException e) {
                 System.out.println("GameSocket.recv() ERROR: " + e);
                 if (i + 1 == MAX_RECV_ATTEMPTS)
                     throw e;
