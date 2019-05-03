@@ -176,7 +176,7 @@ public class GameSocket {
                     throw new GameSocketException("sock_in.readLine() returned null.");
                 CryptoMessage msg_enc = CryptoMessage.fromJSON(line);
                 resp = new JSONObject(msg_enc.decrypt(key));
-                System.out.println("recv(): " + resp);
+                //System.out.println("recv(): " + resp);
                 //CryptoMessage reply_enc = new CryptoMessage(key, "{\"status\": \"OK\"}");
                 //sock_out.write(reply_enc.asJSON());
                 //sock_out.write("\n");

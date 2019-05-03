@@ -58,13 +58,6 @@ public class AiPlayer extends Player {
         for (Card c : optimal) {
             int goof = rnd.nextInt(difficulty);
 
-            if (chosen_cards.size() >= CardManager.NUM_ACTIVE_SLOTS) {
-                while (chosen_cards.size() > CardManager.NUM_ACTIVE_SLOTS) {
-                    chosen_cards.remove(chosen_cards.size()-1);
-                }
-                return chosen_cards;
-            }
-
             if (c.getName().equals("rotate")) {
                 if (goof == 0 && difficulty != 10) {
                     System.out.println("Goofed!");
@@ -75,6 +68,7 @@ public class AiPlayer extends Player {
                 }
                 ArrayList<Card> found_rotation = findMatchingCards(c.getAmount(), left_in_hand, "rotate");
                 if (found_rotation.isEmpty()) {
+                    System.out.println("Found no rotation cards");
                     Vector2Di dir = currentDir(orig_dir, chosen_cards);
                     Card filler = fillIn(left_in_hand, dir, path.get(path_num), path.get(path.size()-1));
                     chosen_cards.add(filler);
@@ -95,6 +89,7 @@ public class AiPlayer extends Player {
                 }
                 ArrayList<Card> found_move = findMatchingCards(c.getAmount(), left_in_hand, "move");
                 if (found_move.isEmpty()) {
+                    System.out.println("Found no move cards");
                     Vector2Di dir = currentDir(orig_dir, chosen_cards);
                     Card filler = fillIn(left_in_hand, dir, path.get(path_num), path.get(path.size()-1));
                     chosen_cards.add(filler);
@@ -103,6 +98,12 @@ public class AiPlayer extends Player {
                 }
                 chosen_cards.addAll(found_move);
                 left_in_hand.removeAll(found_move);
+            }
+            if (chosen_cards.size() >= CardManager.NUM_ACTIVE_SLOTS) {
+                while (chosen_cards.size() > CardManager.NUM_ACTIVE_SLOTS) {
+                    chosen_cards.remove(chosen_cards.size()-1);
+                }
+                return chosen_cards;
             }
         }
         while (chosen_cards.size() < 5) {
@@ -162,7 +163,7 @@ public class AiPlayer extends Player {
                 total_move_power += c.getAmount();
             }
 
-        if (total_move_power < amount)
+        if (total_move_power < amount && type.equals("move"))
             return only_of_type;
 
         ArrayList<Card> correct = new ArrayList<>();
