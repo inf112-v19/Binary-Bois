@@ -65,8 +65,35 @@ public class GameBroadcaster extends Thread {
         return brd_addrs;
     }
 
+    /**
+     * This is a dumb broadcast method that sends packets to every address on the subnet.
+     *
+     * This allows us to play the game on Høytek and other networks that might not
+     * allow UDP broadcasts.
+     */
+    public void epicHighTechWorkaround(JSONObject obj, int wait_time) {
+        int err = 0;
+        for (int i = 0; i <= 8192; i++) {
+            byte[] addr = {10, 113, 0, 0};
+            addr[2] = (byte) Math.abs((i & 0xff00) >> 8);
+            addr[3] = (byte) Math.abs(i & 0xff);
+            try {
+                broadcastTo(obj, InetAddress.getByAddress(addr));
+            } catch (IOException e) {
+                err++;
+            }
+            try {
+                Thread.sleep(wait_time);
+            } catch (InterruptedException e) {
+                ;
+            }
+        }
+        System.out.println("DUN: " + err);
+    }
+
     public void run() {
         final int WAIT_TIME = 1024;
+        int htek_wait_time = 3;
         boolean running;
         synchronized (this) {
             running = this.running;
@@ -75,8 +102,17 @@ public class GameBroadcaster extends Thread {
         do {
             try {
                 broadcastToAll(settings);
+                epicHighTechWorkaround(settings, htek_wait_time++);
             } catch (IOException e) {
                 System.out.println("Unable to broadcast:");
+                e.printStackTrace();
+            }
+
+            if (htek_wait_time == 32)
+                htek_wait_time = 3;
+            try {
+                broadcastTo(settings, InetAddress.getByName("10.113.22.168"));
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 

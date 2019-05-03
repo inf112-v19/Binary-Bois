@@ -105,7 +105,7 @@ public class HostGameSetupMenu implements Screen, InputProcessor {
                 config.put("num_starting_cards", StaticConfig.DEFAULT_GAME_OPTIONS.get("num_starting_cards"));
                 config.put("choosing_cards_time",  StaticConfig.DEFAULT_GAME_OPTIONS.get("choosing_cards_time"));
 
-                GameServer server = new GameServer(1, config, init_key);
+                GameServer server = new GameServer(player_robots.size(), config, init_key);
                 server.start();
 
                 game.setScreen(new GameLoop("localhost", init_key, batch, font));

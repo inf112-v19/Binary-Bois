@@ -13,12 +13,14 @@ import java.io.IOException;
  */
 public class GameServerTest {
     public static void main(String args[]) throws IOException, CSV.CSVError, NoSuchResource {
+        GameServer serv = new GameServer(1, StaticConfig.DEFAULT_GAME_OPTIONS, "abc123");
+        serv.start();
         LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
         cfg.title = "Robo Rally";
         cfg.width = 1600;
         cfg.height = 900;
         cfg.resizable = false;
         cfg.fullscreen = false;
-        new LwjglApplication(new RoboRally(), cfg);
+        new LwjglApplication(new GameLoop("localhost", "abc123"), cfg);
     }
 }

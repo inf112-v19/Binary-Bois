@@ -39,6 +39,7 @@ public class JoinGameMenu implements Screen, InputProcessor {
                 game.batch.begin();
                 game.font.getData().setScale(3.0f);
                 game.font.draw(game.batch, "Game code: " + init_key, 0, Gdx.graphics.getHeight()/2);
+                game.font.getData().setScale(1.0f);
                 game.batch.end();
             } break;
 
