@@ -47,12 +47,8 @@ public class JoinGameMenu implements Screen, InputProcessor {
                 ArrayList<GameSettings> games = game_finder.getGames();
                 for (GameSettings game_set : games) {
                     System.out.println("Found game: " + game_set);
-                    try {
-                        game.setScreen(new GameLoop(game_set.getHost(), init_key, game.batch, game.font));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        System.out.println("Unable to connect to: " + game_set);
-                    }
+                    game.setScreen(new GameLoop(game_set.getHost(), init_key, game.batch, game.font));
+
                 }
                 dispose();
             } break;
