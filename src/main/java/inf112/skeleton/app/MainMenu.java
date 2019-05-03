@@ -1,6 +1,8 @@
 package inf112.skeleton.app;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -52,6 +54,30 @@ class MainMenu implements Screen {
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1600, 900);
+
+        InputMultiplexer mul = new InputMultiplexer();
+        for (InputProcessor inp : cm.getInputProcessors())
+            mul.addProcessor(inp);
+        Gdx.input.setInputProcessor(mul);
+
+        cm.onChange((Card[] card_arr) -> {
+            Card c = card_arr[0];
+            if (c == null)
+                return;
+            switch (c.getName()) {
+                case "join_game":
+                    System.out.println("JOIN GAME");
+                break;
+
+                case "ai_game":
+                    System.out.println("AI GAME");
+                break;
+
+                case "host_game":
+                    System.out.println("HOST GAME");
+                break;
+            }
+        });
     }
 
     @Override
