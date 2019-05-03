@@ -11,8 +11,8 @@ public interface ICommand {
      *
      * @param amount Scales the command, i.e move 1 or move 2, rotate 90 or rotate 180
      * @param robot The robot to act upon.
-     * @param roboRallyGame The roboRallyGame to act upon.
+     * @param game The game to act upon.
      * @return Whether or not the command succeeded fully.
      */
-    boolean exec(int amount, Robot robot, RoboRallyGame roboRallyGame);
+    boolean exec(int amount, Robot robot, RoboRallyGame game);
 }

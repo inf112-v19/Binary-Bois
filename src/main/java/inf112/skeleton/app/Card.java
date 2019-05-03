@@ -95,11 +95,11 @@ public class Card extends Renderable {
      * Run the card command.
      *
      * @param robot Robot to act upon.
-     * @param roboRallyGame RoboRallyGame to act upon.
+     * @param game RoboRallyGame to act upon.
      * @return Whether or not the command succeeded fully.
      */
-    public boolean exec(Robot robot, RoboRallyGame roboRallyGame) {
-        return this.cmd.exec(this.amount, robot, roboRallyGame);
+    public boolean exec(Robot robot, RoboRallyGame game) {
+        return this.cmd.exec(this.amount, robot, game);
     }
 
     public static Card getNoneCard() {

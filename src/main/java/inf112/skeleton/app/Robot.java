@@ -95,12 +95,12 @@ public class Robot extends Renderable implements IItem {
     /**
      * Reset a player to it's archiveMarker, and animate respawning.
      *
-     * @param roboRallyGame The board in which the robot exists.
+     * @param game The board in which the robot exists.
      */
-    public void respawn(RoboRallyGame roboRallyGame) {
+    public void respawn(RoboRallyGame game) {
         health = MAX_HEALTH;
         Vector2Di backupPos = getArchiveMarkerPos();
-        roboRallyGame.setOnBoard(this, backupPos);
+        game.setOnBoard(this, backupPos);
         pos = archiveMarker.copy();
         setArchiveMarker(backupPos);
         addAnimation(Animation.scaleTo(this, 1, 1f));
