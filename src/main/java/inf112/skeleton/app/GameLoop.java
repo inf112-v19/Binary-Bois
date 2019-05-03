@@ -13,16 +13,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
-enum ZuckerState {
-    INSTIGATOR,
-    LISTENER
-}
 
 abstract class AZucc extends Thread {
     public abstract ArrayList<Card> getCards() throws NoSuchResource;
@@ -40,9 +34,33 @@ class AiZucc extends AZucc {
     private ArrayList<Card> active_cards;
     private RoboRallyGame game;
     private final int NUM_PLAYERS = 4;
+    private JSONObject game_settings;
+    private CardDeck deck;
 
-    public AiZucc(RoboRallyGame game) {
-        this.cfg = cfg;
+    public AiZucc(RoboRallyGame game) throws IOException, NoSuchResource, CSV.CSVError, CardDeck.NoMoreCards {
+        deck = new CardDeck(StaticConfig.GAME_CARDS_SRC);
+        JSONObject config = new JSONObject();
+        config.put("robots_pos", StaticConfig.DEFAULT_ROBOTS_POS_JSON);
+        config.put("flags_pos", new JSONArray());
+        config.put("version", StaticConfig.VERSION);
+        config.put("num_players", NUM_PLAYERS);
+        config.put("map", StaticConfig.DEFAULT_GAME_OPTIONS.get("map"));
+        config.put("num_starting_cards", StaticConfig.DEFAULT_GAME_OPTIONS.get("num_starting_cards"));
+        config.put("choosing_cards_time",  StaticConfig.DEFAULT_GAME_OPTIONS.get("choosing_cards_time"));
+        this.game_settings = game_settings;
+        JSONObject game_init_cfg = new JSONObject();
+        game_init_cfg.put("idx", NUM_PLAYERS);
+        game_init_cfg.put("robots_pos", game_settings.get("robots_pos"));
+        try {
+            ArrayList<Card> cards = deck.get(9);
+            JSONArray cards_jarr = new JSONArray();
+            for (Card c : cards)
+                cards_jarr.put(c.asJSON());
+            game_init_cfg.put("cards", cards_jarr);
+        } catch (CardDeck.NoMoreCards e) {
+            SystemPanic.panic("loaded empty card set");
+        }
+        game_init_cfg.put("flags_pos", game_settings.get("flags_pos"));
         this.game = game;
     }
 
@@ -411,8 +429,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             this.game = new RoboRallyGame(map_dim.getX(), map_dim.getY(), robots);
             this.game.initTextures();
 
-
-
             updatePlayer(local_player_idx);
 
             giveCards();
@@ -442,6 +458,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             System.exit(1);
         } catch (IOException e) {
             System.out.println("Failed to connect: " + e);
+            System.exit(1);
+        } catch (CSV.CSVError | CardDeck.NoMoreCards e) {
+            e.printStackTrace();
             System.exit(1);
         }
     }
@@ -478,7 +497,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     }
 
     public void render (float dt) {
-        ArrayList<Vector2Di> vecs = map.getTileClicks();
+        /**ArrayList<Vector2Di> vecs = map.getTileClicks();
         if (!vecs.isEmpty()) {
             Vector2Di to = vecs.get(0);
             Vector2Di from = current_robot.getPos();
@@ -488,11 +507,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
                 System.out.println("   " + c);
             ICommand cmd = CardManager.getSequenceAsCommand(cards);
             cmd.exec(1, current_robot, game);
-        }
-
-        if (ai_game) {
-
-        }
+        }*/
 
         // Check for sounds to play
         for (String sound : game.checkPlaySound()) {
