@@ -40,17 +40,13 @@ public class CardManager implements InputProcessor {
     private Texture deck_bg;
     private Vector2Di deck_bg_pos;
     private ShapeRenderer shape_renderer;
-    private final float bg_gray = 0.40f;
-    private Color bgcolor = new Color(bg_gray, bg_gray, bg_gray, 1.0f);
     private int cards_moving = 0;
-    private Vector2Di mouse_start_drag_pos = null;
     private Card dragged_card = null;
     private DragAndDrop dragndrop;
     private Skin ui_skin;
     private HashMap<Object, DragAndDrop.Source> card_drag_sources = new HashMap<>();
     private HashMap<Object, Image> card_drag_source_images = new HashMap<>();
     private Vector2Di mouse_pos = new Vector2Di(0, 0);
-    private int numberofcards = 0;
     /** This callback gets executed when there is a change in the active_cards array. */
     private Consumer<Card[]> on_change_cb;
     int cardsScrolledBy;
@@ -83,7 +79,6 @@ public class CardManager implements InputProcessor {
         stage = new Stage();
         slot_back = Resources.getTexture("cards/" + sz + "/slot/slot_back.png");
         slot_front = Resources.getTexture("cards/"+ sz + "/slot/slot_front.png");
-        //slot_sep = Resources.getTexture("cards/175x250/slot/separator.png");
         if (draw_deck)
             deck_bg = Resources.getTexture("cards/175x250/deck/deck_background.png");
         this.draw_deck = draw_deck;
@@ -120,10 +115,6 @@ public class CardManager implements InputProcessor {
     public void removeAllCards(Robot robot) {
         inactive_cards.clear();
 
-        numberofcards = 0;
-        if (robot.getHealth() < 6)
-            numberofcards = 6 - robot.getHealth(); //He has some cards locked in place
-
         //int top = robot.getHealth() - 6;
         //top = (top < 0) ? -top : num_active_slots;
         //for (int i = 0; i < top; i++)
@@ -142,19 +133,11 @@ public class CardManager implements InputProcessor {
     }
 
     public void setCards(ArrayList<Card> cards) {
-        numberofcards = 0;
+
         inactive_cards.clear();
         inactive_cards.addAll(cards);
-        for (Card c : cards){
+        for (Card c : cards)
             c.setDrawPos(start_pos.tof());
-            numberofcards++;
-        }
-
-
-        // TODO: Add click event to activate toggle hideCards()/showCards()
-        //       when the cards have been moved after showCards() there should
-        //       be a dotted line around where the card deck was, clicking on that
-        //       area should return the cards.
     }
 
     public ArrayList<Card> getActiveCards() {
@@ -455,7 +438,6 @@ public class CardManager implements InputProcessor {
                 img.setBounds(80, 80, card_w, card_h);
                 c.hide();
 
-                mouse_start_drag_pos = new Vector2Di((int)x, (int)y);
                 dragged_card = c;
 
                 payload.setDragActor(img);
@@ -471,16 +453,6 @@ public class CardManager implements InputProcessor {
                 return payload;
             }
 
-            // FIXME: This method doesn't seem to exist in the current version of libgdx.
-            //        Emulate this by using mouseMove in an InputProcessor
-            // UPDATE: The stage seems to get exclusive mouse access after the drag has started,
-            //         this appears to happen no matter the order they are added to the input
-            //         multiplexer. You'll have to use the scrollwheel as a temporary solution
-            //         and investigate how to retrieve the drag(x, y) events.
-            //
-            // This function should correct the position of the card so that it slides in
-            // properly into the slot.
-            //
             public void drag(InputEvent event, float x, float y, int pointer) {
                 System.out.println("Drag(x, y) = (" + x + ", " + y + ")");
             }
@@ -500,7 +472,6 @@ public class CardManager implements InputProcessor {
                         resetDrag(ac);
                 }
 
-                mouse_start_drag_pos = null;
                 dragged_card = null;
                 RoboRallyGame.addSoundFX("snapCard");
                 /*if (inactive_cards.size() == numberofcards - num_active_slots && !cardsAutoHidden){

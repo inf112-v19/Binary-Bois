@@ -5,10 +5,4 @@ package inf112.skeleton.app;
  * and robots
  */
 public interface IItem {
-
-    /**
-     * Identifies the item type
-     * @return String used for identification
-     */
-    String getName();
 }

@@ -370,7 +370,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private boolean ai_game;
 
     private GameClient gclient;
-    private boolean autofill_cards = false;
     private String host;
     private String init_key;
     private AnimatedTexture my_robot_texture;
@@ -407,7 +406,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         font.setColor(Color.BLACK);
         this.host = host;
         this.init_key = init_key;
-        this.ai_game = true;
+        this.ai_game = ai_game;
         create();
     }
 
@@ -492,10 +491,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
                 gclient.setActiveCards(cards);
             });
 
-            if (StaticConfig.DEBUG && autofill_cards) {
-                game.forceActiveCards();
-                gclient.setActiveCards(game.getActivePlayer().getCardManager().getActiveCards());
-            }
         } catch (NoSuchResource e) {
             System.out.println("Unable to load: " + e.getMessage());
             System.exit(1);

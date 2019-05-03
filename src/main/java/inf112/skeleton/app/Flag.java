@@ -15,11 +15,6 @@ public class Flag implements IItem, Comparable<Flag> {
     }
 
     @Override
-    public String getName() {
-        return "Flag";
-    }
-
-    @Override
     public int compareTo(Flag o) {
         return this.getNumber()-o.getNumber();
     }

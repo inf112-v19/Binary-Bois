@@ -10,11 +10,6 @@ public class ConveyorBelt extends TilePiece {
         this.is_express = is_express;
     }
 
-    @Override
-    public String getName() {
-        return "Conveyor belt";
-    }
-
     public Vector2Di getDir() {
         return dir;
     }

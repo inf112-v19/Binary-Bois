@@ -8,7 +8,6 @@ public class Robot extends Renderable implements IItem {
     private Vector2Di pos;
     private Vector2Di dir;
     private Texture texture;
-    private int size;
     private String name;
     private static int nameInt = 1;
     private Vector2Di archiveMarker;
@@ -173,7 +172,6 @@ public class Robot extends Renderable implements IItem {
         return texture;
     }
 
-    @Override
     public String getName() {
         return name;
     }

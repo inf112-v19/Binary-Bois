@@ -4,15 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-public class AiPlayer extends Player {
-
-    int difficulty;   // 1 to 10, 10 being smartest/hardest
-                      // 1 is random bot
-
-    public AiPlayer(String name, int difficulty) throws NoSuchResource {
-        super(name);
-        this.difficulty = difficulty;
-    }
+public class AiPlayer  {
 
     public static ArrayList<Card> pointsToCards(Vector2Di orig_dir, ArrayList<Vector2Di> path) {
         Vector2Di dir = orig_dir;
@@ -27,14 +19,12 @@ public class AiPlayer extends Player {
                 if (dir_cnt > 0)
                     cards.add(new Card(Commands.moveCommand, "move", dir_cnt));
                 dir_cnt = 0;
-
                 cards.add(new Card(Commands.rotateCommand, "rotate", (int) Math.round(diff.angle(dir))));
             }
             dir_cnt++;
             dir = diff;
             pos = path.get(i);
         }
-
         if (dir_cnt > 0)
             cards.add(new Card(Commands.moveCommand, "move", dir_cnt));
 

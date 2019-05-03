@@ -7,9 +7,4 @@ public class Laser implements IItem {
     public Laser(Vector2Di pos) {
         this.pos = pos;
     }
-
-    @Override
-    public String getName() {
-        return "Laser";
-    }
 }
