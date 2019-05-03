@@ -16,8 +16,6 @@ import java.util.Vector;
 
 /**
  * Presents the map and the objects that live on it.
- *
- * TODO: Make the positioning work properly, currently it just centers the map at the top.
  */
 public class GameMap implements InputProcessor {
     /** Enable/disable fun */

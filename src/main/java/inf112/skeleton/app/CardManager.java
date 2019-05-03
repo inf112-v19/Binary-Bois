@@ -22,9 +22,9 @@ import java.util.function.Consumer;
  * the mouse.
  */
 public class CardManager implements InputProcessor {
-    private final int card_w = 175;
-    private final int card_h = 250;
-    private final Vector2Di CARD_SPACING = new Vector2Di(card_w + 10, 0);
+    private final int card_w;
+    private final int card_h;
+    private final Vector2Di CARD_SPACING;
     private final Vector2Di FIRST_CARD_POS = new Vector2Di(0, 300);
     private final Vector2Di DECK_BG_OFFSET = new Vector2Di(-12, -12);
     private final Vector2Di FIRST_SLOT_POS;
@@ -36,7 +36,7 @@ public class CardManager implements InputProcessor {
     private Card[] total_active_cards;
     private Texture slot_back;
     private Texture slot_front;
-    private Texture slot_sep;
+    //private Texture slot_sep;
     private Texture deck_bg;
     private Vector2Di deck_bg_pos;
     private ShapeRenderer shape_renderer;
@@ -55,7 +55,9 @@ public class CardManager implements InputProcessor {
     private Consumer<Card[]> on_change_cb;
     int cardsScrolledBy;
     boolean cardsAutoHidden;
+    boolean draw_deck;
     public static final int NUM_ACTIVE_SLOTS = 5;
+    private final int num_active_slots;
 
     private Stage stage;
 
@@ -69,20 +71,31 @@ public class CardManager implements InputProcessor {
     }
 
     public CardManager() throws NoSuchResource {
-        start_pos = new Vector2Di(CARD_SPACING.getX() * NUM_ACTIVE_SLOTS + 20, 10);
+        this("175x250", true, NUM_ACTIVE_SLOTS);
+    }
+
+    public CardManager(String sz, boolean draw_deck, int num_active_slots) throws NoSuchResource {
+        String sz_split[] = sz.split("x");
+        card_w = Integer.parseInt(sz_split[0]);
+        card_h = Integer.parseInt(sz_split[1]);
+        CARD_SPACING = new Vector2Di(card_w + 10, 0);
+        start_pos = new Vector2Di(CARD_SPACING.getX() * num_active_slots + 20, 10);
         stage = new Stage();
-        slot_back = Resources.getTexture("cards/175x250/slot/slot_back.png");
-        slot_front = Resources.getTexture("cards/175x250/slot/slot_front.png");
-        slot_sep = Resources.getTexture("cards/175x250/slot/separator.png");
-        deck_bg = Resources.getTexture("cards/175x250/deck/deck_background.png");
+        slot_back = Resources.getTexture("cards/" + sz + "/slot/slot_back.png");
+        slot_front = Resources.getTexture("cards/"+ sz + "/slot/slot_front.png");
+        //slot_sep = Resources.getTexture("cards/175x250/slot/separator.png");
+        if (draw_deck)
+            deck_bg = Resources.getTexture("cards/175x250/deck/deck_background.png");
+        this.draw_deck = draw_deck;
         FIRST_SLOT_POS = new Vector2Di(0, 0);
         shape_renderer = new ShapeRenderer();
         deck_bg_pos = start_pos.copy();
         deck_bg_pos.add(DECK_BG_OFFSET);
-        active_cards = new Card[NUM_ACTIVE_SLOTS];
+        active_cards = new Card[num_active_slots];
         dragndrop = new DragAndDrop();
         ui_skin = new Skin();
         ui_skin.add("card", Resources.getTexture("cards/175x250/unknown.png"));
+        this.num_active_slots = num_active_slots;
     }
 
     public ArrayList<InputProcessor> getInputProcessors() {
@@ -108,12 +121,11 @@ public class CardManager implements InputProcessor {
         inactive_cards.clear();
 
         numberofcards = 0;
-
         if (robot.getHealth() < 6)
             numberofcards = 6 - robot.getHealth(); //He has some cards locked in place
 
         int top = robot.getHealth() - 6;
-        top = (top < 0) ? -top : NUM_ACTIVE_SLOTS;
+        top = (top < 0) ? -top : num_active_slots;
         for (int i = 0; i < top; i++)
             active_cards[i] = null;
     }
@@ -143,7 +155,7 @@ public class CardManager implements InputProcessor {
     /** This is a test method, it does not bother to update the card positions,
      *  do not use for non-testing purposes. */
     public void setAllActiveCards() {
-        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
+        for (int i = 0; i < num_active_slots; i++) {
             Card c = inactive_cards.get(0);
             inactive_cards.remove(0);
             active_cards[i] = c;
@@ -174,7 +186,7 @@ public class CardManager implements InputProcessor {
         if (last_card != null)
             last_card.addAnimationCallback(() -> {
                 setupDragTargets();
-                for (int j = 0; j < NUM_ACTIVE_SLOTS; j++) {
+                for (int j = 0; j < num_active_slots; j++) {
                     Card c = active_cards[j];
                     if (c != null)
                         makeDraggable(c);
@@ -203,7 +215,7 @@ public class CardManager implements InputProcessor {
 
     public ArrayList<Card> getSequence() {
         ArrayList<Card> cards = new ArrayList<>();
-        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
+        for (int i = 0; i < num_active_slots; i++) {
             Card c = active_cards[i];
             if (c != null)
                 cards.add(c);
@@ -245,7 +257,7 @@ public class CardManager implements InputProcessor {
     // TODO: Add the deck as a drag target so that cards can be put away.
     public void setupDragTargets() {
         Vector2Di slot_pos = FIRST_SLOT_POS.copy();
-        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
+        for (int i = 0; i < num_active_slots; i++) {
             Image target_img = new Image(ui_skin, "card");
             target_img.setColor(0, 0, 0, 0.0f);
             target_img.setBounds(slot_pos.getX(), slot_pos.getY(), card_w, card_h);
@@ -271,7 +283,7 @@ public class CardManager implements InputProcessor {
                             c.show();
                             int idx = inactive_cards.indexOf(c);
                             int active_idx = -1;
-                            for (int i = 0; i < NUM_ACTIVE_SLOTS; i++)
+                            for (int i = 0; i < num_active_slots; i++)
                                 if (active_cards[i] == c) {
                                     active_idx = i;
                                     break;
@@ -363,7 +375,7 @@ public class CardManager implements InputProcessor {
                         c.show();
                         int idx = inactive_cards.indexOf(c);
                         int active_idx = -1;
-                        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++)
+                        for (int i = 0; i < num_active_slots; i++)
                             if (active_cards[i] == c) {
                                 active_idx = i;
                                 break;
@@ -440,7 +452,7 @@ public class CardManager implements InputProcessor {
                 dragndrop.setDragActorPosition(x, y - img.getHeight());
                 source_image.setColor(0.00f, 0.00f, 0.00f, 0.00f);
 
-                for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
+                for (int i = 0; i < num_active_slots; i++) {
                     Card ac = active_cards[i];
                     if (ac != null && ac != c)
                         makeUnDraggable(ac);
@@ -472,7 +484,7 @@ public class CardManager implements InputProcessor {
                 source_image.setColor(1, 1, 1, 1);
                 c.show();
 
-                for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
+                for (int i = 0; i < num_active_slots; i++) {
                     Card ac = active_cards[i];
                     if (ac != null && ac != c)
                         resetDrag(ac);
@@ -481,7 +493,7 @@ public class CardManager implements InputProcessor {
                 mouse_start_drag_pos = null;
                 dragged_card = null;
                 Game.addSoundFX("snapCard");
-                if(inactive_cards.size() == numberofcards - NUM_ACTIVE_SLOTS && !cardsAutoHidden){
+                if(inactive_cards.size() == numberofcards - num_active_slots && !cardsAutoHidden){
                     autoHideCards();
                 }
             }
@@ -506,21 +518,22 @@ public class CardManager implements InputProcessor {
 
     public void render(SpriteBatch batch) {
         Vector2Di bg_sz = new Vector2Di(Gdx.graphics.getWidth(), card_h + 20);
-        shape_renderer.begin(ShapeRenderer.ShapeType.Filled);
-        shape_renderer.setColor(bgcolor);
-        shape_renderer.rect(0, 0, bg_sz.getX(), bg_sz.getY());
-        shape_renderer.end();
+        //shape_renderer.begin(ShapeRenderer.ShapeType.Filled);
+        //shape_renderer.setColor(bgcolor);
+        //shape_renderer.rect(0, 0, bg_sz.getX(), bg_sz.getY());
+        //shape_renderer.end();
 
         batch.begin();
-        batch.draw(deck_bg, deck_bg_pos.getX(), deck_bg_pos.getY());
+        if (draw_deck)
+            batch.draw(deck_bg, deck_bg_pos.getX(), deck_bg_pos.getY());
 
         Vector2Di slot_bg_pos = FIRST_SLOT_POS.copy();
-        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
+        for (int i = 0; i < num_active_slots; i++) {
             batch.draw(slot_back, slot_bg_pos.getX(), slot_bg_pos.getY());
             slot_bg_pos.add(CARD_SPACING);
         }
 
-        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
+        for (int i = 0; i < num_active_slots; i++) {
             Card c = active_cards[i];
             if (c != null)
                 c.render(batch, 1);
@@ -542,7 +555,7 @@ public class CardManager implements InputProcessor {
         //       red flash: card execution aborted mid-way (ran into wall, hole etc.)
 
         Vector2Di slot_pos = FIRST_SLOT_POS.copy();
-        for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {
+        for (int i = 0; i < num_active_slots; i++) {
             batch.draw(slot_front, slot_pos.getX(), slot_pos.getY());
             slot_pos.add(CARD_SPACING);
         }

@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * This class is suggestive of how the mainMenu should be implemented.
@@ -19,18 +21,34 @@ import java.io.IOException;
  */
 class MainMenu implements Screen {
 
+    final String card_sz = "280x400";
     final RoboRally game;
     OrthographicCamera camera;
     final String hostname = "localhost";
     CardManager cm;
+    private Texture bg;
 
     public MainMenu(final RoboRally game) {
         this.game = game;
         try {
-            this.cm = new CardManager();
+            this.cm = new CardManager(card_sz, false, 1);
         } catch (NoSuchResource e) {
             System.out.println(e + "caught in MainMenu constructor");
         }
+        ArrayList<Card> cards = new ArrayList<>();
+        cards.add(new Card(Commands.none, "ai_game", 0, 0, 0));
+        cards.add(new Card(Commands.none, "join_game", 0, 1, 0));
+        cards.add(new Card(Commands.none, "host_game", 0, 2, 0));
+        try {
+            for (Card c : cards)
+                c.initTexture(card_sz);
+            bg = Resources.getTexture("background.png");
+        } catch (NoSuchResource e) {
+            e.printStackTrace();
+            SystemPanic.panic("Unable to load card textures for menu.");
+        }
+        cm.setCards(cards);
+        cm.showCards();
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1600, 900);
@@ -45,27 +63,30 @@ class MainMenu implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Renderable.updateAll();
 
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-        game.font.getData().setScale(6.0f);
-        game.font.draw(game.batch, "RoboRally ", Gdx.graphics.getWidth()/2-200, Gdx.graphics.getHeight()/2+400);
-        game.font.getData().setScale(1);
-        game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
+        game.batch.draw(bg, 0, 0);
+        //game.font.getData().setScale(6.0f);
+        //game.font.draw(game.batch, "RoboRally ", Gdx.graphics.getWidth()/2-200, Gdx.graphics.getHeight()/2+400);
+        //game.font.getData().setScale(1);
+        //game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
         game.batch.end();
 
-        cm.menuRender(game.batch);
+        cm.drawStage();
+        cm.render(game.batch);
 
-        if (Gdx.input.isTouched()) {
-            try {
-                game.setScreen(new GameLoop(hostname, "abc123", game));
-            } catch (IOException e) {
-                System.out.println("Exception caught in MainMenu render(): " + e);
-            }
-            dispose();
-        }
+        //if (Gdx.input.isTouched()) {
+        //    try {
+        //        game.setScreen(new GameLoop(hostname, "abc123", game));
+        //    } catch (IOException e) {
+        //        System.out.println("Exception caught in MainMenu render(): " + e);
+        //    }
+        //    dispose();
+        //}
     }
 
     @Override
