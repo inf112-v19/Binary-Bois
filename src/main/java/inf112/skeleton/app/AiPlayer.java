@@ -5,8 +5,11 @@ import java.util.Collections;
 
 public class AiPlayer extends Player {
 
-    public AiPlayer(String name) throws NoSuchResource {
+    int difficulty;
+
+    public AiPlayer(String name, int difficulty) throws NoSuchResource {
         super(name);
+        this.difficulty = difficulty;
     }
 
     public static ArrayList<Card> pointsToCards(Vector2Di orig_dir, ArrayList<Vector2Di> path) {
@@ -48,29 +51,97 @@ public class AiPlayer extends Player {
         ArrayList<Card> chosen_cards = new ArrayList<>();
         ArrayList<Card> left_in_hand = new ArrayList<>(hand);
         System.out.println("Cards chosen:");
+        int path_num = 0;
         for (Card c : optimal) {
+
             if (chosen_cards.size() >= 5)
                 return chosen_cards;
 
             if (c.getName().equals("rotate")) {
                 ArrayList<Card> found_rotation = findMatchingCards(c.getAmount(), left_in_hand, "rotate");
+                if (found_rotation.isEmpty()) {
+                    Vector2Di dir = currentDir(orig_dir, chosen_cards);
+                    Card filler = fillIn(left_in_hand, dir, path.get(path_num), path.get(path.size()-1));
+                    chosen_cards.add(filler);
+                    left_in_hand.remove(filler);
+                    continue;
+                }
                 chosen_cards.addAll(found_rotation);
                 left_in_hand.removeAll(found_rotation);
 
             } else if (c.getName().equals("move")) {
+                path_num += c.getAmount();
                 ArrayList<Card> found_move = findMatchingCards(c.getAmount(), left_in_hand, "move");
+                if (found_move.isEmpty()) {
+                    Vector2Di dir = currentDir(orig_dir, chosen_cards);
+                    Card filler = fillIn(left_in_hand, dir, path.get(path_num), path.get(path.size()-1));
+                    chosen_cards.add(filler);
+                    left_in_hand.remove(filler);
+                    continue;
+                }
                 chosen_cards.addAll(found_move);
                 left_in_hand.removeAll(found_move);
             }
         }
+        while (chosen_cards.size() < 5) {
+            Vector2Di dir = currentDir(orig_dir, chosen_cards);
+            Card filler = fillIn(left_in_hand, dir, path.get(path_num), path.get(path.size()-1));
+            chosen_cards.add(filler);
+            left_in_hand.remove(filler);
+        }
         return chosen_cards;
+    }
+
+    public static Vector2Di currentDir(Vector2Di orig_dir, ArrayList<Card> chosen_cards) {
+        int rotation = 0;
+        for (Card c : chosen_cards) {
+            if (c.getName().equals("rotate")) {
+                rotation += c.getAmount();
+            }
+        }
+        Vector2Di rotated = orig_dir.copy();
+        rotated.rotate(rotation);
+        return rotated;
+    }
+
+    public static Card fillIn(ArrayList<Card> left_in_hand, Vector2Di dir, Vector2Di from, Vector2Di goal) {
+        double euclid_dist = Float.MAX_VALUE;
+        Card best_card = null;
+        for (Card c : left_in_hand) {
+            if (c.getName().equals("rotate")) {
+                Vector2Di diff = goal.copy();
+                diff.sub(from);
+                double dist = diff.magnitude();
+                if (dist < euclid_dist) {
+                    euclid_dist = dist;
+                    best_card = c;
+                }
+            } else if (c.getName().equals("move")) {
+                Vector2Di diff = goal.copy();
+                Vector2Di moved = from.copy();
+                moved.move(dir, c.getAmount());
+                diff.sub(moved);
+                double dist = diff.magnitude();
+                if (dist < euclid_dist) {
+                    euclid_dist = dist;
+                    best_card = c;
+                }
+            }
+        }
+        return best_card;
     }
 
     public static ArrayList<Card> findMatchingCards(int amount, ArrayList<Card> left_in_hand, String type) {
         ArrayList<Card> only_of_type = new ArrayList<>();
+        int total_move_power = 0;
         for (Card c : left_in_hand)
-            if (c.getName().equals(type))
+            if (c.getName().equals(type)) {
                 only_of_type.add(c);
+                total_move_power += c.getAmount();
+            }
+
+        if (total_move_power < amount)
+            return only_of_type;
 
         ArrayList<Card> correct = new ArrayList<>();
         for (int r = 1; r < only_of_type.size(); r++) {
@@ -82,13 +153,12 @@ public class AiPlayer extends Player {
                 for (Card c : combo)
                     current_amount += c.getAmount();
 
-                if (current_amount == amount) {
+                if (current_amount == amount || current_amount == amount + 360) {  //Special case for -90 rotation
                     Collections.addAll(correct, combo);
                     return correct;
                 }
             }
         }
-        correct.add(left_in_hand.get(0));
         return correct;
     }
 
