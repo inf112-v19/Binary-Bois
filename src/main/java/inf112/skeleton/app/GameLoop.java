@@ -180,9 +180,7 @@ class ServerClient extends GameClient {
         System.out.println("Starting ServerClient.run() ...");
         for (;;) {
             try {
-                //System.out.println("Waiting for command ...");
                 JSONObject obj = gsock.recv();
-                //System.out.println("Received command.");
                 if (!JSONTools.checkSpec(obj, JSONSpecs.cmd_base))
                     throw new JSONException("Illegal JSON structure.");
                 String cmd = obj.getString("cmd");
@@ -206,7 +204,6 @@ class ServerClient extends GameClient {
                     break;
 
                     case "run_round":
-                        System.out.println("RUNNING THE ROUND");
                         if (!JSONTools.checkSpec(obj, JSONSpecs.run_round_map))
                             throw new JSONException("run_round command did not match spec");
                         JSONArray player_cards_arr = obj.getJSONArray("player_cards");
@@ -464,7 +461,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             }
 
             Vector2Di map_dim = map.getDimensions();
-            System.out.println("GameMap Dimensions: " + map_dim);
             this.game = new RoboRallyGame(map_dim.getX(), map_dim.getY(), robots);
             this.game.initTextures();
             gclient.setGame(this.game);
@@ -504,7 +500,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private void giveCards() throws NoSuchResource {
         ArrayList<Card> my_cards = gclient.getCards();
         if (my_cards != null) {
-            System.out.println("!!!!!!! DOING THE CARDS THING !!!!!!!!");
             for (Card c : my_cards)
                 c.initTexture();
             game.getActivePlayer().getCardManager().removeAllCards(current_robot);
@@ -625,7 +620,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
                 }
 
                 Runnable run = () -> {
-                    System.out.println("CALLBACK");
                     state = GameState.CHECKING_POWER_ON;
                     state_start_t = System.currentTimeMillis() / 1000.0;
                 };
