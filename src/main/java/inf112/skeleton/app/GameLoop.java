@@ -75,12 +75,7 @@ class AIClient extends GameClient {
     }
 
     public ArrayList<Card> getCards() throws NoSuchResource {
-        ArrayList<Card> cards = new_cards;
-        if (cards != null) {
-            System.out.println("New cards: " + Arrays.toString(cards.toArray()));
-        }
-        new_cards = null;
-        return cards;
+        return new_cards;
     }
 
     public ArrayList<ArrayList<Card>> getRoundCards() {
