@@ -58,8 +58,8 @@ public class Round {
 
     @SuppressWarnings("unchecked")
     public Round(ArrayList<Robot> robots, ArrayList<ArrayList<Card>> hands, RoboRallyGame game) {
-        // Assertions
 
+        // Assertions
         this.game = game;
         demirounds = (ArrayList<RoboCard>[]) (new ArrayList[NUM_CARDS]);
         System.out.println("Cards: " + Arrays.toString(hands.toArray()));

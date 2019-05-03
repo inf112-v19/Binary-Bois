@@ -69,6 +69,7 @@ class AiZucc extends AZucc {
             round_cards.add(cards);
         }
         return round_cards;
+
     }
 
     public void setActiveCards(ArrayList<Card> active_cards) {
@@ -321,10 +322,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private String host;
     private String init_key;
 
-    public GameLoop(String host, String init_key, RoboRally robo_rally) throws IOException {
+    public GameLoop(String host, String init_key, SpriteBatch batch, BitmapFont font) throws IOException {
         super();
-        batch = robo_rally.batch;
-        font = robo_rally.font;
+        this.batch = batch;
+        this.font = font;
         font.setColor(Color.BLACK);
         this.host = host;
         this.init_key = init_key;

@@ -32,6 +32,10 @@ public class Robot extends Renderable implements IItem {
         setDrawPos(new Vector2Df(x, y));
     }
 
+    public static void resetNameIntCounter() {
+        nameInt = 1;
+    }
+
     public void initTextures() throws NoSuchResource {
         this.texture = Resources.getTexture(tex_src);
     }
@@ -94,6 +98,7 @@ public class Robot extends Renderable implements IItem {
      * @param game The board in which the robot exists.
      */
     public void respawn(RoboRallyGame game) {
+
         health = MAX_HEALTH;
         Vector2Di backupPos = getArchiveMarkerPos();
         game.setOnBoard(this, backupPos);

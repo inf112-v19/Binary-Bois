@@ -11,6 +11,7 @@ import java.util.HashMap;
 public class Commands {
     /** Move a robot along its direction vector. */
     public static ICommand moveCommand = (int amount, Robot robot, RoboRallyGame game) -> {
+
         if (robot.hasDied())
             return false;
         int sgn = (int) Math.signum(amount);
@@ -33,13 +34,16 @@ public class Commands {
 
     /** Rotate the direction vector of a robot. */
     public static ICommand rotateCommand = (int amount, Robot robot, RoboRallyGame game) -> {
+
         if (robot.hasDied())
             return false;
         robot.rot(amount);
         return true;
     };
 
+
     public static ICommand none = (int amount, Robot robot, RoboRallyGame game) -> true;
+
 
     /** GameMap strings to command functions. */
     private static HashMap<String, ICommand> cmd_map;

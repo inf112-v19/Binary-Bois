@@ -7,6 +7,7 @@ import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.*;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -218,5 +219,19 @@ public class GameServer extends Thread {
                 ;
             }
         }
+    }
+
+    public static String generateKey() {
+        final int NUM_CHARS = 3;
+        final int NUM_DIGITS = 3;
+        char alpha[] = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+        char digits[] = "0123456789".toCharArray();
+        SecureRandom sr = new SecureRandom();
+        String key = "";
+        for (int i = 0; i < NUM_CHARS; i++)
+            key += alpha[sr.nextInt(alpha.length)];
+        for (int i = 0; i < NUM_DIGITS; i++)
+            key += digits[sr.nextInt(digits.length)];
+        return key;
     }
 }
