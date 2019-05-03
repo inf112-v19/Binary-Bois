@@ -27,6 +27,7 @@ class MainMenu implements Screen {
     final RoboRally game;
     OrthographicCamera camera;
     final String hostname = "localhost";
+    String init_key = "abc123";
     CardManager cm;
     private Texture bg;
 
@@ -71,6 +72,11 @@ class MainMenu implements Screen {
 
                 case "ai_game":
                     System.out.println("AI GAME");
+                    try {
+                        game.setScreen(new GameLoop(hostname, init_key, game));
+                    } catch (IOException e) {
+                        System.out.println(e + "caught in MainMenu, case ai_game");
+                    }
                 break;
 
                 case "host_game":

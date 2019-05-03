@@ -245,6 +245,8 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private GameSocket gsock;
     private int local_player_idx = 0;
 
+    private boolean ai_game;
+
     private Zucc zucc;
     private boolean autofill_cards = false;
     private String host;
@@ -257,6 +259,17 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         font.setColor(Color.BLACK);
         this.host = host;
         this.init_key = init_key;
+        create();
+    }
+
+    public GameLoop(String host, String init_key, RoboRally robo_rally, boolean ai_game) {
+        super();
+        batch = robo_rally.batch;
+        font = robo_rally.font;
+        font.setColor(Color.BLACK);
+        this.host = host;
+        this.init_key = init_key;
+        this.ai_game = true;
         create();
     }
 
@@ -383,6 +396,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
                 System.out.println("   " + c);
             ICommand cmd = CardManager.getSequenceAsCommand(cards);
             cmd.exec(1, current_robot, game);
+        }
+
+        if (ai_game) {
+
         }
 
         // Check for sounds to play
