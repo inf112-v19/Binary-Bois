@@ -190,6 +190,7 @@ public class GameServer extends Thread {
         // Wait for clients to connect.
         listen();
 
+        System.out.println("STOPPING BROADCAST");
         broadcaster.done();
 
         for (;;) {
