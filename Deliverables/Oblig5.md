@@ -13,19 +13,20 @@ Gruppen har lært at god arbeidsflyt, løpende dialog og møte opp til avtaler e
 
 Liste over implementerte krav: 
 
-Man må kunne spille en komplett runde 
-Man må kunne vinne spillet spillet ved å besøke siste flagg (fullføre et spill)
-Det skal være lasere på brettet 
-Det skal være hull på brettet
-Skademekanismer (spilleren får færre kort ved skade) NEI
-Spillmekanismer for å skyte andre spillere innen rekkevidde med laser som peker rett frem Fungerende samlebånd på brettet som flytter robotene 
-Fungerende gyroer på brettet som flytter robotene 
-Game over etter 3 tapte liv 
-Multiplayer over LAN eller Internet 
-Feilhåndtering ved disconnect. (Spillet skal i hvertfall ikke kræsje) 
-Power down NEI
-Samlebånd som går i dobbelt tempo 
-Spille mot AI (single-player-mode), evt spill mot random-roboter
+Man må kunne spille en komplett runde   JA
+Man må kunne vinne spillet spillet ved å besøke siste flagg (fullføre et spill)   JA
+Det skal være lasere på brettet   JA
+Det skal være hull på brettet  JA
+Skademekanismer (spilleren får færre kort ved skade) NEI  
+Spillmekanismer for å skyte andre spillere innen rekkevidde med laser som peker rett frem  JA
+Fungerende samlebånd på brettet som flytter robotene   JA
+Fungerende gyroer på brettet som flytter robotene   JA
+Game over etter 3 tapte liv   JA
+Multiplayer over LAN eller Internet   JA
+Feilhåndtering ved disconnect. (Spillet skal i hvertfall ikke kræsje)   NEI
+Power down NEI  
+Samlebånd som går i dobbelt tempo   JA
+Spille mot AI (single-player-mode), evt spill mot random-roboter  JA
 
 
 
@@ -61,3 +62,33 @@ Kodekvalitet og testdekning vektlegges. Merk at testene dere skriver skal brukes
 Legg også ved et klassediagram som viser de viktige delene av koden. Tilpass klassediagrammet slik at det gir leseren mest mulig informasjon (feks Intellij kan tilpasse klassediagram som genereres).
     
     - Klassediagrammet ligger ved i "Deliverables" folderen i prosjektet. 
+
+
+
+
+#Møter:
+
+
+02.04.19
+Martin og Tellev til stede
+
+Implementerte mock-up klasser av laserskytere og rullebånd.
+
+03.04.19
+Alle til stede
+
+
+Fordelte ansvarsområder til hele gruppa og fant ut mer nøye hvordan reglene fungerer.
+
+09.04.19
+Jonas og Tellev til stede
+
+
+Lagde basic runder og en del refaktorering slik at programmet skulle bli mer intuitivt.
+
+10.04.19
+Alle til stede, minus Martin
+
+Alle jobbet med hvert sitt. Jonas og Tellev med runder, Eirik og Lars med brett, grafisk.
+
+**Etter dette har vi ikke hatt offisielle “møter” men har jobbet mer sammen i mindre grupper, og hyppigere enn før.**

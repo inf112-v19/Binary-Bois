@@ -97,6 +97,8 @@ public class Robot extends Renderable implements IItem {
      * @param game The board in which the robot exists.
      */
     public void respawn(RoboRallyGame game) {
+        if (game_over)
+            return;
         health = MAX_HEALTH;
         Vector2Di backupPos = getArchiveMarkerPos();
         game.setOnBoard(this, backupPos);
@@ -138,24 +140,6 @@ public class Robot extends Renderable implements IItem {
         }
     }
 
-    /** You are out of the game if this is true */
-    public boolean isGameOver(){
-        return game_over;
-    }
-
-    public boolean isPoweredDown() {
-        return !powered_on;
-    }
-
-    public void powerOn() {
-        assert !powered_on;
-
-        if (!game_over) {
-            powered_on = true;
-            health = MAX_HEALTH;
-        }
-    }
-
     public void setPos(Vector2Di pos) {
         this.pos = pos;
         clearAnimations();
@@ -178,9 +162,5 @@ public class Robot extends Renderable implements IItem {
 
     public int getHealth() {
         return health;
-    }
-
-    public int getDeaths() {
-        return deaths;
     }
 }
