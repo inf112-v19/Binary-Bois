@@ -36,7 +36,7 @@ public class CardManager implements InputProcessor {
     private Card[] total_active_cards;
     private Texture slot_back;
     private Texture slot_front;
-    private Texture slot_sep;
+    //private Texture slot_sep;
     private Texture deck_bg;
     private Vector2Di deck_bg_pos;
     private ShapeRenderer shape_renderer;
@@ -55,6 +55,7 @@ public class CardManager implements InputProcessor {
     private Consumer<Card[]> on_change_cb;
     int cardsScrolledBy;
     boolean cardsAutoHidden;
+    boolean draw_deck;
     public static final int NUM_ACTIVE_SLOTS = 5;
 
     private Stage stage;
@@ -69,12 +70,18 @@ public class CardManager implements InputProcessor {
     }
 
     public CardManager() throws NoSuchResource {
+        this("175x250", true);
+    }
+
+    public CardManager(String sz, boolean draw_deck) throws NoSuchResource {
         start_pos = new Vector2Di(CARD_SPACING.getX() * NUM_ACTIVE_SLOTS + 20, 10);
         stage = new Stage();
-        slot_back = Resources.getTexture("cards/175x250/slot/slot_back.png");
-        slot_front = Resources.getTexture("cards/175x250/slot/slot_front.png");
-        slot_sep = Resources.getTexture("cards/175x250/slot/separator.png");
-        deck_bg = Resources.getTexture("cards/175x250/deck/deck_background.png");
+        slot_back = Resources.getTexture("cards/" + sz + "/slot/slot_back.png");
+        slot_front = Resources.getTexture("cards/"+ sz + "/slot/slot_front.png");
+        //slot_sep = Resources.getTexture("cards/175x250/slot/separator.png");
+        if (draw_deck)
+            deck_bg = Resources.getTexture("cards/175x250/deck/deck_background.png");
+        this.draw_deck = draw_deck;
         FIRST_SLOT_POS = new Vector2Di(0, 0);
         shape_renderer = new ShapeRenderer();
         deck_bg_pos = start_pos.copy();
@@ -504,7 +511,8 @@ public class CardManager implements InputProcessor {
         shape_renderer.end();
 
         batch.begin();
-        batch.draw(deck_bg, deck_bg_pos.getX(), deck_bg_pos.getY());
+        if (draw_deck)
+            batch.draw(deck_bg, deck_bg_pos.getX(), deck_bg_pos.getY());
 
         Vector2Di slot_bg_pos = FIRST_SLOT_POS.copy();
         for (int i = 0; i < NUM_ACTIVE_SLOTS; i++) {

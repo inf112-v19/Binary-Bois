@@ -1,18 +1,13 @@
 package inf112.skeleton.app;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Arrays;
-import java.util.Base64;
 
 // FIXME: Actually using the iv causes an exception to be thrown.
 //        for now it's just disabled but still passed around so that
