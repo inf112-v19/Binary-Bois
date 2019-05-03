@@ -19,7 +19,7 @@ public class RoboRallyGame {
     private HashMap<Robot, Player> robotsToPlayers;
     private ArrayList<Robot> robots;
     private ArrayList<Player> players;
-    private ArrayList<IItem> flags;
+    private ArrayList<Vector2Di> flags_pos = new ArrayList<>();
     private Log game_log;
     private CardDeck deck;
     private int active_player_num = 0;
@@ -400,7 +400,6 @@ public class RoboRallyGame {
     }
 
     private void boardSetup() {
-
         TiledMap tiledMap = GameMap.getTiledMap();
         for(int k = 0; k < tiledMap.getLayers().size(); k++){
             TiledMapTileLayer layer = (TiledMapTileLayer)tiledMap.getLayers().get(k);
@@ -454,9 +453,10 @@ public class RoboRallyGame {
                     }
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("flag")) {
                         numberOfFlags += 1;
-                        Flag flag = new Flag(numberOfFlags, new Vector2Di(i, j));
+                        Vector2Di flag_pos = new Vector2Di(i, j);
+                        Flag flag = new Flag(numberOfFlags, flag_pos);
+                        flags_pos.add(flag_pos);
                         board.set(flag, i, j);
-
                     }
                     if (cell.getTile().getProperties().get("MapObject", String.class).equals("hole")) {
                         board.set(new Hole(), i, j);
@@ -476,4 +476,11 @@ public class RoboRallyGame {
         }
     }
 
+    public ArrayList<Vector2Di> getFlagPositions() {
+        return flags_pos;
+    }
+
+    public ArrayList<IItem> itemsAtPos(Vector2Di pos) {
+        return board.get(pos);
+    }
 }

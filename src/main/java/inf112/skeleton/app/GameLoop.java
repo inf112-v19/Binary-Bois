@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-abstract class AZucc extends Thread {
+abstract class GameClient extends Thread {
     public abstract ArrayList<Card> getCards() throws NoSuchResource;
     public abstract ArrayList<ArrayList<Card>> getRoundCards();
     public abstract void setActiveCards(ArrayList<Card> active_cards);
@@ -26,13 +26,14 @@ abstract class AZucc extends Thread {
     public abstract void setUpState(boolean up_state);
     public abstract JSONObject getConfig();
     public abstract void reset();
+    public abstract void setGame(RoboRallyGame game);
 }
 
-class AiZucc extends AZucc {
+class AIClient extends GameClient {
 
-    private boolean do_return_cards = true;
     private JSONObject cfg;
     private ArrayList<Card> active_cards;
+    private ArrayList<Card> new_cards = null;
     private RoboRallyGame game;
     private final int NUM_PLAYERS = 4;
     private JSONObject game_settings;
@@ -41,7 +42,11 @@ class AiZucc extends AZucc {
     public void reset() {
     }
 
-    public AiZucc(RoboRallyGame game) throws IOException, NoSuchResource, CSV.CSVError, CardDeck.NoMoreCards {
+    public void setGame(RoboRallyGame game) {
+        this.game = game;
+    }
+
+    public AIClient() throws IOException, NoSuchResource, CSV.CSVError, CardDeck.NoMoreCards {
         deck = new CardDeck(StaticConfig.GAME_CARDS_SRC);
         JSONObject config = new JSONObject();
         config.put("robots_pos", StaticConfig.DEFAULT_ROBOTS_POS_JSON);
@@ -51,12 +56,13 @@ class AiZucc extends AZucc {
         config.put("map", StaticConfig.DEFAULT_GAME_OPTIONS.get("map"));
         config.put("num_starting_cards", StaticConfig.DEFAULT_GAME_OPTIONS.get("num_starting_cards"));
         config.put("choosing_cards_time",  StaticConfig.DEFAULT_GAME_OPTIONS.get("choosing_cards_time"));
-        this.game_settings = game_settings;
+        this.game_settings = config;
         JSONObject game_init_cfg = new JSONObject();
-        game_init_cfg.put("idx", NUM_PLAYERS);
+        game_init_cfg.put("idx", 0);
         game_init_cfg.put("robots_pos", game_settings.get("robots_pos"));
         try {
             ArrayList<Card> cards = deck.get(9);
+            new_cards = cards;
             JSONArray cards_jarr = new JSONArray();
             for (Card c : cards)
                 cards_jarr.put(c.asJSON());
@@ -65,14 +71,16 @@ class AiZucc extends AZucc {
             SystemPanic.panic("loaded empty card set");
         }
         game_init_cfg.put("flags_pos", game_settings.get("flags_pos"));
-        this.game = game;
+        cfg = game_init_cfg;
     }
 
     public ArrayList<Card> getCards() throws NoSuchResource {
-        if (!do_return_cards)
-            return null;
-        do_return_cards = false;
-        return active_cards;
+        ArrayList<Card> cards = new_cards;
+        if (cards != null) {
+            System.out.println("New cards: " + Arrays.toString(cards.toArray()));
+        }
+        new_cards = null;
+        return cards;
     }
 
     public ArrayList<ArrayList<Card>> getRoundCards() {
@@ -82,14 +90,40 @@ class AiZucc extends AZucc {
         for (int i = 1; i < NUM_PLAYERS; i++) {
             Player p = game.getPlayer(i);
             Robot robot = game.getRobot(p);
-            Vector2Di to = new Vector2Di(12, 12);      //TODO: DUMMY DUMMY
+            Vector2Di to = null;
+            ArrayList<Flag> flags = p.getFlags();
+            outer_for:
+            for (Vector2Di flag_pos : game.getFlagPositions()) {
+                item_for:
+                for (IItem item : game.itemsAtPos(flag_pos)) {
+                    if (item instanceof Flag)
+                        for (Flag this_flag : flags)
+                            if (this_flag.equals(item))
+                                break item_for;
+                    to = flag_pos;
+                    break outer_for;
+                }
+            }
+            if (to == null)
+                continue;
             Vector2Di from = robot.getPos();
             ArrayList<Vector2Di> path = game.fromTo(from, to);
             ArrayList<Card> cards = AiPlayer.chooseCards(robot.getDir(), path, game.getActivePlayer().getHand(), 10);
-            for (Card c : cards)
-                System.out.println("   " + c);
             round_cards.add(cards);
         }
+
+        try {
+            new_cards = deck.get(9);
+        } catch (CardDeck.NoMoreCards e) {
+            deck.restore();
+            deck.shuffle();
+            try {
+                new_cards = deck.get(9);
+            } catch (CardDeck.NoMoreCards e2) {
+                SystemPanic.panic("Loaded an empty deck");
+            }
+        }
+
         return round_cards;
 
     }
@@ -98,28 +132,21 @@ class AiZucc extends AZucc {
         this.active_cards = active_cards;
     }
 
-    public void submitAnswer() {
-        do_return_cards = true;
-    }
+    public void submitAnswer() {}
 
-    public void setUpState(boolean up_state) {
-        ;
-    }
-
+    public void setUpState(boolean up_state) {}
 
     public JSONObject getConfig() {
         return cfg;
     }
 
-    public void run() {
-        ;
-    }
+    public void run() {}
 }
 
 /**
- * Zucc sucks in commands from the server and handles them.
+ * ServerClient sucks in commands from the server and handles them.
  */
-class Zucc extends AZucc {
+class ServerClient extends GameClient {
     private GameSocket gsock;
     private ArrayList<JSONArray> cards_json = new ArrayList<>();
     private JSONArray cards_answer = new JSONArray();
@@ -129,7 +156,7 @@ class Zucc extends AZucc {
     private final Object monitor = new Object();
     private boolean up_state = true;
 
-    public Zucc(GameSocket gsock) throws IOException {
+    public ServerClient(GameSocket gsock) throws IOException {
         this.gsock = gsock;
         try {
             game_init_cfg = gsock.recv();
@@ -139,6 +166,9 @@ class Zucc extends AZucc {
         } catch (GameSocketException e) {
             SystemPanic.panic("fucc");
         }
+    }
+
+    public void setGame(RoboRallyGame game) {
     }
 
     /**
@@ -152,7 +182,7 @@ class Zucc extends AZucc {
      * Listen on the gamesocket and handle events.
      */
     public void run() {
-        System.out.println("Starting Zucc.run() ...");
+        System.out.println("Starting ServerClient.run() ...");
         for (;;) {
             try {
                 //System.out.println("Waiting for command ...");
@@ -299,7 +329,7 @@ class Zucc extends AZucc {
     }
 
     /**
-     * Reset the Zucc to prepare for a new round.
+     * Reset the ServerClient to prepare for a new round.
      */
     public void reset() {
         has_final_answer = false;
@@ -339,7 +369,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     
     private boolean ai_game;
 
-    private AZucc zucc;
+    private GameClient gclient;
     private boolean autofill_cards = false;
     private String host;
     private String init_key;
@@ -412,15 +442,14 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             if (font == null)  font = new BitmapFont();
 
             if (ai_game) {
-                zucc = new AiZucc(game);
-                local_player_idx = 0;
+                gclient = new AIClient();
             } else {
                 gsock = new GameSocket(host, init_key);
-                zucc = new Zucc(gsock);
-                zucc.start();
-                local_player_idx = zucc.getConfig().getInt("idx");
+                gclient = new ServerClient(gsock);
             }
 
+            gclient.start();
+            local_player_idx = gclient.getConfig().getInt("idx");
             my_robot_texture = new AnimatedTexture("textures/thicc_robot0" + (local_player_idx+1) + ".png");
             my_robot_texture.setDrawPos(new Vector2Df(-400, 200));
             my_robot_texture.addAnimation(new Animation(new Vector2Df(2000, 0), 360, 0, 3));
@@ -430,7 +459,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             map = new GameMap(180, 0, 300, 200, "map2.tmx");
 
             int[][] robot_start_positions =
-                    JSONTools.toIntMatrix(zucc
+                    JSONTools.toIntMatrix(gclient
                                           .getConfig()
                                           .getJSONArray("robots_pos"));
             for (int[] pos : robot_start_positions) {
@@ -444,6 +473,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             System.out.println("GameMap Dimensions: " + map_dim);
             this.game = new RoboRallyGame(map_dim.getX(), map_dim.getY(), robots);
             this.game.initTextures();
+            gclient.setGame(this.game);
 
             updatePlayer(local_player_idx);
 
@@ -453,18 +483,18 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             game.appendToLogBuilder("Press e to run selected cards");
             game.appendToLogBuilder("Use scrollwheel to scroll cards");
 
-            // Make sure the card manager passes the card order to zucc.
+            // Make sure the card manager passes the card order to gclient.
             game.getActivePlayer().getCardManager().onChange((Card[] cards_arr) -> {
                 ArrayList<Card> cards = new ArrayList<>();
                 for (Card c : cards_arr)
                     if (c != null)
                         cards.add(c);
-                zucc.setActiveCards(cards);
+                gclient.setActiveCards(cards);
             });
 
             if (StaticConfig.DEBUG && autofill_cards) {
                 game.forceActiveCards();
-                zucc.setActiveCards(game.getActivePlayer().getCardManager().getActiveCards());
+                gclient.setActiveCards(game.getActivePlayer().getCardManager().getActiveCards());
             }
         } catch (NoSuchResource e) {
             System.out.println("Unable to load: " + e.getMessage());
@@ -482,8 +512,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     }
 
     private void giveCards() throws NoSuchResource {
-        ArrayList<Card> my_cards = zucc.getCards();
+        ArrayList<Card> my_cards = gclient.getCards();
         if (my_cards != null) {
+            System.out.println("!!!!!!! DOING THE CARDS THING !!!!!!!!");
             for (Card c : my_cards)
                 c.initTexture();
             game.getActivePlayer().getCardManager().removeAllCards(current_robot);
@@ -579,7 +610,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             break;
 
             case WAITING_FOR_ROUND_START:
-                ArrayList<ArrayList<Card>> round_cards = zucc.getRoundCards();
+                ArrayList<ArrayList<Card>> round_cards = gclient.getRoundCards();
                 if (round_cards != null) {
                     round = new Round(robots, round_cards, game);
                     state = GameState.RUNNING_ROUND;
@@ -591,7 +622,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
                 game.emptyHand(current_robot);
                 if (round != null && !round.doStep()) {
                     round = null;
-                    zucc.reset();
+                    gclient.reset();
                     state = GameState.RESPAWNING;
                 }
             break;
@@ -624,7 +655,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
                 double cur_time = System.currentTimeMillis() / 1000.0;
                 if (state_start_t + POWER_ON_TIMEOUT <= cur_time) {
                     state = GameState.CHOOSING_CARDS;
-                    zucc.setUpState(true);
+                    gclient.setUpState(true);
                 }
             break;
         }
@@ -732,9 +763,11 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             break;
 
             case Input.Keys.ENTER:
+                if (!game.getActivePlayer().getCardManager().isFull())
+                    break;
                 game.appendToLogBuilder("Waiting for round start ...");
                 state = GameState.WAITING_FOR_ROUND_START;
-                zucc.submitAnswer();
+                gclient.submitAnswer();
             break;
 
             default:

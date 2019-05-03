@@ -62,15 +62,6 @@ class Node {
     public String toString() {
         return Integer.toString(num);
     }
-
-    public void printNeighbours() {
-        //System.out.println("Node " + num + " is adjacent to:");
-
-        for (Map.Entry<Node, Integer> n : adjacent.entrySet()) {
-            String dir = getCardinal(n.getKey());
-            System.out.println("a" + num  + " -> " + "a" + n.getKey() + ":" + dir + ";");
-        }
-    }
 }
 
 /**

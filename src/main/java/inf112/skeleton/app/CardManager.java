@@ -134,6 +134,13 @@ public class CardManager implements InputProcessor {
         stage.clear();
     }
 
+    public boolean isFull() {
+        for (Card c : active_cards)
+            if (c == null)
+                return false;
+        return true;
+    }
+
     public void setCards(ArrayList<Card> cards) {
         numberofcards = 0;
         inactive_cards.clear();
@@ -451,7 +458,6 @@ public class CardManager implements InputProcessor {
                 mouse_start_drag_pos = new Vector2Di((int)x, (int)y);
                 dragged_card = c;
 
-                System.out.println("Start drag: " + new Vector2Df(x, y).toi());
                 payload.setDragActor(img);
                 dragndrop.setDragActorPosition(x, y - img.getHeight());
                 source_image.setColor(0.00f, 0.00f, 0.00f, 0.00f);
