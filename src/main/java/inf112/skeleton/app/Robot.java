@@ -32,7 +32,7 @@ public class Robot extends Renderable implements IItem {
     }
 
     public void initTextures() throws NoSuchResource {
-        this.texture = Resources.getTexture("robot1.png");
+        this.texture = Resources.getTexture("textures/robot0"+nameInt+".png");
     }
 
     /**
