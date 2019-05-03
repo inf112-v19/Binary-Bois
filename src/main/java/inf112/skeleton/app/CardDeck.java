@@ -38,7 +38,7 @@ public class CardDeck {
      * @throws CSV.CSVError If the file is not valid CSV, or if a
      *                      column or column header is missing
      */
-    public CardDeck(String path) throws IOException, CSV.CSVError, NoSuchResource {
+    public CardDeck(String path) throws IOException, CSV.CSVError {
         CSV csv = new CSV(path);
         for (CSV.Row row : csv) {
             String type = row.get("Type");

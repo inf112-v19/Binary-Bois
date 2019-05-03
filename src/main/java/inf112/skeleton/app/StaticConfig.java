@@ -12,7 +12,7 @@ public class StaticConfig {
 
     public static final String VERSION = "0.9";
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     public static final int UDP_BRD_PORT = 31337;
 

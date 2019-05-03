@@ -20,8 +20,6 @@ public class Log {
                 return;
             }
 
-        // This is obviously inefficient, but the game log doesn't exactly have
-        // to be high-performance.
         if (logs.size() >= max_len)
             logs.removeElementAt(logs.size()-1);
 

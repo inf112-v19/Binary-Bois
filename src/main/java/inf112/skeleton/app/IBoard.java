@@ -64,7 +64,5 @@ public interface IBoard {
      */
     int getWidth();
 
-    ArrayList<IItem>[] getGrid();
-
     ArrayList<IItem> getAllItemsOnBoard();
 }

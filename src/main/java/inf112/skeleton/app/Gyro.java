@@ -14,9 +14,4 @@ public class Gyro extends TilePiece {
     public int getRotation() {
         return rotation;
     }
-
-    @Override
-    public String getName() {
-        return "Gyro";
-    }
 }

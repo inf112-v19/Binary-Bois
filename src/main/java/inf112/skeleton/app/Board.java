@@ -54,11 +54,6 @@ public class Board implements IBoard {
     }
 
     @Override
-    public ArrayList<IItem>[] getGrid() {
-        return grid;
-    }
-
-    @Override
     public ArrayList<IItem> getAllItemsOnBoard() {
         ArrayList<IItem> gridArrayList = new ArrayList<>();
         for(int i = 0; i < grid.length; i++){

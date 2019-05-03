@@ -56,14 +56,6 @@ public class Player {
         card_man.setCards(hand);
     }
 
-    public Card popCard() {
-        if (hand.size() == 0)
-            return null;
-        Card c = hand.get(0);
-        hand.remove(0);
-        return c;
-    }
-
     public ArrayList<Card> getHand() {
         return hand;
     }

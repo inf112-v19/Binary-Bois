@@ -12,9 +12,4 @@ public class LaserShooter extends Renderable implements IItem {
         this.pos = pos;
         this.dir = dir;
     }
-
-    @Override
-    public String getName() {
-        return "Laser Shooter";
-    }
 }

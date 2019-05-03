@@ -122,7 +122,7 @@ public class Card extends Renderable {
      * @return The card being represented.
      * @throws NoSuchResource Thrown from Card::new()
      */
-    public static Card fromJSON(JSONObject card_obj) throws NoSuchResource {
+    public static Card fromJSON(JSONObject card_obj) {
         return new Card(
                 Commands.getComand(card_obj.getString("type")),
                 card_obj.getString("type"),
