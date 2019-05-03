@@ -25,6 +25,7 @@ abstract class AZucc extends Thread {
     public abstract void submitAnswer();
     public abstract void setUpState(boolean up_state);
     public abstract JSONObject getConfig();
+    public abstract void reset();
 }
 
 class AiZucc extends AZucc {
@@ -36,6 +37,9 @@ class AiZucc extends AZucc {
     private final int NUM_PLAYERS = 4;
     private JSONObject game_settings;
     private CardDeck deck;
+
+    public void reset() {
+    }
 
     public AiZucc(RoboRallyGame game) throws IOException, NoSuchResource, CSV.CSVError, CardDeck.NoMoreCards {
         deck = new CardDeck(StaticConfig.GAME_CARDS_SRC);
@@ -339,8 +343,9 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     private boolean autofill_cards = false;
     private String host;
     private String init_key;
+    private AnimatedTexture my_robot_texture;
 
-    public GameLoop(String host, String init_key) throws IOException {
+    public GameLoop(String host, String init_key) {
         super();
         this.batch = null;
         this.font = null;
@@ -348,7 +353,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         this.init_key = init_key;
     }
 
-    public GameLoop(String host, String init_key, SpriteBatch batch, BitmapFont font) throws IOException {
+    public GameLoop(String host, String init_key, SpriteBatch batch, BitmapFont font) {
         super();
         this.batch = batch;
         this.font = font;
@@ -359,7 +364,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         create();
     }
 
-    public GameLoop(String host, String init_key, RoboRally robo_rally, boolean ai_game) throws IOException {
+    public GameLoop(String host, String init_key, RoboRally robo_rally, boolean ai_game) {
         super();
         batch = robo_rally.batch;
         font = robo_rally.font;
@@ -402,12 +407,17 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
             if (ai_game) {
                 zucc = new AiZucc(game);
+                local_player_idx = 0;
             } else {
                 gsock = new GameSocket(host, init_key);
                 zucc = new Zucc(gsock);
                 zucc.start();
                 local_player_idx = zucc.getConfig().getInt("idx");
             }
+
+            my_robot_texture = new AnimatedTexture("textures/thicc_robot0" + (local_player_idx+1) + ".png");
+            my_robot_texture.setDrawPos(new Vector2Df(-400, 200));
+            my_robot_texture.addAnimation(new Animation(new Vector2Df(2000, 0), 360, 0, 3));
 
             addSounds();
 
@@ -578,6 +588,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
                 game.emptyHand(current_robot);
                 if (round != null && !round.doStep()) {
                     round = null;
+                    zucc.reset();
                     state = GameState.RESPAWNING;
                 }
             break;
@@ -613,6 +624,10 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         }
 
         // TODO: The UI will be drawn here later.
+
+        batch.begin();
+        my_robot_texture.render(batch, 1);
+        batch.end();
     }
 
     private ArrayList<Robot> getDeadRobots() {
