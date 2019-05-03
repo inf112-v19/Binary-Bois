@@ -116,20 +116,10 @@ public class Game {
         }
     }
 
-    public Dijkstra getDijkstraedOn() {
-        return new Dijkstra(board);
-    }
-
     public ArrayList<Vector2Di> fromTo(Vector2Di from, Vector2Di to) {
-        return Dijkstra.fromTo(board, from, to);
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public int getWidth() {
-        return width;
+        ArrayList<Vector2Di> path = Dijkstra.fromTo(board, from, to);
+        path.add(to);  //This isn't added in the Dijkstra
+        return path;
     }
 
     public Player getActivePlayer() {

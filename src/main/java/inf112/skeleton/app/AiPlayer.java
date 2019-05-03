@@ -2,10 +2,12 @@ package inf112.skeleton.app;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 public class AiPlayer extends Player {
 
-    int difficulty;
+    int difficulty;   // 1 to 10, 10 being smartest/hardest
+                      // 1 is random bot
 
     public AiPlayer(String name, int difficulty) throws NoSuchResource {
         super(name);
@@ -43,7 +45,7 @@ public class AiPlayer extends Player {
      * The AI finds the smartest combination of it's cards
      * @return active cards
      */
-    public static ArrayList<Card> chooseCards(Vector2Di orig_dir, ArrayList<Vector2Di> path, ArrayList<Card> hand) {
+    public static ArrayList<Card> chooseCards(Vector2Di orig_dir, ArrayList<Vector2Di> path, ArrayList<Card> hand, int difficulty) {
         ArrayList<Card> optimal = pointsToCards(orig_dir, path);
         System.out.println("Optimal route:");
         for (Card c : optimal)
@@ -52,12 +54,25 @@ public class AiPlayer extends Player {
         ArrayList<Card> left_in_hand = new ArrayList<>(hand);
         System.out.println("Cards chosen:");
         int path_num = 0;
+        Random rnd = new Random();
         for (Card c : optimal) {
+            int goof = rnd.nextInt(difficulty);
 
-            if (chosen_cards.size() >= 5)
+            if (chosen_cards.size() >= CardManager.NUM_ACTIVE_SLOTS) {
+                while (chosen_cards.size() > CardManager.NUM_ACTIVE_SLOTS) {
+                    chosen_cards.remove(chosen_cards.size()-1);
+                }
                 return chosen_cards;
+            }
 
             if (c.getName().equals("rotate")) {
+                if (goof == 0 && difficulty != 10) {
+                    System.out.println("Goofed!");
+                    int rnd_index = rnd.nextInt(left_in_hand.size());
+                    chosen_cards.add(left_in_hand.get(rnd_index));
+                    left_in_hand.remove(left_in_hand.get(rnd_index));
+                    continue;
+                }
                 ArrayList<Card> found_rotation = findMatchingCards(c.getAmount(), left_in_hand, "rotate");
                 if (found_rotation.isEmpty()) {
                     Vector2Di dir = currentDir(orig_dir, chosen_cards);
@@ -71,6 +86,13 @@ public class AiPlayer extends Player {
 
             } else if (c.getName().equals("move")) {
                 path_num += c.getAmount();
+                if (goof == 0 && difficulty != 10) {
+                    System.out.println("Goofed!");
+                    int rnd_index = rnd.nextInt(left_in_hand.size());
+                    chosen_cards.add(left_in_hand.get(rnd_index));
+                    left_in_hand.remove(left_in_hand.get(rnd_index));
+                    continue;
+                }
                 ArrayList<Card> found_move = findMatchingCards(c.getAmount(), left_in_hand, "move");
                 if (found_move.isEmpty()) {
                     Vector2Di dir = currentDir(orig_dir, chosen_cards);

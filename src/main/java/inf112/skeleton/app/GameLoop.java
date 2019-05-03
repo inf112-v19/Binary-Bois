@@ -373,7 +373,7 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
             Vector2Di from = current_robot.getPos();
             ArrayList<Vector2Di> path = game.fromTo(from, to);
             path.add(to);
-            ArrayList<Card> cards = AiPlayer.chooseCards(current_robot.getDir(), path, game.getActivePlayer().getHand());
+            ArrayList<Card> cards = AiPlayer.chooseCards(current_robot.getDir(), path, game.getActivePlayer().getHand(), 10);
             for (Card c : cards)
                 System.out.println("   " + c);
             ICommand cmd = CardManager.getSequenceAsCommand(cards);
