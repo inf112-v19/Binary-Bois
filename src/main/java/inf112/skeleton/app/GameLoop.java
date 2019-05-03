@@ -541,18 +541,6 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
     }
 
     public void render (float dt) {
-        /**ArrayList<Vector2Di> vecs = map.getTileClicks();
-        if (!vecs.isEmpty()) {
-            Vector2Di to = vecs.get(0);
-            Vector2Di from = current_robot.getPos();
-            ArrayList<Vector2Di> path = game.fromTo(from, to);
-            ArrayList<Card> cards = AiPlayer.chooseCards(current_robot.getDir(), path, game.getActivePlayer().getHand(), 10);
-            for (Card c : cards)
-                System.out.println("   " + c);
-            ICommand cmd = CardManager.getSequenceAsCommand(cards);
-            cmd.exec(1, current_robot, game);
-        }*/
-
         // Check for sounds to play
         for (String sound : game.checkPlaySound()) {
             fxPlayer = soundNametoFile.get(sound);
@@ -594,7 +582,8 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
         map.render();
 
         try {
-            giveCards();
+            if (!ai_game)
+                giveCards();
         } catch (NoSuchResource e) {
             System.out.println(e + " in GameLoop render(), case WAITING_FOR_ROUND_START");
         }
@@ -620,6 +609,12 @@ public class GameLoop extends ApplicationAdapter implements InputProcessor, Scre
 
             case RUNNING_ROUND:
                 game.emptyHand(current_robot);
+                try {
+                    giveCards();
+                } catch (NoSuchResource e) {
+                    e.printStackTrace();
+                    SystemPanic.panic("Unable to load resource");
+                }
                 if (round != null && !round.doStep()) {
                     round = null;
                     gclient.reset();
